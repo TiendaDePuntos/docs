@@ -1,97 +1,139 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Documentación"
+description: "Todo lo que necesitás para conectar Tienda de Puntos con tu negocio."
+mode: "custom"
 ---
 
-## Setting up
+export const TopicCard = ({ eyebrow, title, description, href, icon }) => (
+  <a href={href} className="tdp-topic-card">
+    <div className="tdp-topic-icon">
+      <Icon icon={icon} size={20} />
+    </div>
+    <div className="tdp-topic-copy">
+      <span className="tdp-eyebrow">{eyebrow}</span>
+      <h2>{title}</h2>
+      <p>{description}</p>
+    </div>
+    <span className="tdp-card-arrow">→</span>
+  </a>
+);
 
-Get your documentation site up and running in minutes.
+export const PurchaseVisual = () => (
+  <div className="tdp-visual tdp-visual-points" aria-hidden="true">
+    <div className="tdp-purchase-card">
+      <div className="tdp-purchase-header">
+        <span className="tdp-avatar">MG</span>
+        <span>
+          <strong>María González</strong>
+          <small>Compra registrada</small>
+        </span>
+      </div>
+      <div className="tdp-points-row">
+        <span>+ 240</span>
+        <small>puntos acreditados</small>
+      </div>
+    </div>
+  </div>
+);
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+export const IntegrationVisual = () => (
+  <div className="tdp-visual tdp-visual-integrations" aria-hidden="true">
+    <div className="tdp-integration-node tdp-node-center">
+      <Icon icon="shopping-bag" size={26} />
+    </div>
+    <div className="tdp-connector tdp-connector-left"></div>
+    <div className="tdp-connector tdp-connector-right"></div>
+    <div className="tdp-integration-node tdp-node-left">POS</div>
+    <div className="tdp-integration-node tdp-node-right">API</div>
+  </div>
+);
 
-## Make it yours
+<div className="tdp-landing">
+  <section className="tdp-hero">
+    <span className="tdp-kicker">CENTRO DE RECURSOS</span>
+    <h1 className="tdp-hero-title">
+      Construí mejores experiencias de fidelización
+    </h1>
+    <p className="tdp-hero-subtitle">
+      Encontrá guías, integraciones y referencias técnicas para poner en marcha
+      tu programa de puntos y conectarlo con las herramientas que ya usás.
+    </p>
+    <div className="tdp-hero-actions">
+      <a className="tdp-btn-primary" href="#primeros-pasos">
+        Empezar ahora
+        <span>→</span>
+      </a>
+      <a className="tdp-btn-secondary" href="https://www.tiendadepuntos.com/blog">
+        Ver casos de éxito
+      </a>
+    </div>
+  </section>
 
-Design a docs site that looks great and empowers your users.
+  <section className="tdp-topics" id="primeros-pasos">
+    <TopicCard
+        eyebrow="PRIMEROS PASOS"
+        title="Configurá tu programa"
+        description="Definí cómo acumulan puntos tus clientes, cuándo vencen y qué recompensas pueden canjear."
+        href="#configuracion"
+        icon="sliders-horizontal"
+      />
+      <TopicCard
+        eyebrow="AUTOMATIZACIÓN"
+        title="Conectá tus sistemas"
+        description="Sincronizá ventas desde tu POS, e-commerce o ERP para acreditar puntos sin tareas manuales."
+        href="#integraciones"
+        icon="blocks"
+      />
+      <TopicCard
+        eyebrow="DESARROLLADORES"
+        title="Construí con la API"
+        description="Consultá clientes, registrá compras y gestioná movimientos desde tus propias aplicaciones."
+        href="#api"
+        icon="braces"
+      />
+  </section>
 
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
-  </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
+  <section className="tdp-feature-row" id="configuracion">
+    <div className="tdp-feature-copy">
+      <span className="tdp-eyebrow">DEL TICKET A LA RECOMPENSA</span>
+      <h2>Una experiencia simple para tu equipo y tus clientes</h2>
+      <p>
+        Registrá compras, acreditá puntos y habilitá canjes desde un único lugar.
+        Las reglas de tu programa se aplican automáticamente en cada operación.
+      </p>
+      <a className="tdp-text-link" href="#primeros-pasos">
+        Conocer la configuración <span>→</span>
+      </a>
+    </div>
+    <PurchaseVisual />
+  </section>
 
-## Create beautiful pages
+  <section className="tdp-feature-row tdp-feature-row-reverse" id="integraciones">
+    <IntegrationVisual />
+    <div className="tdp-feature-copy">
+      <span className="tdp-eyebrow">INTEGRACIONES</span>
+      <h2>Tu programa de puntos, conectado a cada venta</h2>
+      <p>
+        Integrá Tienda de Puntos con Fudo, Dragonfish, Contabilium y otras
+        plataformas para mantener clientes y movimientos siempre sincronizados.
+      </p>
+      <a className="tdp-text-link" href="#api">
+        Explorar opciones de integración <span>→</span>
+      </a>
+    </div>
+  </section>
 
-Everything you need to create world-class documentation.
-
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
-
-## Need inspiration?
-
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+  <section className="tdp-api-banner" id="api">
+    <div>
+      <span className="tdp-eyebrow">API DE TIENDA DE PUNTOS</span>
+      <h2>¿Necesitás una integración a medida?</h2>
+      <p>
+        Usá nuestra API para incorporar fidelización en tus sistemas y flujos de trabajo.
+      </p>
+    </div>
+    <a className="tdp-btn-light" href="mailto:hola@tiendadepuntos.com">
+      Hablar con el equipo
+      <span>↗</span>
+    </a>
+  </section>
+</div>
