@@ -1,0 +1,230 @@
+---
+title: "Integraciones"
+description: "Qué hace cada integración, cómo funciona y qué necesitás para configurarla."
+---
+
+# Integraciones
+
+Las integraciones conectan Tienda de Puntos con sistemas que ya usás: e-commerce, POS, ERP, WhatsApp o gift cards. La mayoría se configura desde **Configuración > Integraciones**.
+
+## Cómo leer esta guía
+
+En cada integración vas a ver:
+
+- **Para qué sirve:** qué problema resuelve.
+- **Cómo funciona:** qué automatiza.
+- **Cómo armarla:** qué pasos o datos necesitás.
+
+<Note>
+  Algunas integraciones necesitan credenciales del proveedor. Si no las tenés, pedilas al administrador del sistema externo o al soporte de Tienda de Puntos.
+</Note>
+
+## Tiendanube
+
+<img className="tdp-integration-logo" src="/images/integraciones/tiendanube.png" alt="Tiendanube" />
+
+**Para qué sirve:** conecta tu tienda online con el programa de puntos.
+
+**Cómo funciona:** cuando una orden queda pagada, Tienda de Puntos puede sumar puntos automáticamente. También permite usar productos y categorías de Tiendanube para crear premios, y generar cupones cuando un cliente canjea.
+
+**Cómo armarla:**
+
+1. Entrá a **Integraciones** y elegí **Tiendanube**.
+2. La app abre el marketplace de Tiendanube según el país del negocio.
+3. Instalá la app de Tienda de Puntos en tu tienda.
+4. Revisá que la integración quede activa y asociada a una sucursal online.
+5. Activá la opción de sumar puntos en órdenes pagas si querés automatizar ventas.
+
+## Shopify
+
+<img className="tdp-integration-logo" src="/images/integraciones/shopify.png" alt="Shopify" />
+
+**Para qué sirve:** conecta Shopify con puntos, clientes, productos y descuentos.
+
+**Cómo funciona:** las ventas pagadas pueden sumar puntos automáticamente. Si una venta se cancela o se reembolsa, el sistema puede descontar puntos. También se pueden sincronizar productos, variantes y colecciones para crear premios, y generar descuentos de Shopify al canjear.
+
+**Cómo armarla:**
+
+1. Entrá a **Integraciones** y elegí **Shopify**.
+2. Ingresá el dominio de tu tienda, por ejemplo `mitienda.myshopify.com`.
+3. Autorizá la app desde Shopify.
+4. Al volver a Tienda de Puntos, revisá el estado de éxito.
+5. En la integración podés activar opciones como sincronizar clientes o enviar puntos en órdenes pagas.
+
+## WooCommerce
+
+<img className="tdp-integration-logo" src="/images/integraciones/woocommerce.png" alt="WooCommerce" />
+
+**Para qué sirve:** conecta una tienda WooCommerce con Tienda de Puntos.
+
+**Cómo funciona:** las órdenes pagadas pueden sumar puntos. También podés usar productos y categorías de WooCommerce como base para premios, y generar cupones de WooCommerce cuando un cliente canjea puntos.
+
+**Cómo armarla:**
+
+1. Entrá a **Integraciones** y elegí **WooCommerce**.
+2. Pegá la URL de tu tienda, empezando con `https://`.
+3. Tienda de Puntos valida que la tienda responda.
+4. Autorizá la conexión desde WordPress/WooCommerce.
+5. Al editar la integración, elegí la sucursal online y las opciones de sincronización.
+
+## Odoo
+
+<img className="tdp-integration-logo" src="/images/integraciones/odoo.png" alt="Odoo" />
+
+**Para qué sirve:** conecta Odoo POS con Tienda de Puntos.
+
+**Cómo funciona:** Odoo puede enviar ventas para sumar puntos, validar cupones de Tienda de Puntos desde el punto de venta y marcar canjes como usados. La venta queda asociada a una sucursal.
+
+**Cómo armarla:**
+
+1. Desde Odoo, generá el código de vinculación con el botón de conexión a Tienda de Puntos.
+2. En Tienda de Puntos, entrá a la pantalla de pairing de Odoo.
+3. Pegá o confirmá el código.
+4. Revisá el POS detectado.
+5. Elegí la sucursal de Tienda de Puntos.
+6. Confirmá la vinculación.
+
+Si Odoo no recibe las credenciales, la pantalla permite reintentar la entrega.
+
+## Dragon Fish
+
+<img className="tdp-integration-logo" src="/images/integraciones/dragonfish.png" alt="Dragon Fish" />
+
+**Para qué sirve:** automatiza puntos desde facturas y notas de crédito de Dragon Fish.
+
+**Cómo funciona:** las facturas pueden sumar puntos y las notas de crédito pueden restarlos. También puede crear o actualizar clientes en Dragon Fish según la configuración.
+
+**Cómo armarla:**
+
+1. Entrá a **Integraciones** y elegí **Dragon Fish**.
+2. Completá nombre, URL, base de datos, ID de cliente y sucursal.
+3. Usá la acción de autenticación para obtener token de acceso y token de refresco.
+4. Definí opciones como sumar puntos al cliente, integrar recibos o actualizar datos del cliente.
+5. Guardá y luego habilitá la integración.
+
+## Fudo
+
+<img className="tdp-integration-logo" src="/images/integraciones/fudo.png" alt="Fudo" />
+
+**Para qué sirve:** suma puntos por ventas cerradas en Fudo.
+
+**Cómo funciona:** Tienda de Puntos consulta las ventas y registra puntos para los clientes asociados. Si un cliente nuevo aparece en el flujo, puede crearse también.
+
+**Cómo armarla:**
+
+1. Elegí **Fudo** en Integraciones.
+2. Cargá API Key y API Secret.
+3. Obtené el token de acceso desde la pantalla.
+4. Elegí la sucursal interna.
+5. Guardá y habilitá.
+
+## Centum
+
+<img className="tdp-integration-logo" src="/images/integraciones/centum.png" alt="Centum" />
+
+**Para qué sirve:** automatiza la suma de puntos desde ventas de Centum.
+
+**Cómo funciona:** la integración puede tomar ventas por punto de venta, vendedor o división de empresa. Cada venta se procesa una sola vez para evitar duplicados.
+
+**Cómo armarla:**
+
+1. Elegí **Centum**.
+2. Cargá URL, clave pública, ID de consumidor y usuario.
+3. Seleccioná la sucursal de Tienda de Puntos.
+4. Completá el ID del punto de venta de Centum, vendedor y división.
+5. Guardá y habilitá.
+
+## Contabilium
+
+<img className="tdp-integration-logo" src="/images/integraciones/contabilium.png" alt="Contabilium" />
+
+**Para qué sirve:** suma puntos desde comprobantes de Contabilium.
+
+**Cómo funciona:** Tienda de Puntos obtiene un token con las credenciales de Contabilium y puede mapear sucursales externas con sucursales internas.
+
+**Cómo armarla:**
+
+1. Elegí **Contabilium**.
+2. Cargá URL, Email API y API Key.
+3. Obtené el token de acceso.
+4. Buscá sucursales externas.
+5. Mapeá cada sucursal externa con una sucursal de Tienda de Puntos.
+6. Guardá y habilitá.
+
+## Dux
+
+<img className="tdp-integration-logo" src="/images/integraciones/dux.png" alt="Dux" />
+
+**Para qué sirve:** suma puntos desde facturas de Dux.
+
+**Cómo funciona:** la integración usa una API Key para buscar empresas y sucursales en Dux. Luego toma ventas desde una fecha inicial de sincronización.
+
+**Cómo armarla:**
+
+1. Elegí **Dux**.
+2. Pegá la API Key.
+3. Buscá empresas y elegí la empresa correcta.
+4. Elegí la sucursal de Dux y la sucursal de Tienda de Puntos.
+5. Definí la fecha inicial de sincronización.
+6. Probá la conexión.
+7. Guardá y habilitá.
+
+## Oh Gift Card
+
+<img className="tdp-integration-logo" src="/images/integraciones/oh-gift-card.png" alt="Oh Gift Card" />
+
+**Para qué sirve:** permite ofrecer gift cards como premios.
+
+**Cómo funciona:** cuando un cliente canjea una gift card, Tienda de Puntos puede generarla automáticamente, enviarla por email y consultar saldo disponible para emitirla.
+
+**Cómo armarla:**
+
+1. Elegí **Oh Gift Card**.
+2. Cargá el `xCatId`.
+3. Cargá el `xCatAuthKey`.
+4. Guardá la integración.
+5. Habilitala antes de ofrecer gift cards en el catálogo.
+
+## WhatsApp Lite
+
+<img className="tdp-integration-logo" src="/images/integraciones/whatsapp-lite.png" alt="WhatsApp Lite" />
+
+**Para qué sirve:** conecta una cuenta de WhatsApp para enviar notificaciones a clientes.
+
+**Cómo funciona:** la pantalla genera un QR de vinculación. El usuario escanea el QR con WhatsApp, confirma la vinculación y acepta los términos. Luego la integración puede enviar avisos de puntos, canjes o movimientos programados.
+
+**Cómo armarla:**
+
+1. Elegí **WhatsApp Lite**.
+2. Generá el QR.
+3. Escanealo desde el WhatsApp que querés usar.
+4. Confirmá la vinculación dentro de los 45 segundos.
+5. Elegí si los administradores, movimientos automáticos o sucursales específicas pueden enviar notificaciones.
+6. Aceptá los términos y guardá.
+
+<Warning>
+  WhatsApp Lite no usa la API oficial de WhatsApp. Puede tener límites o interrupciones si cambia el funcionamiento de WhatsApp.
+</Warning>
+
+## Cómo activar una integración
+
+Después de crearla, volvé a la lista de **Integraciones** y activala. Antes de habilitar, la pantalla muestra un aviso con lo que esa integración va a automatizar.
+
+También podés:
+
+- Probar la conexión.
+- Editar la configuración.
+- Deshabilitar temporalmente.
+- Eliminar una integración que ya no usás.
+
+## Señales de sincronización
+
+Las integraciones de POS y ERP suelen consultar ventas cada cierto tiempo. Las integraciones de e-commerce suelen trabajar con webhooks: el sistema externo avisa cuando ocurre una venta, producto o cambio relevante.
+
+Si una integración deja de actualizarse, revisá:
+
+- Que siga habilitada.
+- Que las credenciales no hayan vencido.
+- Que la sucursal esté bien asociada.
+- Que la última sincronización sea reciente.
+- Que el sistema externo esté funcionando.
