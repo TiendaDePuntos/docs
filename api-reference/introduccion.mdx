@@ -3,7 +3,7 @@ title: "Introducción a la API"
 description: "Conectá tu POS, ERP o e-commerce con el programa de puntos de tu comercio."
 ---
 
-La API pública te permite operar el programa de fidelidad desde tus propios sistemas: sumar puntos cuando alguien compra, consultar el saldo de un cliente, entregar canjes en el mostrador y validar cupones.
+La API pública te permite operar el programa de fidelidad desde tus propios sistemas: sumar puntos cuando alguien compra, administrar tu padrón de clientes, mantener el catálogo de premios y los niveles, y entregar canjes en el mostrador.
 
 Es la misma API que usan nuestras integraciones con Dragonfish, Fudo, Centum, Contabilium y Dux. Si tu sistema no está en la lista de [integraciones](/integraciones), esta es la vía para conectarlo.
 
@@ -29,11 +29,14 @@ Todos los endpoints públicos cuelgan de `/external`.
   <Card title="Sumar puntos" icon="plus" href="/api-reference/endpoints/puntos/sumar-puntos-a-un-cliente-por-una-compra">
     Acreditar puntos por el monto de una compra, con el cliente identificado por email o documento.
   </Card>
-  <Card title="Consultar clientes" icon="user-search" href="/api-reference/endpoints/clientes/buscar-un-cliente-por-email-o-documento">
-    Buscar un cliente y ver su saldo de puntos, nivel de actividad y estado.
+  <Card title="Administrar clientes" icon="users" href="/api-reference/endpoints/clientes/listar-clientes">
+    Listar, dar de alta, editar y dar de baja clientes, con su saldo de puntos y su nivel.
   </Card>
-  <Card title="Leer el catálogo" icon="package" href="/api-reference/endpoints/premios/listar-premios">
-    Traer los premios con su precio en puntos según el nivel, y los niveles del programa.
+  <Card title="Mantener el catálogo" icon="package" href="/api-reference/endpoints/premios/listar-premios">
+    Crear y editar premios con su precio en puntos por nivel, y controlar su stock.
+  </Card>
+  <Card title="Configurar niveles" icon="layers" href="/api-reference/endpoints/niveles/listar-niveles">
+    Armar la escalera de niveles del programa y sus multiplicadores de puntos.
   </Card>
   <Card title="Canjear premios" icon="shopping-bag" href="/api-reference/endpoints/canjes/canjear-un-premio">
     Descontar puntos y generar el canje, por un premio del catálogo o por un monto en pesos.
@@ -41,8 +44,8 @@ Todos los endpoints públicos cuelgan de `/external`.
   <Card title="Entregar canjes" icon="gift" href="/api-reference/endpoints/canjes/entregar-un-canje">
     Consultar qué premio pidió el cliente y marcarlo como entregado.
   </Card>
-  <Card title="Validar cupones" icon="ticket" href="/api-reference/endpoints/cupones/consumir-un-cupon">
-    Verificar y consumir cupones de descuento generados por un canje.
+  <Card title="Gestionar operadores" icon="id-card" href="/api-reference/endpoints/operadores/listar-operadores">
+    Dar de alta el personal del comercio y asignarle sucursales y permisos.
   </Card>
 </CardGroup>
 
@@ -97,10 +100,43 @@ La mayoría de los endpoints envuelve el resultado en una estructura común:
 ```
 
 <Warning>
-  Hay tres endpoints que **no** usan este envelope y devuelven el objeto directamente: los dos de cupones (`/external/product-coupons/*`) y los dos de consulta de canjes (`GET /external/purchase` y `GET /external/purchase/code/{code}`). Está aclarado en la ficha de cada uno.
+  Los listados paginados **no** usan este envelope: devuelven `{ data, meta, links }` en la raíz. Son `GET /external/clients`, `/external/levels`, `/external/products`, `/external/operators` y `/external/purchase`. `GET /external/purchase/code/{code}` también devuelve el objeto directamente. Está aclarado en la ficha de cada uno.
 
   Además, el campo `status` de adentro del envelope no siempre coincide con el código HTTP de la respuesta. **Guiate por el código HTTP**, no por ese campo.
 </Warning>
+
+## Listados paginados
+
+Los listados aceptan siempre los mismos parámetros: `page` (arranca en 1), `limit` (hasta 200), `query` para búsqueda parcial, y `order` + `direction` (`asc` / `desc`) para el orden. Los campos válidos de `order` cambian según el recurso y están en la ficha de cada endpoint.
+
+```json
+{
+  "data": [],
+  "meta": {
+    "totalItems": 128,
+    "itemCount": 10,
+    "itemsPerPage": 10,
+    "totalPages": 13,
+    "currentPage": 1
+  },
+  "links": { "next": "external/clients?page=2&limit=10" }
+}
+```
+
+<Tip>
+  Para recorrer un padrón completo conviene pedir `limit=200` e iterar con `page` hasta que `currentPage` llegue a `totalPages`.
+</Tip>
+
+## Escrituras: reemplazo total vs. incremental
+
+No todos los `PUT` se comportan igual, y la diferencia importa:
+
+| Endpoint | Comportamiento |
+| --- | --- |
+| `PUT /external/levels/{id}` | Reemplazo total: mandá el nivel completo |
+| `PUT /external/products/{id}` | Reemplazo total: las ofertas y categorías que no vengan se eliminan |
+| `PUT /external/clients/{id}` | Incremental: lo que no mandás queda como está |
+| `PUT /external/operators/{id}` | Incremental en los datos personales; `branches` reemplaza las asignaciones |
 
 ## Antes de empezar
 

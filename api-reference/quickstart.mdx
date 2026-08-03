@@ -52,13 +52,19 @@ Respuesta:
   "status": 200,
   "message": "Request was successful",
   "data": [
-    { "id": 1972, "name": "Sucursal Centro", "isEnabled": true },
-    { "id": 1973, "name": "Sucursal Norte", "isEnabled": true }
+    {
+      "id": 1972,
+      "name": "Sucursal Centro",
+      "isEnabled": true,
+      "branchType": "physical",
+      "ubication": "Av. Corrientes 1234, CABA"
+    },
+    { "id": 1973, "name": "Sucursal Norte", "isEnabled": true, "branchType": "physical" }
   ]
 }
 ```
 
-Guardá el `id` que corresponda en la configuración de cada caja. Es un dato que no cambia, así que alcanza con traerlo una vez.
+Guardá el `id` que corresponda en la configuración de cada caja. Es un dato que no cambia, así que alcanza con traerlo una vez. Si ya lo tenés y solo querés verificar una sucursal, `GET /external/branch/{id}` devuelve una sola.
 
 ## 2. Sumá puntos en una venta
 
@@ -312,8 +318,12 @@ Además de entregar canjes que el cliente generó en la app, podés generarlos v
 Para canjear por dinero en vez de por un premio, `POST /external/exchange/money` con `moneyAmount` y `clientId`. Si el comercio tiene un mínimo configurado y no se alcanza, devuelve `409`.
 
 <Tip>
-  Los listados (`/external/products`, `/external/levels`, `/external/purchase`) devuelven `{ data, meta, links }` en la raíz, sin el envelope. Los premios están en `data`, no en `items`.
+  Los listados (`/external/products`, `/external/levels`, `/external/clients`, `/external/operators`, `/external/purchase`) devuelven `{ data, meta, links }` en la raíz, sin el envelope. Los premios están en `data`, no en `items`.
 </Tip>
+
+## Y después
+
+Con esto el POS ya suma puntos y entrega canjes. Si además querés administrar el programa desde tu sistema —dar de alta clientes, mantener el catálogo de premios, configurar los niveles o gestionar el personal— seguí con [Administrar el programa](/api-reference/administracion).
 
 ## Antes de pasar a producción
 

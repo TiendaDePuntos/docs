@@ -1,0 +1,213 @@
+---
+title: "Administrar el programa"
+description: "Crear y mantener niveles, premios, clientes y operadores desde tu sistema."
+---
+
+Más allá de sumar puntos y entregar canjes, la API te deja administrar la configuración del programa: los niveles, el catálogo de premios, el padrón de clientes y el personal del comercio. Es lo mismo que hacés en el panel, con las mismas reglas de negocio.
+
+<Info>
+  Todos los ejemplos apuntan a `https://apidev.tiendadepuntos.com`. Estas llamadas escriben configuración real del comercio: probá contra desarrollo antes de pasar a producción.
+</Info>
+
+## El orden importa
+
+Los recursos se referencian entre sí, así que si vas a armar un programa desde cero conviene este orden:
+
+<Steps>
+  <Step title="Niveles">
+    Definen la escalera del programa. Sus `id` son los que después usás en las ofertas de cada premio.
+  </Step>
+  <Step title="Premios">
+    Cada premio necesita al menos una oferta (precio en puntos), y las ofertas se atan a un nivel.
+  </Step>
+  <Step title="Sucursales y operadores">
+    Las sucursales se crean desde el panel; los operadores se asignan a esas sucursales.
+  </Step>
+  <Step title="Clientes">
+    Se pueden dar de alta en cualquier momento; el nivel se les asigna solo, según sus puntos.
+  </Step>
+</Steps>
+
+## Niveles
+
+Un nivel se identifica por sus `minPoints`: son los puntos acumulados que un cliente necesita para alcanzarlo, y no pueden repetirse entre niveles del mismo comercio.
+
+```bash
+curl -X POST https://apidev.tiendadepuntos.com/external/levels \
+  -H "x-api-key: TU_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Nivel 2",
+    "description": "Beneficios para clientes frecuentes",
+    "minPoints": 5000,
+    "pointsMultiplier": 1.5,
+    "colors": { "primary": "#55FFFF", "secondary": "#ABFFFF", "border": "#000000" }
+  }'
+```
+
+El `pointsMultiplier` es la bonificación de puntos de ese nivel: `1.5` significa que las compras de esos clientes acreditan un 50% más. `1` es sin bonificación.
+
+<Warning>
+  Crear o eliminar un nivel reubica a los clientes según sus puntos acumulados y sincroniza las ofertas de todos los premios. Eso pasa de forma **asincrónica**: puede tardar unos segundos en reflejarse. Si justo después consultás un cliente, puede venir con el nivel viejo.
+</Warning>
+
+`PUT /external/levels/{id}` es un **reemplazo total**: mandá el nivel completo, porque los campos que omitas se sobrescriben. Un `409` significa que otro nivel ya tiene esos `minPoints`.
+
+## Premios
+
+Un premio se compone de sus datos (nombre, descripciones, imagen) más el array `offers`, que es el precio en puntos por nivel:
+
+```bash
+curl -X POST https://apidev.tiendadepuntos.com/external/products \
+  -H "x-api-key: TU_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Café gratis",
+    "shortDescription": "Café a elección",
+    "description": "Un café de especialidad a elección.",
+    "image": "https://mi-cdn.com/premios/cafe.png",
+    "offers": [
+      { "levelId": 3, "points": 500 },
+      { "levelId": 4, "points": 400 }
+    ],
+    "stock": { "controlled": true, "available": 12 },
+    "maxPurchases": 1
+  }'
+```
+
+<AccordionGroup>
+  <Accordion title="offers — el precio por nivel" defaultOpen>
+    Necesitás al menos una. Los `levelId` salen de `GET /external/levels`; una oferta **sin** `levelId` es el precio para los clientes que todavía no tienen nivel.
+
+    La respuesta devuelve cada oferta con su `productOfferId`: ese es el valor que consume `POST /external/exchange/product` para canjear.
+  </Accordion>
+  <Accordion title="stock — control de unidades">
+    Con `controlled: false` el premio no lleva control de stock y se puede canjear sin límite de unidades. Con `controlled: true`, al llegar `available` a `0` Tienda de Puntos **deshabilita el premio** automáticamente.
+  </Accordion>
+  <Accordion title="image — solo la URL">
+    Tienda de Puntos no descarga la imagen: guarda la URL que le mandes. Tiene que ser pública y estable. Si la omitís, el premio queda sin imagen.
+  </Accordion>
+  <Accordion title="maxPurchases — tope por cliente">
+    Máximo de canjes que puede hacer un mismo cliente de ese premio. Omitilo para no poner tope.
+  </Accordion>
+</AccordionGroup>
+
+### Al actualizar un premio
+
+`PUT /external/products/{id}` también es un **reemplazo total**, con dos detalles que conviene tener claros:
+
+- Las ofertas se **reconcilian por nivel**: la que ya cubría un `levelId` conserva su `productOfferId`, así que los códigos que tengas guardados siguen sirviendo. Las ofertas de niveles que no vengan en `offers` se eliminan.
+- Lo mismo con `categoryIds`: las categorías que no mandes se desasocian del premio.
+
+<Note>
+  Las opciones que la API pública no expone —mensaje post canje, restricción temporal, tope mensual de canjes, cupones de integración con Tiendanube o WooCommerce— **se conservan** como estaban. No hace falta mandarlas para no perderlas.
+
+  Si el premio usa cupones personalizados (los que se cargan uno por uno desde el panel), no mandes `stock`: ese stock lo derivan los cupones y la API responde `400`.
+</Note>
+
+## Clientes
+
+El alta por API dispara los mismos automatismos que el panel: puntos de bienvenida si el comercio los tiene configurados, asignación de nivel inicial y email de bienvenida.
+
+```bash
+curl -X POST https://apidev.tiendadepuntos.com/external/clients \
+  -H "x-api-key: TU_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "x-branch-id: 1972" \
+  -d '{
+    "firstName": "Juan Manuel",
+    "lastName": "Pérez",
+    "email": "juanma@mailinator.com",
+    "documentNumber": "40100800",
+    "phone": "+541164593678"
+  }'
+```
+
+Hace falta al menos `email` o `documentNumber`: son las claves con las que Tienda de Puntos identifica a un cliente dentro del comercio. El `x-branch-id` (o el campo `branchId`) deja registrada la sucursal de alta, que después sirve para los reportes por sucursal.
+
+<Tip>
+  Si estás sumando puntos de una venta y el cliente puede no existir, no hace falta darlo de alta antes: `POST /external/tags/add` lo crea solo con los datos que mandes en `client`.
+</Tip>
+
+A diferencia de niveles y premios, `PUT /external/clients/{id}` es **incremental**: lo que no mandás queda como está.
+
+```bash
+curl -X PUT https://apidev.tiendadepuntos.com/external/clients/84213 \
+  -H "x-api-key: TU_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "phone": "+541164593679" }'
+```
+
+<Warning>
+  El email no se puede cambiar si el cliente ya ingresó al menos una vez a la plataforma: es su credencial de acceso. Cambiar el email o el documento por uno que ya usa otro cliente del comercio devuelve `409`.
+</Warning>
+
+### Dar de baja un cliente
+
+`DELETE /external/clients/{id}` **programa** la baja, no la ejecuta en el momento. El cliente entra en un período de gracia de 30 días: deja de aparecer en la operación y, al cumplirse el plazo, sus datos personales se anonimizan de forma irreversible.
+
+```bash
+curl -X DELETE https://apidev.tiendadepuntos.com/external/clients/84213 \
+  -H "x-api-key: TU_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "reasons": ["REQUESTED_BY_CLIENT"] }'
+```
+
+Los motivos son obligatorios y quedan en el registro de auditoría de la baja. Valores posibles: `REQUESTED_BY_CLIENT`, `DUPLICATE_CLIENT`, `INCORRECT_EMAIL`, `OTHER`.
+
+<Note>
+  Para revertir una baja dentro del período de gracia hay que restaurar al cliente desde el panel. La API no expone la restauración.
+
+  Si lo que querés es que el cliente deje de acumular sin borrarlo, usá `PUT /external/clients/{id}/status` con `SUSPEND`.
+</Note>
+
+## Operadores
+
+Los operadores son las personas del comercio que usan el panel y la app de caja.
+
+```bash
+curl -X POST https://apidev.tiendadepuntos.com/external/operators \
+  -H "x-api-key: TU_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firstName": "Ana",
+    "lastName": "Gómez",
+    "email": "ana@micomercio.com",
+    "branches": [
+      { "branchId": 1972, "permissionGroupId": 12 }
+    ]
+  }'
+```
+
+Si mandás `password`, el operador ya puede ingresar; si la omitís, recibe un email para definirla él mismo.
+
+<Note>
+  Los **grupos de permisos** se crean desde el panel y la API no los expone como recurso propio. Para saber qué `permissionGroupId` usar, mirá el campo `branches` de un operador ya configurado con `GET /external/operators/{id}`.
+
+  Si omitís `permissionGroupId`, el operador queda creado pero sin permisos hasta que se le asigne un grupo desde el panel.
+</Note>
+
+En el `PUT` los datos personales son incrementales, pero si mandás `branches` **se reemplazan todas** las asignaciones del operador por las que envíes. El email, la contraseña y el documento no se editan por esta vía.
+
+<Warning>
+  El plan del comercio puede tener un tope de operadores. Si está alcanzado, el alta responde `400` con el motivo.
+</Warning>
+
+## Qué no se puede hacer por API
+
+<AccordionGroup>
+  <Accordion title="Crear o editar sucursales">
+    Las sucursales se administran desde el panel: el alta genera el QR de registro y valida el tope del plan. La API solo las lee (`GET /external/branch` y `GET /external/branch/{id}`).
+  </Accordion>
+  <Accordion title="Crear grupos de permisos">
+    Se definen en el panel, permiso por permiso. La API los referencia por `id` pero no los crea.
+  </Accordion>
+  <Accordion title="Marcar un canje como entregado en un solo paso">
+    Registrar una entrega requiere identificar al operador que la hizo, y una API key representa a un sistema, no a una persona. Siempre son dos pasos: generar el canje y después `redeem`.
+  </Accordion>
+  <Accordion title="Restaurar un cliente dado de baja">
+    La restauración dentro del período de gracia se hace desde el panel.
+  </Accordion>
+</AccordionGroup>
+
+¿Necesitás algo que no está acá? Escribinos a [hola@tiendadepuntos.com](mailto:hola@tiendadepuntos.com).
