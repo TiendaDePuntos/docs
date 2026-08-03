@@ -28,7 +28,14 @@
   --tdp-purchase-muted: #777482;
 }
 
-:where(html.dark, body.dark, [data-theme="dark"], [data-mode="dark"], .dark) {
+/* Sin `:where()`: ese selector tiene especificidad 0 y `:root` (0,1,0) le ganaba,
+   así que en tema oscuro el fondo se quedaba en blanco con el texto claro de
+   Mintlify encima. Estos selectores sí pisan a `:root`. */
+html.dark,
+body.dark,
+[data-theme="dark"],
+[data-mode="dark"],
+.dark {
   --tdp-page-bg: #0f1014;
   --tdp-primary: #5b53f0;
   --tdp-primary-hover: #4a42d9;

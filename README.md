@@ -1,43 +1,34 @@
-# Mintlify Starter Kit
+# Documentación de Tienda de Puntos
 
-Use the starter kit to get your docs deployed and ready to customize.
+Documentación pública de [Tienda de Puntos](https://www.tiendadepuntos.com): guías del panel, referencia de la API y catálogo de integraciones. Corre sobre [Mintlify](https://mintlify.com/docs) y se publica automáticamente al pushear a `main`.
 
-Click the green **Use this template** button at the top of this repo to copy the Mintlify starter kit. The starter kit contains examples with
+## Estructura
 
-- Guide pages
-- Navigation
-- Customizations
-- API reference pages
-- Use of popular components
+| Ruta | Qué es |
+| --- | --- |
+| `docs.json` | Navegación, colores, logos y footer del sitio |
+| `index.mdx` | Tab de ayuda |
+| `documentacion.mdx`, `primeros-pasos.mdx`, `pantallas-principales.mdx` | Guías del panel |
+| `api-reference/` | Referencia de la API pública ([ver README](api-reference/README.md)) |
+| `integraciones.mdx` | Catálogo de integraciones con POS, ERP y e-commerce |
+| `style.css` | Overrides de estilo |
+| `logo/`, `images/`, `favicon.png` | Assets |
 
-**[Follow the full quickstart guide](https://starter.mintlify.com/quickstart)**
+El `api-reference/openapi.json` **es un archivo generado** desde los controllers `/external` del backend: no lo edites a mano. Está explicado en [api-reference/README.md](api-reference/README.md).
 
-## Development
+## Desarrollo
 
-Install the [Mintlify CLI](https://www.npmjs.com/package/mint) to preview your documentation changes locally. To install, use the following command:
-
-```
-npm i -g mint
-```
-
-Run the following command at the root of your documentation, where your `docs.json` is located:
-
-```
-mint dev
+```bash
+npx mint@latest dev        # preview en http://localhost:3000
+npx mint@latest validate   # valida docs.json, MDX y OpenAPI
 ```
 
-View your local preview at `http://localhost:3000`.
+Si `mint dev` no arranca, corré `npx mint@latest update` para actualizar la CLI. Si una página da 404, chequeá que esté listada en el `docs.json`.
 
-## Publishing changes
+## Publicar cambios
 
-Install our GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app) to propagate changes from your repo to your deployment. Changes are deployed to production automatically after pushing to the default branch.
+Los cambios en `main` se despliegan solos vía la [GitHub app de Mintlify](https://dashboard.mintlify.com/settings/organization/github-app).
 
-## Need help?
+## Assets de marca
 
-### Troubleshooting
-
-- If your dev environment isn't running: Run `mint update` to ensure you have the most recent version of the CLI.
-- If a page loads as a 404: Make sure you are running in a folder with a valid `docs.json`.
-
-### Resources
-- [Mintlify documentation](https://mintlify.com/docs)
+Los logos salen de `tdp-webapp/src/assets/icons/logo_completo.png`. `logo/light.png` usa el wordmark en el violeta de marca (`#5b53f1`) y `logo/dark.png` la variante en blanco para el tema oscuro; los dos comparten el ícono. Si cambia la marca, hay que actualizar los dos.

@@ -19,9 +19,10 @@ Si querés cambiar la descripción de un endpoint, sus parámetros o sus ejemplo
 
 | Archivo | Qué es |
 | --- | --- |
-| `introduccion.mdx` | Panorama de la API, URL base, formato de respuestas |
+| `introduccion.mdx` | Panorama de la API, URL base, formato de respuestas, paginación |
 | `autenticacion.mdx` | API key, header `x-branch-id`, errores de auth |
 | `quickstart.mdx` | Guía paso a paso para integrar un POS |
+| `administracion.mdx` | CRUD de niveles, premios, clientes y operadores |
 | `errores.mdx` | Códigos de error, idempotencia, rate limits |
 
 Las páginas de cada endpoint las genera Mintlify desde el spec: no existen como archivos.
