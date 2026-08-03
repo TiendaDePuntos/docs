@@ -1,0 +1,4963 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/external/clients/search": {
+      "get": {
+        "description": "Busca un único cliente del comercio por email exacto o por número de documento exacto. No hace búsqueda parcial. Si no encuentra al cliente devuelve 404 con el mensaje `Client not found`.",
+        "operationId": "ExternalClientController_search",
+        "parameters": [
+          {
+            "name": "query",
+            "required": true,
+            "in": "query",
+            "description": "Email o número de documento del cliente.",
+            "schema": {
+              "type": "string",
+              "example": "juanma@mailinator.com"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cliente encontrado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExternalClientOutputDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api Key is required"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Buscar un cliente por email o documento",
+        "tags": [
+          "Clientes"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/clientes/buscar-un-cliente-por-email-o-documento",
+          "metadata": {
+            "title": "Buscar un cliente por email o documento",
+            "sidebarTitle": "Buscar un cliente por email o documento"
+          }
+        }
+      }
+    },
+    "/external/clients/{id}/status": {
+      "put": {
+        "description": "Activa o suspende a un cliente del programa de fidelidad. Un cliente suspendido no acumula ni canjea puntos. Al suspender (`SUSPEND`) el campo `reason` es obligatorio.",
+        "operationId": "ExternalClientController_updateClientStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID del cliente en Tienda de Puntos.",
+            "schema": {
+              "type": "integer",
+              "example": 84213
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateClientStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cliente actualizado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 84213
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "ACTIVE",
+                            "SUSPEND"
+                          ],
+                          "example": "SUSPEND"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api Key is required"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Cambiar el estado de un cliente",
+        "tags": [
+          "Clientes"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/clientes/cambiar-el-estado-de-un-cliente",
+          "metadata": {
+            "title": "Cambiar el estado de un cliente",
+            "sidebarTitle": "Cambiar el estado de un cliente"
+          }
+        }
+      }
+    },
+    "/external/branch": {
+      "get": {
+        "description": "Devuelve todas las sucursales del comercio dueño de la API key. El `id` de cada sucursal es el que se usa después en el header `x-branch-id` y en el campo `branch_id` al sumar puntos.",
+        "operationId": "ExternalBranchController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Listado de sucursales del comercio.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 1972
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "Sucursal Centro"
+                          },
+                          "isEnabled": {
+                            "type": "boolean",
+                            "example": true
+                          },
+                          "emailOfBranch": {
+                            "type": "string",
+                            "nullable": true,
+                            "example": "centro@micomercio.com"
+                          },
+                          "phoneOfBranch": {
+                            "type": "string",
+                            "nullable": true,
+                            "example": "+541164593678"
+                          },
+                          "ubication": {
+                            "type": "string",
+                            "nullable": true,
+                            "example": "Av. Corrientes 1234, CABA"
+                          },
+                          "websiteUrl": {
+                            "type": "string",
+                            "nullable": true,
+                            "example": null
+                          },
+                          "ubicationUrl": {
+                            "type": "string",
+                            "nullable": true,
+                            "example": null
+                          },
+                          "registerQrUrl": {
+                            "type": "string",
+                            "nullable": true,
+                            "example": null
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "example": "2026-02-14T12:30:00.000Z"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "example": "2026-06-01T09:15:00.000Z"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api Key is required"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Listar sucursales",
+        "tags": [
+          "Sucursales"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/sucursales/listar-sucursales",
+          "metadata": {
+            "title": "Listar sucursales",
+            "sidebarTitle": "Listar sucursales"
+          }
+        }
+      }
+    },
+    "/external/product-coupons/consume": {
+      "post": {
+        "description": "Valida el cupón y lo marca como usado en una sola operación. Es la llamada que hace el e-commerce o el POS al aplicar el descuento.\n\nLa operación es de un solo uso: un segundo intento con el mismo código devuelve 400 con `error_code: COUPON_ALREADY_USED`.\n\n**Atención**: estos endpoints no usan el envelope `{ success, status, message, data }`. Devuelven el objeto de resultado plano, tanto en 200 como en 400.",
+        "operationId": "ExternalProductCouponController_consumeCoupon",
+        "parameters": [
+          {
+            "name": "x-branch-id",
+            "in": "header",
+            "description": "ID de la sucursal en la que se registra la operación. Si se omite, la operación queda asociada al comercio sin sucursal.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 1972
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsumeExternalProductCouponDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cupón válido y consumido.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "valid": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "consumed": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Cupon consumido correctamente."
+                    },
+                    "discount_info": {
+                      "type": "object",
+                      "properties": {
+                        "coupon_id": {
+                          "type": "integer",
+                          "example": 3312
+                        },
+                        "product_id": {
+                          "type": "integer",
+                          "example": 771
+                        },
+                        "coupon_code": {
+                          "type": "string",
+                          "example": "TDP-4F2A-9K1B"
+                        },
+                        "type": {
+                          "type": "string",
+                          "example": "product_coupon"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cupón no existe, ya fue usado o está vencido. El campo `error_code` distingue el caso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "valid": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "consumed": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error_code": {
+                      "type": "string",
+                      "enum": [
+                        "COUPON_NOT_FOUND",
+                        "COUPON_ALREADY_USED",
+                        "COUPON_EXPIRED"
+                      ],
+                      "example": "COUPON_ALREADY_USED"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "El cupon ya fue utilizado."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api Key is required"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Consumir un cupón",
+        "tags": [
+          "Cupones"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/cupones/consumir-un-cupon",
+          "metadata": {
+            "title": "Consumir un cupón",
+            "sidebarTitle": "Consumir un cupón"
+          }
+        }
+      }
+    },
+    "/external/product-coupons/validate": {
+      "post": {
+        "description": "Chequea si el cupón existe, está habilitado y no venció, sin marcarlo como usado. Sirve para mostrar el descuento en el carrito antes de confirmar la compra.\n\nLa respuesta trae siempre `consumed: false`.\n\n**Atención**: no usa el envelope `{ success, status, message, data }`.",
+        "operationId": "ExternalProductCouponController_validateCoupon",
+        "parameters": [
+          {
+            "name": "x-branch-id",
+            "in": "header",
+            "description": "ID de la sucursal en la que se registra la operación. Si se omite, la operación queda asociada al comercio sin sucursal.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 1972
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsumeExternalProductCouponDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cupón válido y disponible para consumir.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "valid": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "consumed": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Cupon consumido correctamente."
+                    },
+                    "discount_info": {
+                      "type": "object",
+                      "properties": {
+                        "coupon_id": {
+                          "type": "integer",
+                          "example": 3312
+                        },
+                        "product_id": {
+                          "type": "integer",
+                          "example": 771
+                        },
+                        "coupon_code": {
+                          "type": "string",
+                          "example": "TDP-4F2A-9K1B"
+                        },
+                        "type": {
+                          "type": "string",
+                          "example": "product_coupon"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cupón no existe, ya fue usado o está vencido.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "valid": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "consumed": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "error_code": {
+                      "type": "string",
+                      "enum": [
+                        "COUPON_NOT_FOUND",
+                        "COUPON_ALREADY_USED",
+                        "COUPON_EXPIRED"
+                      ],
+                      "example": "COUPON_ALREADY_USED"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "El cupon ya fue utilizado."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api Key is required"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Validar un cupón sin consumirlo",
+        "tags": [
+          "Cupones"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/cupones/validar-un-cupon-sin-consumirlo",
+          "metadata": {
+            "title": "Validar un cupón sin consumirlo",
+            "sidebarTitle": "Validar un cupón sin consumirlo"
+          }
+        }
+      }
+    },
+    "/external/products": {
+      "get": {
+        "description": "Devuelve el catálogo de premios del comercio, paginado.\n\nCada premio trae un array `offers` con el precio en puntos según el nivel del cliente. El `productOfferId` de la oferta que corresponda es lo que después mandás a `POST /external/exchange/product`.\n\nSi enviás el header `x-branch-id`, se excluyen los premios que están limitados a otras sucursales.\n\n**Atención**: este endpoint devuelve `{ data, meta, links }` en la raíz, sin el envelope `{ success, status, message, data }`.",
+        "operationId": "ExternalProductCatalogController_findAll",
+        "parameters": [
+          {
+            "name": "order",
+            "required": false,
+            "in": "query",
+            "description": "Campo por el que ordenar.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "name",
+                "stock",
+                "createdAt",
+                "points"
+              ]
+            }
+          },
+          {
+            "name": "levelId",
+            "required": false,
+            "in": "query",
+            "description": "Devuelve solo los premios que tengan una oferta para este nivel. Los IDs salen de `GET /external/levels`.",
+            "schema": {
+              "example": 3,
+              "type": "number"
+            }
+          },
+          {
+            "name": "isEnabled",
+            "required": false,
+            "in": "query",
+            "description": "Filtra por premios habilitados. Si vas a mostrar el catálogo a un cliente, usá `true`: los deshabilitados no son canjeables desde la API.",
+            "schema": {
+              "example": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "x-branch-id",
+            "in": "header",
+            "description": "ID de la sucursal en la que se registra la operación. Si se omite, la operación queda asociada al comercio sin sucursal.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 1972
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "example": 1
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Cantidad de resultados por página. Máximo 200.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 10,
+              "example": 10
+            }
+          },
+          {
+            "name": "query",
+            "required": false,
+            "in": "query",
+            "description": "Búsqueda parcial por nombre.",
+            "schema": {
+              "type": "string",
+              "example": "café"
+            }
+          },
+          {
+            "name": "direction",
+            "required": false,
+            "in": "query",
+            "description": "Sentido del orden. Solo aplica si se envía `order`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Página de premios. Sin envelope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ExternalProductOutputDto"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "totalItems": {
+                          "type": "integer",
+                          "example": 128
+                        },
+                        "itemCount": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "itemsPerPage": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "totalPages": {
+                          "type": "integer",
+                          "example": 13
+                        },
+                        "currentPage": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "from": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "to": {
+                          "type": "integer",
+                          "example": 10
+                        }
+                      }
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "first": {
+                          "type": "string",
+                          "example": "external/products?page=1&limit=10"
+                        },
+                        "previous": {
+                          "type": "string",
+                          "nullable": true,
+                          "example": null
+                        },
+                        "next": {
+                          "type": "string",
+                          "nullable": true,
+                          "example": "external/products?page=2&limit=10"
+                        },
+                        "last": {
+                          "type": "string",
+                          "example": "external/products?page=13&limit=10"
+                        },
+                        "path": {
+                          "type": "string",
+                          "example": "external/products"
+                        },
+                        "firstPageUrl": {
+                          "type": "string",
+                          "example": "external/products?page=1&limit=10"
+                        },
+                        "lastPageUrl": {
+                          "type": "string",
+                          "example": "external/products?page=13&limit=10"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api Key is required"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Listar premios",
+        "tags": [
+          "Premios"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/premios/listar-premios",
+          "metadata": {
+            "title": "Listar premios",
+            "sidebarTitle": "Listar premios"
+          }
+        }
+      }
+    },
+    "/external/levels": {
+      "get": {
+        "description": "Devuelve los niveles del programa de fidelidad del comercio, paginados y ordenados por puntos mínimos ascendente.\n\nEl `id` de cada nivel sirve para filtrar el catálogo de premios con `GET /external/products?levelId=`, y aparece en el array `offers` de cada premio indicando cuántos puntos cuesta para ese nivel.\n\n**Atención**: este endpoint devuelve `{ data, meta, links }` en la raíz, sin el envelope `{ success, status, message, data }`.",
+        "operationId": "ExternalLevelController_findAll",
+        "parameters": [
+          {
+            "name": "order",
+            "required": false,
+            "in": "query",
+            "description": "Campo por el que ordenar.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "name",
+                "minPoints",
+                "createdAt"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "example": 1
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Cantidad de resultados por página. Máximo 200.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 10,
+              "example": 10
+            }
+          },
+          {
+            "name": "query",
+            "required": false,
+            "in": "query",
+            "description": "Búsqueda parcial por nombre.",
+            "schema": {
+              "type": "string",
+              "example": "café"
+            }
+          },
+          {
+            "name": "direction",
+            "required": false,
+            "in": "query",
+            "description": "Sentido del orden. Solo aplica si se envía `order`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Página de niveles. Sin envelope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ExternalLevelOutputDto"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "totalItems": {
+                          "type": "integer",
+                          "example": 128
+                        },
+                        "itemCount": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "itemsPerPage": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "totalPages": {
+                          "type": "integer",
+                          "example": 13
+                        },
+                        "currentPage": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "from": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "to": {
+                          "type": "integer",
+                          "example": 10
+                        }
+                      }
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "first": {
+                          "type": "string",
+                          "example": "external/levels?page=1&limit=10"
+                        },
+                        "previous": {
+                          "type": "string",
+                          "nullable": true,
+                          "example": null
+                        },
+                        "next": {
+                          "type": "string",
+                          "nullable": true,
+                          "example": "external/levels?page=2&limit=10"
+                        },
+                        "last": {
+                          "type": "string",
+                          "example": "external/levels?page=13&limit=10"
+                        },
+                        "path": {
+                          "type": "string",
+                          "example": "external/levels"
+                        },
+                        "firstPageUrl": {
+                          "type": "string",
+                          "example": "external/levels?page=1&limit=10"
+                        },
+                        "lastPageUrl": {
+                          "type": "string",
+                          "example": "external/levels?page=13&limit=10"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api Key is required"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Listar niveles",
+        "tags": [
+          "Niveles"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/niveles/listar-niveles",
+          "metadata": {
+            "title": "Listar niveles",
+            "sidebarTitle": "Listar niveles"
+          }
+        }
+      }
+    },
+    "/external/tags": {
+      "post": {
+        "description": "Genera una oferta de puntos que el cliente reclama después. Según el `type`:\n\n- `qr-fixed` / `qr-variable`: devuelve la imagen del QR y la URL de reclamo.\n- `email`: envía la oferta al `email` indicado.\n\nLos tipos restantes del enum no están soportados por este endpoint y devuelven `data: null`. A diferencia de `POST /external/tags/add`, acá los puntos todavía no se acreditan: quedan pendientes hasta que el cliente reclama la oferta.",
+        "operationId": "ExternalTagsController_createPointOffer",
+        "parameters": [
+          {
+            "name": "x-branch-id",
+            "in": "header",
+            "description": "ID de la sucursal en la que se registra la operación. Si se omite, la operación queda asociada al comercio sin sucursal.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 1972
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExternalPointOfferDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Oferta creada. El envelope trae `status: 200` aunque el código HTTP sea 201.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 201
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true,
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 55231
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "9f8b1c2d-4e5a-6b7c-8d9e-0f1a2b3c4d5e"
+                        },
+                        "pointsToGive": {
+                          "type": "integer",
+                          "example": 55
+                        },
+                        "image": {
+                          "type": "string",
+                          "description": "URL de la imagen del QR. Solo para ofertas de tipo QR.",
+                          "example": "https://puntos-qrs.s3.amazonaws.com/9f8b1c2d.png"
+                        },
+                        "url": {
+                          "type": "string",
+                          "description": "URL que reclama la oferta.",
+                          "example": "https://mi.tiendadepuntos.com/reclamar/9f8b1c2d"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api Key is required"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Crear una oferta de puntos (QR o email)",
+        "tags": [
+          "Puntos"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/puntos/crear-una-oferta-de-puntos-qr-o-email",
+          "metadata": {
+            "title": "Crear una oferta de puntos (QR o email)",
+            "sidebarTitle": "Crear una oferta de puntos (QR o email)"
+          }
+        }
+      }
+    },
+    "/external/tags/{id}": {
+      "put": {
+        "description": "Cambia el monto en pesos de una oferta QR ya creada y la deja en estado activo. Se usa típicamente en QR variables de caja, donde el mismo QR se reutiliza y se le actualiza el importe en cada venta.",
+        "operationId": "ExternalTagsController_updateQrPointOffer",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID de la oferta de puntos devuelto al crearla.",
+            "schema": {
+              "type": "integer",
+              "example": 55231
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateExternalQrPointOfferDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Oferta actualizada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 55231
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Compra de $50"
+                        },
+                        "status": {
+                          "type": "string",
+                          "example": "active"
+                        },
+                        "url": {
+                          "type": "string",
+                          "example": "https://mi.tiendadepuntos.com/reclamar/9f8b1c2d"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api Key is required"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Actualizar el monto de una oferta QR",
+        "tags": [
+          "Puntos"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/puntos/actualizar-el-monto-de-una-oferta-qr",
+          "metadata": {
+            "title": "Actualizar el monto de una oferta QR",
+            "sidebarTitle": "Actualizar el monto de una oferta QR"
+          }
+        }
+      }
+    },
+    "/external/tags/add": {
+      "post": {
+        "description": "Acredita puntos de forma inmediata a partir del monto de una compra. Es el endpoint principal para integrar un POS o ERP.\n\nEl cliente se identifica por `email` o `dni`. Si no existe, se crea automáticamente, salvo que se mande `ignoreCreateClient: true`.\n\n**Idempotencia**: mandá siempre `external_id` con el identificador de la venta en tu sistema (número de factura, id de ticket). Si llega un `external_id` que ya tiene una operación activa, la API responde 409 en vez de duplicar los puntos. Ese mismo `external_id` es el que se usa para cancelar la operación después.",
+        "operationId": "ExternalTagsController_createPointOperation",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExternalDirectSumRegisterClientDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Puntos acreditados.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 201
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "pointOperationId": {
+                          "type": "integer",
+                          "example": 998877
+                        },
+                        "clientId": {
+                          "type": "integer",
+                          "example": 84213
+                        },
+                        "points": {
+                          "type": "object",
+                          "properties": {
+                            "amount": {
+                              "type": "number",
+                              "example": 50
+                            },
+                            "totalPointsToGive": {
+                              "type": "integer",
+                              "example": 55
+                            },
+                            "initialPointsToGive": {
+                              "type": "integer",
+                              "example": 50
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "El `branch_id` enviado no pertenece al comercio de la API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 403
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Branch with id 1972 does not belong to business with id 42"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api Key is required"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Ya existe una operación activa con ese `external_id` para este comercio.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 409
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Ya existe una operación de puntos con el externalId FAC-A-0001-00012345 para este negocio"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Sumar puntos a un cliente por una compra",
+        "tags": [
+          "Puntos"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/puntos/sumar-puntos-a-un-cliente-por-una-compra",
+          "metadata": {
+            "title": "Sumar puntos a un cliente por una compra",
+            "sidebarTitle": "Sumar puntos a un cliente por una compra"
+          }
+        }
+      }
+    },
+    "/external/tags/cancel/{externalId}": {
+      "put": {
+        "description": "Revierte una operación de puntos identificada por el `external_id` con el que se creó. Se usa cuando se anula la venta en el sistema de origen. Descuenta los puntos que se habían acreditado.",
+        "operationId": "ExternalTagsController_cancelPointOperation",
+        "parameters": [
+          {
+            "name": "externalId",
+            "required": true,
+            "in": "path",
+            "description": "El `external_id` con el que se registró la suma de puntos.",
+            "schema": {
+              "type": "string",
+              "example": "FAC-A-0001-00012345"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación cancelada. El envelope trae `status: 201` aunque el código HTTP sea 200.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "pointOperationId": {
+                          "type": "integer",
+                          "example": 998877
+                        },
+                        "clientId": {
+                          "type": "integer",
+                          "example": 84213
+                        },
+                        "points": {
+                          "type": "object",
+                          "properties": {
+                            "amount": {
+                              "type": "number",
+                              "example": 50
+                            },
+                            "totalPointsToGive": {
+                              "type": "integer",
+                              "example": 55
+                            },
+                            "initialPointsToGive": {
+                              "type": "integer",
+                              "example": 50
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No hay ninguna operación activa con ese `external_id`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "PointOperation with externalId FAC-A-0001-00012345 not found"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Cancelar una suma de puntos",
+        "tags": [
+          "Puntos"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/puntos/cancelar-una-suma-de-puntos",
+          "metadata": {
+            "title": "Cancelar una suma de puntos",
+            "sidebarTitle": "Cancelar una suma de puntos"
+          }
+        }
+      }
+    },
+    "/external/validation-code/qrs": {
+      "get": {
+        "description": "Devuelve los QR activos del comercio que tienen habilitado el código de validación rotativo. El `validationWindowSeconds` de cada QR indica cada cuántos segundos rota su código, y sirve para decidir la frecuencia de polling.",
+        "operationId": "ExternalValidationCodeController_listPollingQrs",
+        "parameters": [
+          {
+            "name": "branchId",
+            "required": false,
+            "in": "query",
+            "description": "Filtrar por sucursal",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "QRs con código de validación habilitado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PollingQrListItemDto"
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api Key is required"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit por comercio: 5 requests por minuto por cada sucursal (mínimo 5). La respuesta incluye los headers `X-RateLimit-Limit` y `X-RateLimit-Remaining`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 429
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Rate limit excedido. Intente más tarde."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Listar QRs con código de validación",
+        "tags": [
+          "Códigos de validación"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/codigos-de-validacion/listar-qrs-con-codigo-de-validacion",
+          "metadata": {
+            "title": "Listar QRs con código de validación",
+            "sidebarTitle": "Listar QRs con código de validación"
+          }
+        }
+      }
+    },
+    "/external/validation-code/{qrId}/current": {
+      "get": {
+        "description": "Devuelve el código de 4 dígitos que está vigente en este momento para el QR, junto con los segundos que le quedan de vida. Se usa para mostrarlo en la pantalla de la caja y que el cliente lo compare con el que ve en su celular.",
+        "operationId": "ExternalValidationCodeController_getCurrentCode",
+        "parameters": [
+          {
+            "name": "qrId",
+            "required": true,
+            "in": "path",
+            "description": "ID del QR",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Código vigente del QR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ValidationCodeResponseDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api Key is required"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit por comercio: 5 requests por minuto por cada sucursal (mínimo 5).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 429
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Rate limit excedido. Intente más tarde."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Obtener el código vigente de un QR",
+        "tags": [
+          "Códigos de validación"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/codigos-de-validacion/obtener-el-codigo-vigente-de-un-qr",
+          "metadata": {
+            "title": "Obtener el código vigente de un QR",
+            "sidebarTitle": "Obtener el código vigente de un QR"
+          }
+        }
+      }
+    },
+    "/external/validation-code/{qrId}/validate": {
+      "post": {
+        "description": "Verifica el código de 4 dígitos que el cliente dice tener en pantalla. Acepta el código de la ventana actual y, durante los primeros 5 segundos de una ventana nueva, también el de la anterior, para no penalizar a quien tipea justo en el cambio.\n\nSi el código no coincide devuelve 400.",
+        "operationId": "ExternalValidationCodeController_validateCode",
+        "parameters": [
+          {
+            "name": "qrId",
+            "required": true,
+            "in": "path",
+            "description": "ID del QR",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateCodeInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "El código es correcto. El envelope trae `status: 200` aunque el código HTTP sea 201.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 201
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "valid": {
+                          "type": "boolean",
+                          "example": true
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api Key is required"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit fijo de 10 intentos por minuto por comercio, para frenar fuerza bruta sobre un código de 4 dígitos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 429
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Rate limit excedido. Intente más tarde."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Validar el código ingresado por el cliente",
+        "tags": [
+          "Códigos de validación"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/codigos-de-validacion/validar-el-codigo-ingresado-por-el-cliente",
+          "metadata": {
+            "title": "Validar el código ingresado por el cliente",
+            "sidebarTitle": "Validar el código ingresado por el cliente"
+          }
+        }
+      }
+    },
+    "/external/purchase": {
+      "get": {
+        "description": "Devuelve los canjes del comercio, paginados y ordenados por fecha. Si no se envían `startDate` y `endDate`, toma el último mes.\n\n**Atención**: a diferencia del resto de la API, este endpoint devuelve el objeto de paginación directamente, sin el envelope `{ success, status, message, data }`.",
+        "operationId": "ExternalPurchaseController_findAll",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "example": 1
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 15,
+              "example": 15
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Fecha de inicio (ISO 8601). Por defecto, un mes atrás.",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2026-07-01T00:00:00.000Z"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Fecha de fin (ISO 8601). Por defecto, ahora.",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2026-07-31T23:59:59.000Z"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "description": "Orden por fecha de creación.",
+            "schema": {
+              "enum": [
+                "ASC",
+                "DESC"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Página de canjes. Sin envelope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 45012
+                          },
+                          "code": {
+                            "type": "string",
+                            "example": "A1B2C3"
+                          },
+                          "points": {
+                            "type": "integer",
+                            "example": 500
+                          },
+                          "status": {
+                            "type": "string",
+                            "example": "PENDING"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "example": "2026-07-28T18:05:00.000Z"
+                          },
+                          "redeemedAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "nullable": true,
+                            "example": "2026-07-29T10:12:00.000Z"
+                          },
+                          "product": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "integer",
+                                "example": 771
+                              },
+                              "name": {
+                                "type": "string",
+                                "example": "Café gratis"
+                              },
+                              "points": {
+                                "type": "integer",
+                                "example": 500
+                              }
+                            }
+                          },
+                          "client": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "integer",
+                                "example": 84213
+                              },
+                              "firstName": {
+                                "type": "string",
+                                "example": "Juan Manuel"
+                              },
+                              "lastName": {
+                                "type": "string",
+                                "example": "Pérez"
+                              },
+                              "email": {
+                                "type": "string",
+                                "example": "juanma@mailinator.com"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "totalItems": {
+                          "type": "integer",
+                          "example": 128
+                        },
+                        "itemCount": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "itemsPerPage": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "totalPages": {
+                          "type": "integer",
+                          "example": 13
+                        },
+                        "currentPage": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "from": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "to": {
+                          "type": "integer",
+                          "example": 10
+                        }
+                      }
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "first": {
+                          "type": "string",
+                          "example": "external/purchase?page=1&limit=10"
+                        },
+                        "previous": {
+                          "type": "string",
+                          "nullable": true,
+                          "example": null
+                        },
+                        "next": {
+                          "type": "string",
+                          "nullable": true,
+                          "example": "external/purchase?page=2&limit=10"
+                        },
+                        "last": {
+                          "type": "string",
+                          "example": "external/purchase?page=13&limit=10"
+                        },
+                        "path": {
+                          "type": "string",
+                          "example": "external/purchase"
+                        },
+                        "firstPageUrl": {
+                          "type": "string",
+                          "example": "external/purchase?page=1&limit=10"
+                        },
+                        "lastPageUrl": {
+                          "type": "string",
+                          "example": "external/purchase?page=13&limit=10"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api Key is required"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Listar canjes",
+        "tags": [
+          "Canjes"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/canjes/listar-canjes",
+          "metadata": {
+            "title": "Listar canjes",
+            "sidebarTitle": "Listar canjes"
+          }
+        }
+      }
+    },
+    "/external/purchase/redeem/{code}": {
+      "post": {
+        "description": "Marca el canje como entregado. Es el paso que se ejecuta en el mostrador cuando el cliente presenta su código y se le da el producto.\n\nAntes de llamar acá, usá `GET /external/purchase/code/{code}` para mostrarle al operador qué producto tiene que entregar.",
+        "operationId": "ExternalPurchaseController_redeem",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "description": "Código del canje que presenta el cliente.",
+            "schema": {
+              "type": "string",
+              "example": "A1B2C3"
+            }
+          },
+          {
+            "name": "x-branch-id",
+            "in": "header",
+            "description": "ID de la sucursal en la que se registra la operación. Si se omite, la operación queda asociada al comercio sin sucursal.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 1972
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Canje entregado. El envelope trae `status: 200` aunque el código HTTP sea 201.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 201
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 45012
+                        },
+                        "code": {
+                          "type": "string",
+                          "example": "A1B2C3"
+                        },
+                        "points": {
+                          "type": "integer",
+                          "example": 500
+                        },
+                        "status": {
+                          "type": "string",
+                          "example": "PENDING"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "example": "2026-07-28T18:05:00.000Z"
+                        },
+                        "redeemedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "nullable": true,
+                          "example": "2026-07-29T10:12:00.000Z"
+                        },
+                        "product": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer",
+                              "example": 771
+                            },
+                            "name": {
+                              "type": "string",
+                              "example": "Café gratis"
+                            },
+                            "points": {
+                              "type": "integer",
+                              "example": 500
+                            }
+                          }
+                        },
+                        "client": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer",
+                              "example": 84213
+                            },
+                            "firstName": {
+                              "type": "string",
+                              "example": "Juan Manuel"
+                            },
+                            "lastName": {
+                              "type": "string",
+                              "example": "Pérez"
+                            },
+                            "email": {
+                              "type": "string",
+                              "example": "juanma@mailinator.com"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El canje ya fue entregado, está vencido o no está en un estado entregable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "El canje ya fue realizado"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api Key is required"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Entregar un canje",
+        "tags": [
+          "Canjes"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/canjes/entregar-un-canje",
+          "metadata": {
+            "title": "Entregar un canje",
+            "sidebarTitle": "Entregar un canje"
+          }
+        }
+      }
+    },
+    "/external/purchase/code/{code}": {
+      "get": {
+        "description": "Devuelve el detalle del canje —producto y cliente— sin entregarlo. Sirve para que el operador confirme qué tiene que dar antes de llamar a `POST /external/purchase/redeem/{code}`.\n\n**Atención**: este endpoint devuelve el canje directamente, sin el envelope `{ success, status, message, data }`.",
+        "operationId": "ExternalPurchaseController_findByCode",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "description": "Código del canje.",
+            "schema": {
+              "type": "string",
+              "example": "A1B2C3"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalle del canje. Sin envelope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 45012
+                    },
+                    "code": {
+                      "type": "string",
+                      "example": "A1B2C3"
+                    },
+                    "points": {
+                      "type": "integer",
+                      "example": 500
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "PENDING"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-28T18:05:00.000Z"
+                    },
+                    "redeemedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true,
+                      "example": "2026-07-29T10:12:00.000Z"
+                    },
+                    "product": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 771
+                        },
+                        "name": {
+                          "type": "string",
+                          "example": "Café gratis"
+                        },
+                        "points": {
+                          "type": "integer",
+                          "example": 500
+                        }
+                      }
+                    },
+                    "client": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 84213
+                        },
+                        "firstName": {
+                          "type": "string",
+                          "example": "Juan Manuel"
+                        },
+                        "lastName": {
+                          "type": "string",
+                          "example": "Pérez"
+                        },
+                        "email": {
+                          "type": "string",
+                          "example": "juanma@mailinator.com"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No existe un canje con ese código en este comercio.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Canje no encontrado"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Consultar un canje por código",
+        "tags": [
+          "Canjes"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/canjes/consultar-un-canje-por-codigo",
+          "metadata": {
+            "title": "Consultar un canje por código",
+            "sidebarTitle": "Consultar un canje por código"
+          }
+        }
+      }
+    },
+    "/external/exchange/product": {
+      "post": {
+        "description": "Descuenta los puntos al cliente y genera un canje pendiente de entrega, con su código.\n\nEl canje **no queda entregado**: para eso, después llamá a `POST /external/purchase/redeem/{code}` con el `code` que devuelve esta llamada. La API pública no puede registrar un canje como entregado en un solo paso, porque esa operación exige un operador identificado.\n\nValidaciones que pueden fallar con 409: puntos insuficientes, premio deshabilitado, sin stock, nivel del cliente insuficiente o tope de canjes alcanzado.",
+        "operationId": "ExternalExchangeController_exchangeProduct",
+        "parameters": [
+          {
+            "name": "x-branch-id",
+            "in": "header",
+            "description": "ID de la sucursal en la que se registra la operación. Si se omite, la operación queda asociada al comercio sin sucursal.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 1972
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExternalExchangeProductDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Canje creado en estado `pending`. El envelope trae `status: 200` aunque el código HTTP sea 201.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 201
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExternalPurchaseOutputDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "El cliente o la oferta del premio no existen en este comercio.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Client not found"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "El canje no se pudo realizar: puntos insuficientes, premio no disponible, sin stock, nivel insuficiente o límite de canjes alcanzado. El `message` indica el caso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 409
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "El producto no se encuentra disponible."
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Canjear un premio",
+        "tags": [
+          "Canjes"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/canjes/canjear-un-premio",
+          "metadata": {
+            "title": "Canjear un premio",
+            "sidebarTitle": "Canjear un premio"
+          }
+        }
+      }
+    },
+    "/external/exchange/money": {
+      "post": {
+        "description": "Descuenta los puntos equivalentes al monto indicado y genera un canje pendiente con su código, para aplicarlo como descuento en la venta.\n\nSi el comercio tiene configurado un monto mínimo de canje y no se alcanza, la API responde 409.\n\nIgual que el canje de premios, nace en `pending` y se cierra con `POST /external/purchase/redeem/{code}`.",
+        "operationId": "ExternalExchangeController_exchangeMoney",
+        "parameters": [
+          {
+            "name": "x-branch-id",
+            "in": "header",
+            "description": "ID de la sucursal en la que se registra la operación. Si se omite, la operación queda asociada al comercio sin sucursal.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 1972
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExternalExchangeMoneyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Canje creado en estado `pending`. El envelope trae `status: 200` aunque el código HTTP sea 201.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 201
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExternalPurchaseOutputDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "El cliente no existe en este comercio.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Client not found"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Puntos insuficientes o monto por debajo del mínimo configurado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 409
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "El monto mínimo para canjear puntos por dinero es de 1000"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Canjear puntos por dinero",
+        "tags": [
+          "Canjes"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/canjes/canjear-puntos-por-dinero",
+          "metadata": {
+            "title": "Canjear puntos por dinero",
+            "sidebarTitle": "Canjear puntos por dinero"
+          }
+        }
+      }
+    }
+  },
+  "info": {
+    "title": "API de Tienda de Puntos",
+    "description": "API pública de Tienda de Puntos. Permite sumar puntos por compra, consultar clientes, validar canjes y consumir cupones desde tu POS, ERP o e-commerce.\n\nTodas las llamadas se autentican con el header `x-api-key`.",
+    "version": "0.0.1",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [
+    {
+      "url": "https://api.tiendadepuntos.com",
+      "description": "Producción"
+    },
+    {
+      "url": "https://apidev.tiendadepuntos.com",
+      "description": "Desarrollo"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key",
+        "description": "API key del comercio. Se genera desde el panel de Tienda de Puntos, en Configuración → Integraciones."
+      }
+    },
+    "schemas": {
+      "UpdateClientStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Nuevo estado del cliente.",
+            "enum": [
+              "SUSPEND",
+              "ACTIVE"
+            ],
+            "example": "SUSPEND"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Motivo del cambio. Obligatorio al suspender. Máximo 500 caracteres.",
+            "example": "Uso fraudulento del programa de puntos",
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "ExternalClientOutputDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "ID del cliente en Tienda de Puntos",
+            "example": 84213
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre completo",
+            "example": "Juan Manuel Pérez"
+          },
+          "first_name": {
+            "type": "string",
+            "description": "Nombre",
+            "example": "Juan Manuel"
+          },
+          "last_name": {
+            "type": "string",
+            "description": "Apellido",
+            "example": "Pérez"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email",
+            "example": "juanma@mailinator.com",
+            "nullable": true
+          },
+          "dni": {
+            "type": "string",
+            "description": "Número de documento. Alias de `document_number`, se mantiene por compatibilidad.",
+            "example": "40100800",
+            "nullable": true
+          },
+          "document_number": {
+            "type": "string",
+            "description": "Número de documento",
+            "example": "40100800",
+            "nullable": true
+          },
+          "document_type": {
+            "type": "string",
+            "description": "Tipo de documento",
+            "example": "DNI",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "description": "Teléfono",
+            "example": "+541164593678",
+            "nullable": true
+          },
+          "gender": {
+            "type": "number",
+            "description": "Género. 0 = masculino, 1 = femenino, 2 = otro, 3 = sin datos.",
+            "enum": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "example": 0
+          },
+          "affiliate_card": {
+            "type": "string",
+            "description": "Número de tarjeta de afiliado",
+            "example": "00012345",
+            "nullable": true
+          },
+          "score": {
+            "type": "number",
+            "description": "Puntos disponibles del cliente",
+            "example": 1250
+          },
+          "description": {
+            "type": "string",
+            "description": "Observaciones internas del comercio",
+            "example": null,
+            "nullable": true
+          },
+          "birthday": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Fecha de nacimiento",
+            "example": "1990-01-01T00:00:00.000Z",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "description": "Estado del cliente en el programa de fidelidad",
+            "enum": [
+              "SUSPEND",
+              "ACTIVE"
+            ],
+            "example": "ACTIVE"
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Fecha de alta",
+            "example": "2026-02-14T12:30:00.000Z"
+          },
+          "last_transaction": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Fecha de la última transacción de puntos",
+            "example": "2026-07-28T18:05:00.000Z",
+            "nullable": true
+          },
+          "purchases_counter": {
+            "type": "number",
+            "description": "Cantidad de canjes realizados",
+            "example": 7
+          },
+          "reads_counter": {
+            "type": "number",
+            "description": "Cantidad de operaciones de suma de puntos",
+            "example": 32
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "first_name",
+          "last_name",
+          "email",
+          "dni",
+          "document_number",
+          "document_type",
+          "phone",
+          "gender",
+          "affiliate_card",
+          "score",
+          "description",
+          "birthday",
+          "status",
+          "created_at",
+          "last_transaction",
+          "purchases_counter",
+          "reads_counter"
+        ]
+      },
+      "ConsumeExternalProductCouponDto": {
+        "type": "object",
+        "properties": {
+          "coupon_code": {
+            "type": "string",
+            "description": "Código del cupón que presenta el cliente.",
+            "example": "TDP-4F2A-9K1B"
+          },
+          "external_consumption_id": {
+            "type": "string",
+            "description": "Identificador del consumo en el sistema externo (número de ticket, id de venta). Se acepta por compatibilidad, pero hoy no se usa para deduplicar el consumo.",
+            "example": "TICKET-000123"
+          }
+        },
+        "required": [
+          "coupon_code"
+        ]
+      },
+      "ExternalProductStockOutputDto": {
+        "type": "object",
+        "properties": {
+          "controlled": {
+            "type": "boolean",
+            "description": "Indica si el comercio lleva control de stock sobre este premio.",
+            "example": true
+          },
+          "available": {
+            "type": "number",
+            "description": "Unidades disponibles. Solo tiene sentido cuando `controlled` es `true`.",
+            "example": 12
+          }
+        },
+        "required": [
+          "controlled",
+          "available"
+        ]
+      },
+      "ExternalProductOfferOutputDto": {
+        "type": "object",
+        "properties": {
+          "productOfferId": {
+            "type": "number",
+            "description": "ID de la oferta. Es el `productOfferId` que consume `POST /external/exchange/product`.",
+            "example": 4412
+          },
+          "points": {
+            "type": "number",
+            "description": "Puntos que cuesta el premio para este nivel.",
+            "example": 500
+          },
+          "levelId": {
+            "type": "number",
+            "description": "Nivel al que aplica el precio. `null` si aplica a todos.",
+            "example": 3,
+            "nullable": true
+          },
+          "levelName": {
+            "type": "string",
+            "description": "Nombre del nivel.",
+            "example": "Nivel 2",
+            "nullable": true
+          }
+        },
+        "required": [
+          "productOfferId",
+          "points",
+          "levelId",
+          "levelName"
+        ]
+      },
+      "ExternalProductCategoryOutputDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 7
+          },
+          "name": {
+            "type": "string",
+            "example": "Cafetería"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "ExternalProductOutputDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "ID del premio.",
+            "example": 771
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre del premio.",
+            "example": "Café gratis"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descripción larga.",
+            "example": "Un café de especialidad a elección.",
+            "nullable": true
+          },
+          "shortDescription": {
+            "type": "string",
+            "description": "Descripción corta.",
+            "example": "Café a elección",
+            "nullable": true
+          },
+          "image": {
+            "type": "string",
+            "description": "URL de la imagen principal.",
+            "example": "https://tdp-products.s3.amazonaws.com/771.png",
+            "nullable": true
+          },
+          "isEnabled": {
+            "type": "boolean",
+            "description": "Si está deshabilitado, no se puede canjear desde la API.",
+            "example": true
+          },
+          "stock": {
+            "$ref": "#/components/schemas/ExternalProductStockOutputDto"
+          },
+          "offers": {
+            "description": "Precio en puntos según el nivel del cliente. El `productOfferId` que se usa para canjear se obtiene de acá.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalProductOfferOutputDto"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalProductCategoryOutputDto"
+            }
+          },
+          "maxPurchases": {
+            "type": "number",
+            "description": "Máximo de canjes por cliente. `null` si no hay tope.",
+            "example": null,
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-02-14T12:30:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-06-01T09:15:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "shortDescription",
+          "image",
+          "isEnabled",
+          "stock",
+          "offers",
+          "categories",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ExternalLevelOutputDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "ID del nivel.",
+            "example": 3
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre del nivel.",
+            "example": "Nivel 2"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descripción del nivel.",
+            "example": "Beneficios para clientes frecuentes.",
+            "nullable": true
+          },
+          "minPoints": {
+            "type": "number",
+            "description": "Puntos acumulados que necesita un cliente para alcanzar este nivel.",
+            "example": 5000
+          },
+          "pointsMultiplier": {
+            "type": "number",
+            "description": "Multiplicador de puntos que se aplica a las compras de los clientes de este nivel. `1` significa sin bonificación.",
+            "example": 1.5
+          },
+          "colors": {
+            "type": "object",
+            "description": "Colores con los que el nivel se muestra en la app del cliente.",
+            "example": {
+              "primary": "#55ffff",
+              "secondary": "#abffff",
+              "border": "#000000"
+            }
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-02-14T12:30:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-06-01T09:15:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "minPoints",
+          "pointsMultiplier",
+          "colors",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "PointsDto": {
+        "type": "object",
+        "properties": {
+          "selectedRewardType": {
+            "type": "string",
+            "description": "Tipo de recompensa seleccionada por el operador",
+            "enum": [
+              "points",
+              "money",
+              "items",
+              "none"
+            ],
+            "example": "points"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Cantidad de dinero que se ingreso para convertir a puntos",
+            "example": 50
+          },
+          "pointItemsIds": {
+            "description": "id de los items de puntos",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "pointsToGive": {
+            "type": "number",
+            "description": "Cantidad de puntos a otorgar como recompensa",
+            "example": 100
+          },
+          "reason": {
+            "type": "string",
+            "description": "Razón o motivo de la recompensa",
+            "example": "Se entregan 500 puntos por comprar un cafe cuyo valor fue de $50"
+          }
+        },
+        "required": [
+          "selectedRewardType",
+          "amount",
+          "pointItemsIds",
+          "pointsToGive"
+        ]
+      },
+      "ApplyBonusDto": {
+        "type": "object",
+        "properties": {
+          "applyLevelPointsBonus": {
+            "type": "boolean",
+            "description": "Aplicar bonificación de puntos por nivel",
+            "example": true
+          },
+          "applyPointRulesBonus": {
+            "type": "boolean",
+            "description": "Aplicar bonificación de puntos por reglas de puntos",
+            "example": true
+          }
+        },
+        "required": [
+          "applyLevelPointsBonus",
+          "applyPointRulesBonus"
+        ]
+      },
+      "CreateExternalPointOfferDto": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "description": "Monto de la compra en pesos que se va a convertir en puntos cuando el cliente reclame la oferta.",
+            "example": 50
+          },
+          "type": {
+            "type": "string",
+            "description": "Cómo se le entrega la oferta al cliente. Este endpoint soporta `qr-fixed`, `qr-variable` y `email`; el resto de los valores del enum devuelven `data: null`.",
+            "example": "qr-variable",
+            "enum": [
+              "qr-fixed",
+              "qr-variable",
+              "email",
+              "whatsapp",
+              "link",
+              "gift-card",
+              "inactivity-reminder"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "description": "Descripción de la oferta. Se usa como nombre del QR.",
+            "example": "Compra de $50"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email al que se envía la oferta. Obligatorio cuando `type` es `email`.",
+            "example": "juanma@mailinator.com"
+          }
+        },
+        "required": [
+          "amount",
+          "type"
+        ]
+      },
+      "UpdateExternalQrPointOfferDto": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "description": "Cantidad de dinero que se ingreso para convertir a puntos",
+            "example": 50
+          },
+          "description": {
+            "type": "string",
+            "description": "Descripcion del QR",
+            "example": "Compra de $50"
+          }
+        },
+        "required": [
+          "amount",
+          "description"
+        ]
+      },
+      "ExternalClientDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email del cliente. Obligatorio si no se envía `dni`: hace falta al menos uno de los dos para identificar o dar de alta al cliente.",
+            "example": "juanma@mailinator.com"
+          },
+          "dni": {
+            "type": "string",
+            "description": "Número de documento del cliente. Obligatorio si no se envía `email`.",
+            "example": "40100800"
+          },
+          "first_name": {
+            "type": "string",
+            "description": "Nombre del cliente. Se usa al darlo de alta automáticamente.",
+            "example": "Juan Manuel"
+          },
+          "last_name": {
+            "type": "string",
+            "description": "Apellido del cliente. Se usa al darlo de alta automáticamente.",
+            "example": "Pérez"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Número de teléfono del cliente, con código de país.",
+            "example": "+541164593678"
+          },
+          "birthday": {
+            "type": "string",
+            "description": "Fecha de nacimiento del cliente",
+            "example": "1990-01-01T00:00:00.000Z"
+          },
+          "gender": {
+            "type": "number",
+            "description": "Género del cliente. 0 = masculino, 1 = femenino, 2 = otro, 3 = sin datos.",
+            "enum": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "example": 0
+          }
+        },
+        "required": [
+          "email",
+          "dni"
+        ]
+      },
+      "ExternalOperatorDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email del operador que registró la venta. Obligatorio si no se envía `dni`.",
+            "example": "cajero.centro@micomercio.com"
+          },
+          "dni": {
+            "type": "string",
+            "description": "Número de documento del operador. Obligatorio si no se envía `email`.",
+            "example": "28455901"
+          },
+          "first_name": {
+            "type": "string",
+            "description": "Nombre del operador",
+            "example": "Carla"
+          },
+          "last_name": {
+            "type": "string",
+            "description": "Apellido del operador",
+            "example": "Gómez"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Número de teléfono del operador, con código de país.",
+            "example": "+541164593678"
+          }
+        },
+        "required": [
+          "email",
+          "dni"
+        ]
+      },
+      "CreateGiftCardOfferDto": {
+        "type": "object",
+        "properties": {
+          "clientMail": {
+            "type": "string",
+            "description": "Correo electrónico del cliente",
+            "example": "exampleMail@tiendadepuntos.com"
+          },
+          "points": {
+            "description": "Puntos a entregar",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PointsDto"
+              }
+            ]
+          },
+          "applyBonus": {
+            "description": "Aplicar bonificaciones de puntos",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApplyBonusDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "clientMail",
+          "points",
+          "applyBonus"
+        ]
+      },
+      "ExternalDirectSumRegisterClientDto": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "description": "Monto de la compra en pesos. La conversión a puntos la define la regla de puntos configurada por el comercio.",
+            "example": 50
+          },
+          "client": {
+            "description": "Datos del cliente que hizo la compra.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExternalClientDto"
+              }
+            ]
+          },
+          "operator": {
+            "description": "Datos del operador o cajero que registró la venta.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExternalOperatorDto"
+              }
+            ]
+          },
+          "branch_id": {
+            "type": "number",
+            "description": "ID de la sucursal donde se hizo la compra. Se obtiene de `GET /external/branch`. Debe pertenecer al comercio de la API key.",
+            "example": 1972
+          },
+          "external_id": {
+            "type": "string",
+            "description": "Identificador de la transacción en tu sistema (número de factura, id de ticket). Es la clave de idempotencia: si repetís un `external_id` que ya tiene una operación activa, la API responde 409 en vez de duplicar los puntos. También es el identificador con el que después se cancela la operación.",
+            "example": "FAC-A-0001-00012345"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Observaciones de la suma de puntos.",
+            "example": "Suma por compra de 2 medialunas y un cafe latte"
+          },
+          "applyBonus": {
+            "description": "Bonificaciones a aplicar sobre los puntos base. Si se omite, no se aplica ninguna.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApplyBonusDto"
+              }
+            ]
+          },
+          "giftCards": {
+            "description": "Gift cards de regalo para otro cliente.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateGiftCardOfferDto"
+            }
+          },
+          "ignoreCreateClient": {
+            "type": "boolean",
+            "description": "Si llega en `true` y el cliente no existe, la operación falla en vez de darlo de alta automáticamente.",
+            "example": false
+          },
+          "origin": {
+            "type": "string",
+            "description": "Sistema desde el que se originó la operación. Se usa para trazabilidad en los reportes. Si integrás un sistema propio, usá `external-integration`.",
+            "example": "external-integration",
+            "enum": [
+              "external-integration",
+              "dragonfish",
+              "fudo",
+              "centum",
+              "contabilium",
+              "tiendanube",
+              "woocommerce",
+              "shopify",
+              "desktop-app",
+              "dux"
+            ]
+          }
+        },
+        "required": [
+          "amount",
+          "client"
+        ]
+      },
+      "PollingQrListItemDto": {
+        "type": "object",
+        "properties": {
+          "qrId": {
+            "type": "number",
+            "description": "ID del QR",
+            "example": 123
+          },
+          "qrName": {
+            "type": "string",
+            "description": "Nombre del QR",
+            "example": "QR Sucursal Centro"
+          },
+          "branchId": {
+            "type": "number",
+            "description": "ID de la sucursal (null si no tiene)",
+            "example": 1,
+            "nullable": true
+          },
+          "branchName": {
+            "type": "string",
+            "description": "Nombre de la sucursal",
+            "example": "Sucursal Centro",
+            "nullable": true
+          },
+          "validationWindowSeconds": {
+            "type": "number",
+            "description": "Ventana de rotación en segundos",
+            "example": 30,
+            "enum": [
+              15,
+              30,
+              60,
+              90
+            ]
+          }
+        },
+        "required": [
+          "qrId",
+          "qrName",
+          "branchId",
+          "branchName",
+          "validationWindowSeconds"
+        ]
+      },
+      "ValidationCodeResponseDto": {
+        "type": "object",
+        "properties": {
+          "qrId": {
+            "type": "number",
+            "description": "ID del QR",
+            "example": 123
+          },
+          "code": {
+            "type": "string",
+            "description": "Código de validación de 4 dígitos",
+            "example": "4821"
+          },
+          "expiresInSeconds": {
+            "type": "number",
+            "description": "Segundos restantes hasta expiración",
+            "example": 37
+          },
+          "validUntil": {
+            "type": "string",
+            "description": "Timestamp de expiración (ISO 8601)",
+            "example": "2026-04-13T18:25:00.000Z"
+          }
+        },
+        "required": [
+          "qrId",
+          "code",
+          "expiresInSeconds",
+          "validUntil"
+        ]
+      },
+      "ValidateCodeInputDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Código de 4 dígitos ingresado por el cliente",
+            "example": "4821"
+          }
+        },
+        "required": [
+          "code"
+        ]
+      },
+      "ExternalPurchaseOutputDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "ID del canje.",
+            "example": 45012
+          },
+          "code": {
+            "type": "string",
+            "description": "Código que presenta el cliente para retirar el premio. Es el que se usa en `POST /external/purchase/redeem/{code}`.",
+            "example": "A1B2C3",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "description": "Estado del canje. Los canjes creados por la API nacen en `pending`.",
+            "enum": [
+              "pending",
+              "canceled",
+              "delivered"
+            ],
+            "example": "pending"
+          },
+          "type": {
+            "type": "string",
+            "description": "Si el canje fue por un premio o por dinero.",
+            "enum": [
+              "product",
+              "money"
+            ]
+          },
+          "points": {
+            "type": "number",
+            "description": "Puntos debitados al cliente.",
+            "example": 500
+          },
+          "moneyAmount": {
+            "type": "number",
+            "description": "Monto en pesos. Solo en canjes por dinero.",
+            "example": null,
+            "nullable": true
+          },
+          "product": {
+            "type": "object",
+            "description": "Premio canjeado. `null` en canjes por dinero.",
+            "example": {
+              "id": 771,
+              "name": "Café gratis"
+            },
+            "nullable": true
+          },
+          "client": {
+            "type": "object",
+            "description": "Cliente que canjeó.",
+            "example": {
+              "id": 84213,
+              "firstName": "Juan Manuel",
+              "lastName": "Pérez"
+            }
+          },
+          "branch": {
+            "type": "object",
+            "description": "Sucursal donde se registró el canje.",
+            "example": {
+              "id": 1972,
+              "name": "Sucursal Centro"
+            },
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-07-28T18:05:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2026-07-28T18:05:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "status",
+          "type",
+          "points",
+          "moneyAmount",
+          "product",
+          "client",
+          "branch",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ExternalExchangeProductDto": {
+        "type": "object",
+        "properties": {
+          "productOfferId": {
+            "type": "number",
+            "description": "ID de la oferta del premio a canjear. Sale del array `offers` de `GET /external/products`, eligiendo la que corresponde al nivel del cliente.",
+            "example": 4412
+          },
+          "clientId": {
+            "type": "number",
+            "description": "ID del cliente que canjea. Se obtiene de `GET /external/clients/search`.",
+            "example": 84213
+          }
+        },
+        "required": [
+          "productOfferId",
+          "clientId"
+        ]
+      },
+      "ExternalExchangeMoneyDto": {
+        "type": "object",
+        "properties": {
+          "moneyAmount": {
+            "type": "number",
+            "description": "Monto en pesos a canjear. El comercio puede tener configurado un mínimo; si no se alcanza, la API responde 409.",
+            "example": 5000
+          },
+          "clientId": {
+            "type": "number",
+            "description": "ID del cliente que canjea. Se obtiene de `GET /external/clients/search`.",
+            "example": 84213
+          }
+        },
+        "required": [
+          "moneyAmount",
+          "clientId"
+        ]
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ]
+}

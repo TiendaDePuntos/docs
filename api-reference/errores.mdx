@@ -1,0 +1,118 @@
+---
+title: "Errores y límites"
+description: "Formato de los errores, códigos que devuelve la API, idempotencia y rate limits."
+---
+
+## Formato de los errores
+
+Los errores devuelven un cuerpo con esta forma:
+
+```json
+{
+  "statusCode": 409,
+  "timestamp": "2026-07-31T14:05:12.431Z",
+  "path": "/external/tags/add",
+  "method": "POST",
+  "message": "Ya existe una operación de puntos con el externalId FAC-A-0001-00012345 para este negocio",
+  "errors": null,
+  "data": null
+}
+```
+
+En los errores de validación (`400`), el campo `errors` trae el detalle campo por campo:
+
+```json
+{
+  "statusCode": 400,
+  "message": "Error de validación",
+  "errors": [
+    {
+      "field": "amount",
+      "constraints": { "isNumber": "amount must be a number conforming to the specified constraints" },
+      "value": "cincuenta"
+    }
+  ]
+}
+```
+
+<Note>
+  Los endpoints de cupones son la excepción: en vez de este formato devuelven su propio objeto con `valid`, `consumed` y `error_code`. Está detallado en la ficha de cada uno.
+</Note>
+
+## Códigos que vas a ver
+
+| Código | Qué significa | Qué hacer |
+| --- | --- | --- |
+| `400` | Datos inválidos, o una regla de negocio que no se cumple (canje ya entregado, código de validación incorrecto). | Revisá `errors` y `message`. No reintentar sin corregir. |
+| `403` | El `branch_id` que mandaste no pertenece a tu comercio. | Verificá los IDs con `GET /external/branch`. |
+| `404` | API key ausente o inválida, **o** el recurso no existe. | Mirá el `message` para distinguir los casos. |
+| `409` | Ya existe una operación con ese `external_id`. | **No reintentes**: los puntos ya se acreditaron. |
+| `429` | Superaste el rate limit. | Esperá y reintentá con backoff. |
+| `500` | Error del lado nuestro. | Reintentá con backoff. Si persiste, escribinos. |
+
+## Idempotencia
+
+Cuando sumás puntos con `POST /external/tags/add`, mandá siempre el campo `external_id` con el identificador de la venta en tu sistema (número de factura, id de ticket).
+
+Si llega un `external_id` que ya tiene una operación activa para tu comercio, la API responde `409` en lugar de acreditar los puntos de nuevo.
+
+<Warning>
+  Un `409` significa que **la operación original se procesó bien**. Es la respuesta correcta ante un reintento, no un fallo: no reintentes ni acredites los puntos por otra vía.
+</Warning>
+
+Sin `external_id` no hay protección contra duplicados: si tu sistema reintenta por un timeout de red, el cliente recibe los puntos dos veces.
+
+Ese mismo `external_id` es el que usás después para cancelar la operación si se anula la venta:
+
+```bash
+curl -X PUT https://api.tiendadepuntos.com/external/tags/cancel/FAC-A-0001-00012345 \
+  -H "x-api-key: TU_API_KEY"
+```
+
+## Rate limits
+
+Los límites se aplican por comercio, no por API key ni por IP.
+
+| Endpoints | Límite |
+| --- | --- |
+| `/external/tags/*` | 10 requests por segundo |
+| `GET /external/validation-code/qrs`<br/>`GET /external/validation-code/{qrId}/current` | 5 requests por minuto por cada sucursal, con un mínimo de 5 |
+| `POST /external/validation-code/{qrId}/validate` | 10 intentos por minuto |
+
+Los endpoints de código de validación devuelven headers informativos en cada respuesta:
+
+```
+X-RateLimit-Limit: 25
+X-RateLimit-Remaining: 18
+```
+
+<Tip>
+  Si hacés polling del código de validación, usá el `validationWindowSeconds` que devuelve `GET /external/validation-code/qrs` para espaciar las llamadas. No tiene sentido consultar más seguido que la rotación del código.
+</Tip>
+
+Al superar el límite, la respuesta es un `429`:
+
+```json
+{
+  "success": false,
+  "status": 429,
+  "message": "Rate limit excedido. Intente más tarde."
+}
+```
+
+## Recomendaciones para producción
+
+<AccordionGroup>
+  <Accordion title="Reintentos con backoff exponencial">
+    Reintentá solo ante `429` y `5xx`, con esperas crecientes (1s, 2s, 4s...). Los `4xx` restantes no se resuelven reintentando.
+  </Accordion>
+  <Accordion title="Nunca reintentes un 409">
+    Un `409` confirma que la operación ya existe. Marcala como exitosa en tu sistema.
+  </Accordion>
+  <Accordion title="Timeouts razonables">
+    Usá un timeout de al menos 15 segundos. Sumar puntos dispara notificaciones y cálculo de bonificaciones, así que no siempre responde instantáneo.
+  </Accordion>
+  <Accordion title="No bloquees la venta">
+    Si la API no responde, encolá la operación y reintentá después. Que el programa de puntos falle no debería impedirle cobrar a la caja.
+  </Accordion>
+</AccordionGroup>

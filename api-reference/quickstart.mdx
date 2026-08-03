@@ -1,0 +1,328 @@
+---
+title: "Integrar tu punto de venta"
+description: "De cero a sumar puntos en una venta real, paso a paso."
+---
+
+Esta guía arma la integración más común: que tu POS sume puntos automáticamente cuando un cliente compra. Al final vas a tener el flujo completo, incluida la anulación de ventas.
+
+<Info>
+  Todos los ejemplos apuntan a `https://apidev.tiendadepuntos.com`. Cambiá a `https://api.tiendadepuntos.com` recién cuando el flujo esté probado: las operaciones de puntos afectan saldos reales.
+</Info>
+
+## 1. Verificá tu API key
+
+Antes que nada, confirmá que la key funciona y traé los IDs de tus sucursales:
+
+<CodeGroup>
+
+```bash cURL
+curl https://apidev.tiendadepuntos.com/external/branch \
+  -H "x-api-key: TU_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch('https://apidev.tiendadepuntos.com/external/branch', {
+  headers: { 'x-api-key': process.env.TDP_API_KEY },
+});
+
+const { data: branches } = await res.json();
+console.log(branches.map(b => `${b.id} — ${b.name}`));
+```
+
+```python Python
+import os
+import requests
+
+res = requests.get(
+    "https://apidev.tiendadepuntos.com/external/branch",
+    headers={"x-api-key": os.environ["TDP_API_KEY"]},
+    timeout=15,
+)
+branches = res.json()["data"]
+print([(b["id"], b["name"]) for b in branches])
+```
+
+</CodeGroup>
+
+Respuesta:
+
+```json
+{
+  "success": true,
+  "status": 200,
+  "message": "Request was successful",
+  "data": [
+    { "id": 1972, "name": "Sucursal Centro", "isEnabled": true },
+    { "id": 1973, "name": "Sucursal Norte", "isEnabled": true }
+  ]
+}
+```
+
+Guardá el `id` que corresponda en la configuración de cada caja. Es un dato que no cambia, así que alcanza con traerlo una vez.
+
+## 2. Sumá puntos en una venta
+
+Esta es la llamada central de la integración:
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://apidev.tiendadepuntos.com/external/tags/add \
+  -H "x-api-key: TU_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 55000,
+    "external_id": "FAC-A-0001-00012345",
+    "branch_id": 1972,
+    "reason": "Compra en caja 3",
+    "client": {
+      "email": "juanma@mailinator.com",
+      "first_name": "Juan Manuel",
+      "last_name": "Pérez"
+    },
+    "origin": "external-integration"
+  }'
+```
+
+```javascript Node.js
+const res = await fetch('https://apidev.tiendadepuntos.com/external/tags/add', {
+  method: 'POST',
+  headers: {
+    'x-api-key': process.env.TDP_API_KEY,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    amount: 55000,
+    external_id: 'FAC-A-0001-00012345',
+    branch_id: 1972,
+    reason: 'Compra en caja 3',
+    client: {
+      email: 'juanma@mailinator.com',
+      first_name: 'Juan Manuel',
+      last_name: 'Pérez',
+    },
+    origin: 'external-integration',
+  }),
+});
+
+if (res.status === 409) {
+  // El external_id ya se procesó. Los puntos están acreditados.
+  return { alreadyProcessed: true };
+}
+
+const { data } = await res.json();
+console.log(`Cliente ${data.clientId} — operación ${data.pointOperationId}`);
+```
+
+```python Python
+res = requests.post(
+    "https://apidev.tiendadepuntos.com/external/tags/add",
+    headers={"x-api-key": os.environ["TDP_API_KEY"]},
+    json={
+        "amount": 55000,
+        "external_id": "FAC-A-0001-00012345",
+        "branch_id": 1972,
+        "reason": "Compra en caja 3",
+        "client": {
+            "email": "juanma@mailinator.com",
+            "first_name": "Juan Manuel",
+            "last_name": "Pérez",
+        },
+        "origin": "external-integration",
+    },
+    timeout=15,
+)
+
+if res.status_code == 409:
+    # El external_id ya se procesó. Los puntos están acreditados.
+    pass
+else:
+    data = res.json()["data"]
+    print(data["clientId"], data["pointOperationId"])
+```
+
+</CodeGroup>
+
+El `amount` es el monto de la compra en pesos: acá, una venta de $55.000. Cuántos puntos son depende de la regla de conversión que tengas configurada en el panel, no de la API.
+
+Respuesta:
+
+```json
+{
+  "success": true,
+  "status": 201,
+  "message": "Request was successful",
+  "data": {
+    "pointOperationId": 998877,
+    "clientId": 84213,
+    "points": {
+      "amount": 55000,
+      "totalPointsToGive": 605,
+      "initialPointsToGive": 550
+    }
+  }
+}
+```
+
+### Los tres campos que importan
+
+<AccordionGroup>
+  <Accordion title="external_id — la clave de idempotencia" defaultOpen>
+    Mandá el número de factura o el id del ticket. Si tu POS reintenta por un timeout de red, la API responde `409` en vez de acreditar los puntos de nuevo.
+
+    Tratá el `409` como éxito: significa que la operación original se procesó bien. Y guardá este valor, porque es el único identificador con el que después podés cancelar.
+  </Accordion>
+  <Accordion title="client — email o documento">
+    Necesitás al menos uno de los dos: `email` o `dni`. Si el cliente no existe todavía, se crea automáticamente con los datos que mandes. Mandá también `first_name` y `last_name` para que el alta quede prolija.
+
+    Si preferís que la operación falle en vez de dar de alta clientes desconocidos, agregá `"ignoreCreateClient": true`.
+  </Accordion>
+  <Accordion title="origin — trazabilidad">
+    Identifica de qué sistema vino la operación, para los reportes del panel. Si integrás un sistema propio, usá `external-integration`.
+  </Accordion>
+</AccordionGroup>
+
+## 3. Manejá la anulación de ventas
+
+Si se anula la factura, revertí los puntos con el mismo `external_id`:
+
+<CodeGroup>
+
+```bash cURL
+curl -X PUT https://apidev.tiendadepuntos.com/external/tags/cancel/FAC-A-0001-00012345 \
+  -H "x-api-key: TU_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  `https://apidev.tiendadepuntos.com/external/tags/cancel/${externalId}`,
+  { method: 'PUT', headers: { 'x-api-key': process.env.TDP_API_KEY } },
+);
+
+if (res.status === 404) {
+  // No había ninguna operación activa con ese external_id.
+}
+```
+
+```python Python
+res = requests.put(
+    f"https://apidev.tiendadepuntos.com/external/tags/cancel/{external_id}",
+    headers={"x-api-key": os.environ["TDP_API_KEY"]},
+    timeout=15,
+)
+
+if res.status_code == 404:
+    # No había ninguna operación activa con ese external_id.
+    pass
+```
+
+</CodeGroup>
+
+Un `404` acá significa que no hay ninguna operación activa con ese identificador: o nunca se creó, o ya se canceló antes.
+
+## 4. Consultá el saldo de un cliente
+
+Para mostrar los puntos disponibles en la pantalla de la caja:
+
+```bash
+curl "https://apidev.tiendadepuntos.com/external/clients/search?query=juanma@mailinator.com" \
+  -H "x-api-key: TU_API_KEY"
+```
+
+El campo `score` de la respuesta es el saldo de puntos disponible. La búsqueda es por coincidencia exacta de email o de número de documento; si no encuentra a nadie devuelve `404`.
+
+## 5. Entregá canjes en el mostrador
+
+Cuando un cliente llega con el código de un premio, son dos llamadas: primero consultás qué pidió, después confirmás la entrega.
+
+<Steps>
+  <Step title="Consultá qué premio es">
+    ```bash
+    curl https://apidev.tiendadepuntos.com/external/purchase/code/A1B2C3 \
+      -H "x-api-key: TU_API_KEY"
+    ```
+
+    Mostrale al operador el producto y el nombre del cliente para que confirme.
+  </Step>
+  <Step title="Confirmá la entrega">
+    ```bash
+    curl -X POST https://apidev.tiendadepuntos.com/external/purchase/redeem/A1B2C3 \
+      -H "x-api-key: TU_API_KEY" \
+      -H "x-branch-id: 1972"
+    ```
+
+    Un `400` acá significa que el canje ya fue entregado o está vencido.
+  </Step>
+</Steps>
+
+<Warning>
+  `GET /external/purchase/code/{code}` devuelve el canje **sin** el envelope `{ success, status, message, data }`: los campos vienen en la raíz de la respuesta. `POST /external/purchase/redeem/{code}` sí usa el envelope.
+</Warning>
+
+## 6. Canjeá premios desde tu sistema
+
+Además de entregar canjes que el cliente generó en la app, podés generarlos vos: mostrás el catálogo en tu POS y canjeás ahí mismo.
+
+<Steps>
+  <Step title="Traé el catálogo">
+    ```bash
+    curl "https://apidev.tiendadepuntos.com/external/products?isEnabled=true&limit=50" \
+      -H "x-api-key: TU_API_KEY" \
+      -H "x-branch-id: 1972"
+    ```
+
+    Cada premio trae un array `offers` con el precio en puntos **según el nivel del cliente**:
+
+    ```json
+    {
+      "id": 771,
+      "name": "Café gratis",
+      "stock": { "controlled": true, "available": 12 },
+      "offers": [
+        { "productOfferId": 4412, "points": 500, "levelId": 3, "levelName": "Nivel 2" },
+        { "productOfferId": 4413, "points": 400, "levelId": 4, "levelName": "Nivel 3" }
+      ]
+    }
+    ```
+
+    El nivel del cliente lo sabés por `GET /external/clients/search`; los niveles del programa, por `GET /external/levels`.
+  </Step>
+  <Step title="Generá el canje">
+    ```bash
+    curl -X POST https://apidev.tiendadepuntos.com/external/exchange/product \
+      -H "x-api-key: TU_API_KEY" \
+      -H "x-branch-id: 1972" \
+      -H "Content-Type: application/json" \
+      -d '{ "productOfferId": 4412, "clientId": 84213 }'
+    ```
+
+    Descuenta los puntos y devuelve el canje con su `code`.
+  </Step>
+  <Step title="Entregá el premio">
+    Con ese `code`, llamá a `POST /external/purchase/redeem/{code}` como en el paso anterior.
+  </Step>
+</Steps>
+
+<Warning>
+  El canje nace en estado `pending`, no `delivered`. Si entregás el premio en el mismo momento, tenés que hacer igual la llamada a `redeem`: son dos pasos siempre.
+
+  El motivo es que registrar una entrega requiere identificar al operador que la hizo, y una API key representa a un sistema, no a una persona.
+</Warning>
+
+Para canjear por dinero en vez de por un premio, `POST /external/exchange/money` con `moneyAmount` y `clientId`. Si el comercio tiene un mínimo configurado y no se alcanza, devuelve `409`.
+
+<Tip>
+  Los listados (`/external/products`, `/external/levels`, `/external/purchase`) devuelven `{ data, meta, links }` en la raíz, sin el envelope. Los premios están en `data`, no en `items`.
+</Tip>
+
+## Antes de pasar a producción
+
+<Check>Mandás `external_id` en todas las sumas de puntos.</Check>
+<Check>Tratás el `409` como éxito, no como error.</Check>
+<Check>La API key está en una variable de entorno del servidor, no en el código del cliente.</Check>
+<Check>Si la API no responde, la venta se cobra igual y la operación queda encolada.</Check>
+<Check>Tenés reintentos con backoff para `429` y `5xx`.</Check>
+
+Cuando esto esté cubierto, cambiá la URL base a `https://api.tiendadepuntos.com` y probá con una venta real de monto chico.
+
+¿Trabás en algún punto? Escribinos a [hola@tiendadepuntos.com](mailto:hola@tiendadepuntos.com).

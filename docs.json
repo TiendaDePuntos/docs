@@ -30,7 +30,28 @@
       },
       {
         "tab": "Documentación",
-        "pages": ["documentacion", "primeros-pasos", "pantallas-principales"]
+        "groups": [
+          {
+            "group": "Guías del panel",
+            "pages": ["documentacion", "primeros-pasos", "pantallas-principales"]
+          },
+          {
+            "group": "API · Empezar",
+            "pages": [
+              "api-reference/introduccion",
+              "api-reference/autenticacion",
+              "api-reference/quickstart",
+              "api-reference/errores"
+            ]
+          },
+          {
+            "group": "API · Endpoints",
+            "openapi": {
+              "source": "/api-reference/openapi.json",
+              "directory": "api-reference/endpoints"
+            }
+          }
+        ]
       },
       {
         "tab": "Integraciones",

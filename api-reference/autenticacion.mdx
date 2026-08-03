@@ -1,0 +1,77 @@
+---
+title: "Autenticación"
+description: "Cómo autenticar tus llamadas con la API key del comercio."
+---
+
+Todas las llamadas a la API pública se autentican con una **API key** que va en el header `x-api-key`.
+
+```bash
+curl https://api.tiendadepuntos.com/external/branch \
+  -H "x-api-key: TU_API_KEY"
+```
+
+No hay OAuth ni tokens que expiren: la misma key sirve indefinidamente hasta que la revoques.
+
+## Cómo obtener tu API key
+
+<Steps>
+  <Step title="Entrá al panel">
+    Ingresá a [mi.tiendadepuntos.com](https://mi.tiendadepuntos.com/auth/my-business) con tu usuario administrador.
+  </Step>
+  <Step title="Andá a Integraciones">
+    En el menú, entrá a **Configuración → Integraciones**.
+  </Step>
+  <Step title="Copiá la key">
+    Guardala en un lugar seguro apenas la generes.
+  </Step>
+</Steps>
+
+## La key identifica a tu comercio
+
+La API key determina de qué comercio son los datos de cada llamada. No hace falta —ni se puede— mandar un identificador de comercio en el cuerpo de las llamadas: todo lo que consultes o modifiques queda acotado al comercio dueño de la key.
+
+<Warning>
+  La API key da acceso completo al programa de fidelidad de tu comercio: puede acreditar puntos, suspender clientes y entregar canjes.
+
+  Tratala como una contraseña: no la pongas en el código de una app móvil ni en JavaScript del navegador, donde cualquiera puede leerla. Usala solo desde tu backend, tu POS o tu ERP.
+</Warning>
+
+## Trabajar por sucursal
+
+Varios endpoints aceptan el header opcional `x-branch-id` para indicar en qué sucursal se está haciendo la operación:
+
+```bash
+curl -X POST https://api.tiendadepuntos.com/external/purchase/redeem/A1B2C3 \
+  -H "x-api-key: TU_API_KEY" \
+  -H "x-branch-id: 1972"
+```
+
+Los IDs de tus sucursales salen de `GET /external/branch`. Si omitís el header, la operación queda registrada a nivel comercio, sin sucursal.
+
+<Note>
+  En `POST /external/tags/add` la sucursal **no** va por header: va en el campo `branch_id` del cuerpo.
+</Note>
+
+## Errores de autenticación
+
+<Warning>
+  Cuando la API key falta o es inválida, la API responde **404**, no el 401 que esperarías. Es un comportamiento heredado que mantenemos por compatibilidad con las integraciones existentes.
+</Warning>
+
+| Situación | Código | `message` |
+| --- | --- | --- |
+| No mandaste el header `x-api-key` | `404` | `Api Key is required` |
+| La key no corresponde a ningún comercio | `404` | `Business not found` |
+
+Como el 404 también se usa para "el recurso no existe", si estás debugueando una integración nueva revisá el campo `message` para distinguir un problema de credenciales de un recurso inexistente.
+
+## Probar que funciona
+
+El endpoint más liviano para verificar que tu key está bien configurada es el de sucursales:
+
+```bash
+curl https://apidev.tiendadepuntos.com/external/branch \
+  -H "x-api-key: TU_API_KEY"
+```
+
+Si devuelve la lista de tus sucursales, ya estás listo para el resto de la API.

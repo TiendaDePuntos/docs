@@ -1,0 +1,119 @@
+---
+title: "Introducción a la API"
+description: "Conectá tu POS, ERP o e-commerce con el programa de puntos de tu comercio."
+---
+
+La API pública te permite operar el programa de fidelidad desde tus propios sistemas: sumar puntos cuando alguien compra, consultar el saldo de un cliente, entregar canjes en el mostrador y validar cupones.
+
+Es la misma API que usan nuestras integraciones con Dragonfish, Fudo, Centum, Contabilium y Dux. Si tu sistema no está en la lista de [integraciones](/integraciones), esta es la vía para conectarlo.
+
+## URL base
+
+<CodeGroup>
+
+```bash Producción
+https://api.tiendadepuntos.com
+```
+
+```bash Desarrollo
+https://apidev.tiendadepuntos.com
+```
+
+</CodeGroup>
+
+Todos los endpoints públicos cuelgan de `/external`.
+
+## Qué podés hacer
+
+<CardGroup cols={2}>
+  <Card title="Sumar puntos" icon="plus" href="/api-reference/endpoints/puntos/sumar-puntos-a-un-cliente-por-una-compra">
+    Acreditar puntos por el monto de una compra, con el cliente identificado por email o documento.
+  </Card>
+  <Card title="Consultar clientes" icon="user-search" href="/api-reference/endpoints/clientes/buscar-un-cliente-por-email-o-documento">
+    Buscar un cliente y ver su saldo de puntos, nivel de actividad y estado.
+  </Card>
+  <Card title="Leer el catálogo" icon="package" href="/api-reference/endpoints/premios/listar-premios">
+    Traer los premios con su precio en puntos según el nivel, y los niveles del programa.
+  </Card>
+  <Card title="Canjear premios" icon="shopping-bag" href="/api-reference/endpoints/canjes/canjear-un-premio">
+    Descontar puntos y generar el canje, por un premio del catálogo o por un monto en pesos.
+  </Card>
+  <Card title="Entregar canjes" icon="gift" href="/api-reference/endpoints/canjes/entregar-un-canje">
+    Consultar qué premio pidió el cliente y marcarlo como entregado.
+  </Card>
+  <Card title="Validar cupones" icon="ticket" href="/api-reference/endpoints/cupones/consumir-un-cupon">
+    Verificar y consumir cupones de descuento generados por un canje.
+  </Card>
+</CardGroup>
+
+## El flujo típico
+
+La integración más común es la de un punto de venta, y son tres llamadas:
+
+<Steps>
+  <Step title="Traés las sucursales, una sola vez">
+    `GET /external/branch` te devuelve los IDs de tus sucursales. Guardalos en la configuración de cada caja.
+  </Step>
+  <Step title="Sumás puntos en cada venta">
+    `POST /external/tags/add` con el monto, el cliente y el número de factura como `external_id`.
+  </Step>
+  <Step title="Cancelás si se anula la venta">
+    `PUT /external/tags/cancel/{externalId}` con ese mismo número de factura.
+  </Step>
+</Steps>
+
+<Tip>
+  Mandá siempre el `external_id`. Es lo que evita que un reintento de red duplique los puntos de una compra, y es la única forma de cancelar la operación después.
+</Tip>
+
+## El flujo de canje
+
+Si además querés que el cliente canjee premios desde tu sistema, son dos pasos:
+
+<Steps>
+  <Step title="Generás el canje">
+    `POST /external/exchange/product` con el `productOfferId` del catálogo y el `clientId`. Descuenta los puntos y devuelve un `code`.
+  </Step>
+  <Step title="Entregás el premio">
+    `POST /external/purchase/redeem/{code}` con ese código, cuando el cliente lo retira.
+  </Step>
+</Steps>
+
+<Note>
+  Los canjes creados por la API nacen en estado `pending`, no `delivered`. No se pueden crear ya entregados en un solo paso: registrar una entrega requiere un operador identificado, y una API key representa a un sistema, no a una persona.
+</Note>
+
+## Formato de las respuestas
+
+La mayoría de los endpoints envuelve el resultado en una estructura común:
+
+```json
+{
+  "success": true,
+  "status": 200,
+  "message": "Request was successful",
+  "data": { }
+}
+```
+
+<Warning>
+  Hay tres endpoints que **no** usan este envelope y devuelven el objeto directamente: los dos de cupones (`/external/product-coupons/*`) y los dos de consulta de canjes (`GET /external/purchase` y `GET /external/purchase/code/{code}`). Está aclarado en la ficha de cada uno.
+
+  Además, el campo `status` de adentro del envelope no siempre coincide con el código HTTP de la respuesta. **Guiate por el código HTTP**, no por ese campo.
+</Warning>
+
+## Antes de empezar
+
+<Steps>
+  <Step title="Conseguí tu API key">
+    Se genera desde el panel, en **Configuración → Integraciones**. Ver [Autenticación](/api-reference/autenticacion).
+  </Step>
+  <Step title="Probá contra desarrollo">
+    Usá `https://apidev.tiendadepuntos.com` hasta que el flujo esté cerrado. Las operaciones de puntos afectan saldos reales de clientes.
+  </Step>
+  <Step title="Revisá el manejo de errores">
+    Sobre todo los 409 por `external_id` repetido y los 429 por rate limit. Ver [Errores](/api-reference/errores).
+  </Step>
+</Steps>
+
+¿Dudas con la integración? Escribinos a [hola@tiendadepuntos.com](mailto:hola@tiendadepuntos.com).
