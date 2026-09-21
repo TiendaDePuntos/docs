@@ -54,16 +54,12 @@ Los IDs de tus sucursales salen de `GET /external/branch`. Si omitís el header,
 
 ## Errores de autenticación
 
-<Warning>
-  Cuando la API key falta o es inválida, la API responde **404**, no el 401 que esperarías. Es un comportamiento heredado que mantenemos por compatibilidad con las integraciones existentes.
-</Warning>
-
 | Situación | Código | `message` |
 | --- | --- | --- |
 | No mandaste el header `x-api-key` | `404` | `Api Key is required` |
-| La key no corresponde a ningún comercio | `404` | `Business not found` |
+| La key no corresponde a ningún comercio | `401` | `Api key is invalid` |
 
-Como el 404 también se usa para "el recurso no existe", si estás debugueando una integración nueva revisá el campo `message` para distinguir un problema de credenciales de un recurso inexistente.
+Una key inválida es un `401`. No la detectes con un `404`: ese código queda para cuando falta el header, o cuando la key es válida y el recurso pedido no existe (`Client not found`, `Level not found`, etc.). En ese caso mirá el campo `message`.
 
 ## Probar que funciona
 

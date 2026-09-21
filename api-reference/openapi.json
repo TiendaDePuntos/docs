@@ -201,8 +201,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -354,8 +398,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -554,8 +642,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -718,8 +850,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -869,8 +1045,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1192,8 +1412,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1356,8 +1620,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1556,8 +1864,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1722,8 +2074,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1927,8 +2323,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2107,8 +2547,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2255,8 +2739,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2411,8 +2939,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2704,8 +3276,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2857,8 +3473,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3013,8 +3673,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3177,8 +3881,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3328,8 +4076,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3590,8 +4382,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3743,8 +4579,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3943,8 +4823,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4107,8 +5031,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4302,8 +5270,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4493,8 +5505,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4677,8 +5733,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4742,7 +5842,7 @@
     },
     "/external/tags/add": {
       "post": {
-        "description": "Acredita puntos de forma inmediata a partir del monto de una compra. Es el endpoint principal para integrar un POS o ERP.\n\nEl cliente se identifica por `email` o `dni`. Si no existe, se crea automáticamente, salvo que se mande `ignoreCreateClient: true`.\n\n**Idempotencia**: mandá siempre `external_id` con el identificador de la venta en tu sistema (número de factura, id de ticket). Si llega un `external_id` que ya tiene una operación activa, la API responde 409 en vez de duplicar los puntos. Ese mismo `external_id` es el que se usa para cancelar la operación después.",
+        "description": "Acredita puntos de forma inmediata a partir del monto de una compra. Es el endpoint principal para integrar un POS o ERP.\n\nEl cliente se identifica por `email` o `dni`. Si no existe, se crea automáticamente, salvo que se mande `ignoreCreateClient: true`.\n\n**Idempotencia**: mandá siempre `external_id` con el identificador de la venta en tu sistema (número de factura, id de ticket). Si llega un `external_id` que ya tiene una operación activa, la API responde 409 en vez de duplicar los puntos. Ese mismo `external_id` es el que se usa para cancelar la operación después.\n\n**Sumar por ítems (`pointItems`)**: en vez del monto podés mandar los ids de los ítems de puntos del catálogo del comercio. Repetí el mismo id para cargar más de una unidad del ítem (tope de 100 ids). Si viene `pointItems`, el `amount` del body se ignora y el `amount` de la respuesta es la suma de los montos de los ítems; `points.selectedRewardType` pasa a `items`. Las bonificaciones de nivel y las reglas de puntos se siguen aplicando igual que en la suma por monto.",
         "operationId": "ExternalTagsController_createPointOperation",
         "parameters": [],
         "requestBody": {
@@ -4816,7 +5916,7 @@
             }
           },
           "400": {
-            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "description": "Los `pointItems` enviados no generan puntos: ni por sus puntos propios ni por la conversión de sus montos.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4841,7 +5941,51 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Error de validación"
+                      "example": "Los ítems enviados no suman puntos. Revisá la configuración de puntos y montos de los ítems."
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
                     },
                     "errors": {
                       "type": "array",
@@ -4904,7 +6048,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Alguno de los ids de `pointItems` no existe, fue eliminado o no pertenece al comercio de la API key.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4929,7 +6073,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "PointsItem with id 12 not found"
                     },
                     "errors": {
                       "type": "array",
@@ -4974,6 +6118,50 @@
                     "message": {
                       "type": "string",
                       "example": "Ya existe una operación de puntos con el externalId FAC-A-0001-00012345 para este negocio"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Hay otra operación en curso con el mismo `external_id` y no se pudo obtener el acceso exclusivo. **Es seguro reintentar**: si la otra terminó, el reintento devuelve 409; si no llegó a procesarse, acredita normalmente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 503
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "No se pudo procesar la suma en este momento. Reintentá en unos segundos."
                     },
                     "errors": {
                       "type": "array",
@@ -5113,6 +6301,50 @@
                     "message": {
                       "type": "string",
                       "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
                     },
                     "errors": {
                       "type": "array",
@@ -5288,8 +6520,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5467,8 +6743,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5662,8 +6982,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5821,74 +7185,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "integer",
-                            "example": 45012
-                          },
-                          "code": {
-                            "type": "string",
-                            "example": "A1B2C3"
-                          },
-                          "points": {
-                            "type": "integer",
-                            "example": 500
-                          },
-                          "status": {
-                            "type": "string",
-                            "example": "PENDING"
-                          },
-                          "createdAt": {
-                            "type": "string",
-                            "format": "date-time",
-                            "example": "2026-07-28T18:05:00.000Z"
-                          },
-                          "redeemedAt": {
-                            "type": "string",
-                            "format": "date-time",
-                            "nullable": true,
-                            "example": "2026-07-29T10:12:00.000Z"
-                          },
-                          "product": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "integer",
-                                "example": 771
-                              },
-                              "name": {
-                                "type": "string",
-                                "example": "Café gratis"
-                              },
-                              "points": {
-                                "type": "integer",
-                                "example": 500
-                              }
-                            }
-                          },
-                          "client": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "integer",
-                                "example": 84213
-                              },
-                              "firstName": {
-                                "type": "string",
-                                "example": "Juan Manuel"
-                              },
-                              "lastName": {
-                                "type": "string",
-                                "example": "Pérez"
-                              },
-                              "email": {
-                                "type": "string",
-                                "example": "juanma@mailinator.com"
-                              }
-                            }
-                          }
-                        }
+                        "$ref": "#/components/schemas/ExternalPurchaseOutputDto"
                       }
                     },
                     "meta": {
@@ -6008,8 +7305,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -6118,74 +7459,7 @@
                       "example": "Request was successful"
                     },
                     "data": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "integer",
-                          "example": 45012
-                        },
-                        "code": {
-                          "type": "string",
-                          "example": "A1B2C3"
-                        },
-                        "points": {
-                          "type": "integer",
-                          "example": 500
-                        },
-                        "status": {
-                          "type": "string",
-                          "example": "PENDING"
-                        },
-                        "createdAt": {
-                          "type": "string",
-                          "format": "date-time",
-                          "example": "2026-07-28T18:05:00.000Z"
-                        },
-                        "redeemedAt": {
-                          "type": "string",
-                          "format": "date-time",
-                          "nullable": true,
-                          "example": "2026-07-29T10:12:00.000Z"
-                        },
-                        "product": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "type": "integer",
-                              "example": 771
-                            },
-                            "name": {
-                              "type": "string",
-                              "example": "Café gratis"
-                            },
-                            "points": {
-                              "type": "integer",
-                              "example": 500
-                            }
-                          }
-                        },
-                        "client": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "type": "integer",
-                              "example": 84213
-                            },
-                            "firstName": {
-                              "type": "string",
-                              "example": "Juan Manuel"
-                            },
-                            "lastName": {
-                              "type": "string",
-                              "example": "Pérez"
-                            },
-                            "email": {
-                              "type": "string",
-                              "example": "juanma@mailinator.com"
-                            }
-                          }
-                        }
-                      }
+                      "$ref": "#/components/schemas/ExternalPurchaseOutputDto"
                     }
                   },
                   "required": [
@@ -6241,8 +7515,52 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`) o la API key no corresponde a ningún comercio (`Business not found`). También se usa cuando el recurso pedido no existe.",
+            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -6326,74 +7644,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "integer",
-                      "example": 45012
-                    },
-                    "code": {
-                      "type": "string",
-                      "example": "A1B2C3"
-                    },
-                    "points": {
-                      "type": "integer",
-                      "example": 500
-                    },
-                    "status": {
-                      "type": "string",
-                      "example": "PENDING"
-                    },
-                    "createdAt": {
-                      "type": "string",
-                      "format": "date-time",
-                      "example": "2026-07-28T18:05:00.000Z"
-                    },
-                    "redeemedAt": {
-                      "type": "string",
-                      "format": "date-time",
-                      "nullable": true,
-                      "example": "2026-07-29T10:12:00.000Z"
-                    },
-                    "product": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "integer",
-                          "example": 771
-                        },
-                        "name": {
-                          "type": "string",
-                          "example": "Café gratis"
-                        },
-                        "points": {
-                          "type": "integer",
-                          "example": 500
-                        }
-                      }
-                    },
-                    "client": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "integer",
-                          "example": 84213
-                        },
-                        "firstName": {
-                          "type": "string",
-                          "example": "Juan Manuel"
-                        },
-                        "lastName": {
-                          "type": "string",
-                          "example": "Pérez"
-                        },
-                        "email": {
-                          "type": "string",
-                          "example": "juanma@mailinator.com"
-                        }
-                      }
-                    }
-                  }
+                  "$ref": "#/components/schemas/ExternalPurchaseOutputDto"
                 }
               }
             }
@@ -6425,6 +7676,50 @@
                     "message": {
                       "type": "string",
                       "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
                     },
                     "errors": {
                       "type": "array",
@@ -6608,6 +7903,50 @@
               }
             }
           },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
           "404": {
             "description": "El cliente o la oferta del premio no existen en este comercio.",
             "content": {
@@ -6679,6 +8018,50 @@
                     "message": {
                       "type": "string",
                       "example": "El producto no se encuentra disponible."
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "No se pudo tomar el canje en este momento porque hay otro canje del mismo premio en curso. Es transitorio: reintentá la misma llamada. El canje **no** se realizó, así que el reintento no duplica puntos ni stock.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 503
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "No se pudo procesar el canje en este momento. Reintentá en unos segundos."
                     },
                     "errors": {
                       "type": "array",
@@ -6801,6 +8184,50 @@
                     "message": {
                       "type": "string",
                       "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
                     },
                     "errors": {
                       "type": "array",
@@ -8413,8 +9840,20 @@
         "properties": {
           "amount": {
             "type": "number",
-            "description": "Monto de la compra en pesos. La conversión a puntos la define la regla de puntos configurada por el comercio.",
+            "description": "Monto de la compra en pesos. La conversión a puntos la define la regla de puntos configurada por el comercio. Se ignora si mandás `pointItems`. Es obligatorio salvo que vengan `pointItems`.",
             "example": 50
+          },
+          "pointItems": {
+            "description": "IDs de los ítems de puntos ya cargados en el comercio. Si viene, los puntos se calculan a partir de los ítems y `amount` se ignora: el monto de la operación es la suma de los montos de los ítems. Repetí el mismo id para cargar más de una unidad (máximo 100 ids).",
+            "example": [
+              12,
+              12,
+              37
+            ],
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
           },
           "client": {
             "description": "Datos del cliente que hizo la compra.",
@@ -8483,10 +9922,14 @@
               "desktop-app",
               "dux"
             ]
+          },
+          "extra_data": {
+            "type": "string",
+            "description": "Datos crudos de la operación en el sistema de origen, como JSON serializado. Hoy solo se persiste cuando `origin` es `dragonfish` (son los renglones de la factura, que el export de movimientos muestra en la columna \"Artículos\"). Para cualquier otro origen se ignora en silencio.",
+            "example": "[{\"ArticuloDetalle\":\"Remera negra\",\"Cantidad\":3,\"Talle\":\"M\"}]"
           }
         },
         "required": [
-          "amount",
           "client"
         ]
       },
@@ -8579,6 +10022,73 @@
           "code"
         ]
       },
+      "ExternalPurchaseProductOutputDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "ID del premio.",
+            "example": 771
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre del premio.",
+            "example": "Café gratis"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "ExternalPurchaseClientOutputDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "ID del cliente.",
+            "example": 84213
+          },
+          "firstName": {
+            "type": "string",
+            "example": "Juan Manuel"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Pérez"
+          },
+          "email": {
+            "type": "string",
+            "description": "Sirve para identificar al cliente en el mostrador antes de entregar el premio.",
+            "example": "juanma@mailinator.com",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "firstName",
+          "lastName",
+          "email"
+        ]
+      },
+      "ExternalPurchaseBranchOutputDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "ID de la sucursal.",
+            "example": 1972
+          },
+          "name": {
+            "type": "string",
+            "example": "Sucursal Centro"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
       "ExternalPurchaseOutputDto": {
         "type": "object",
         "properties": {
@@ -8623,31 +10133,31 @@
             "nullable": true
           },
           "product": {
-            "type": "object",
             "description": "Premio canjeado. `null` en canjes por dinero.",
-            "example": {
-              "id": 771,
-              "name": "Café gratis"
-            },
-            "nullable": true
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExternalPurchaseProductOutputDto"
+              }
+            ]
           },
           "client": {
-            "type": "object",
             "description": "Cliente que canjeó.",
-            "example": {
-              "id": 84213,
-              "firstName": "Juan Manuel",
-              "lastName": "Pérez"
-            }
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExternalPurchaseClientOutputDto"
+              }
+            ]
           },
           "branch": {
-            "type": "object",
             "description": "Sucursal donde se registró el canje.",
-            "example": {
-              "id": 1972,
-              "name": "Sucursal Centro"
-            },
-            "nullable": true
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExternalPurchaseBranchOutputDto"
+              }
+            ]
           },
           "createdAt": {
             "format": "date-time",
