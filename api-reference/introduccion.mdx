@@ -15,7 +15,7 @@ Es la misma API que usan nuestras integraciones con Dragonfish, Fudo, Centum, Co
 https://api.tiendadepuntos.com
 ```
 
-```bash Desarrollo
+```bash QA
 https://apidev.tiendadepuntos.com
 ```
 
@@ -58,7 +58,7 @@ La integración más común es la de un punto de venta, y son tres llamadas:
     `GET /external/branch` te devuelve los IDs de tus sucursales. Guardalos en la configuración de cada caja.
   </Step>
   <Step title="Sumás puntos en cada venta">
-    `POST /external/tags/add` con el monto, el cliente y el número de factura como `external_id`.
+    `POST /external/tags/add` con el monto (o los ids de ítems de puntos en `pointItems`), el cliente y el número de factura como `external_id`.
   </Step>
   <Step title="Cancelás si se anula la venta">
     `PUT /external/tags/cancel/{externalId}` con ese mismo número de factura.
@@ -144,7 +144,7 @@ No todos los `PUT` se comportan igual, y la diferencia importa:
   <Step title="Conseguí tu API key">
     Se genera desde el panel, en **Configuración → Integraciones**. Ver [Autenticación](/api-reference/autenticacion).
   </Step>
-  <Step title="Probá contra desarrollo">
+  <Step title="Probá contra QA">
     Usá `https://apidev.tiendadepuntos.com` hasta que el flujo esté cerrado. Las operaciones de puntos afectan saldos reales de clientes.
   </Step>
   <Step title="Revisá el manejo de errores">

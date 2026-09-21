@@ -56,14 +56,16 @@ Los IDs de tus sucursales salen de `GET /external/branch`. Si omitís el header,
 
 | Situación | Código | `message` |
 | --- | --- | --- |
-| No mandaste el header `x-api-key` | `404` | `Api Key is required` |
+| No mandaste el header `x-api-key`, o vino vacío | `401` | `Api Key is required` |
 | La key no corresponde a ningún comercio | `401` | `Api key is invalid` |
 
-Una key inválida es un `401`. No la detectes con un `404`: ese código queda para cuando falta el header, o cuando la key es válida y el recurso pedido no existe (`Client not found`, `Level not found`, etc.). En ese caso mirá el campo `message`.
+Los dos fallos de credencial son `401`. El `message` los separa: header ausente contra key que no pertenece a ningún comercio.
+
+El `404` queda para cuando la key es válida y el recurso pedido no existe (`Client not found`, `Level not found`, `PointsItem with id 12 not found`).
 
 ## Probar que funciona
 
-El endpoint más liviano para verificar que tu key está bien configurada es el de sucursales:
+El endpoint más liviano para verificar que tu key está bien configurada es el de sucursales, contra QA (`https://apidev.tiendadepuntos.com`):
 
 ```bash
 curl https://apidev.tiendadepuntos.com/external/branch \

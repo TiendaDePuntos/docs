@@ -202,7 +202,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -246,7 +246,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -271,7 +271,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -399,7 +399,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -443,7 +443,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -468,7 +468,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -643,7 +643,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -687,7 +687,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -712,7 +712,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -851,7 +851,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -895,7 +895,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -920,7 +920,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -1046,7 +1046,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -1090,7 +1090,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1115,7 +1115,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -1413,7 +1413,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -1457,7 +1457,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1482,7 +1482,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -1621,7 +1621,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -1665,7 +1665,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1690,7 +1690,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -1865,7 +1865,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -1909,7 +1909,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1934,7 +1934,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -2075,7 +2075,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -2119,7 +2119,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2144,7 +2144,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -2324,7 +2324,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -2368,7 +2368,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2393,7 +2393,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -2548,7 +2548,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -2592,7 +2592,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2617,7 +2617,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -2740,7 +2740,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -2784,7 +2784,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -2809,7 +2809,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -2940,7 +2940,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -2984,7 +2984,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3009,7 +3009,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -3277,7 +3277,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -3321,7 +3321,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3346,7 +3346,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -3474,7 +3474,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -3518,7 +3518,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3543,7 +3543,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -3674,7 +3674,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -3718,7 +3718,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3743,7 +3743,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -3882,7 +3882,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -3926,7 +3926,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3951,7 +3951,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -4077,7 +4077,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -4121,7 +4121,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4146,7 +4146,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -4383,7 +4383,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -4427,7 +4427,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4452,7 +4452,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -4580,7 +4580,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -4624,7 +4624,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4649,7 +4649,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -4824,7 +4824,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -4868,7 +4868,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4893,7 +4893,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -5032,7 +5032,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -5076,7 +5076,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5101,7 +5101,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -5271,7 +5271,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -5315,7 +5315,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5340,7 +5340,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -5506,7 +5506,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -5550,7 +5550,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5575,7 +5575,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -5734,7 +5734,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -5778,7 +5778,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5803,7 +5803,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -5960,7 +5960,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -6319,7 +6319,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -6521,7 +6521,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -6565,7 +6565,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -6590,7 +6590,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -6744,7 +6744,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -6788,7 +6788,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -6813,7 +6813,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -6983,7 +6983,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -7027,7 +7027,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7052,7 +7052,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -7306,7 +7306,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -7350,7 +7350,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7375,7 +7375,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -7516,7 +7516,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -7560,7 +7560,7 @@
             }
           },
           "404": {
-            "description": "Falta el header `x-api-key` (`Api Key is required`). También se usa cuando el recurso pedido no existe.",
+            "description": "La key es válida y el recurso pedido no existe.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7585,7 +7585,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Api Key is required"
+                      "example": "Client not found"
                     },
                     "errors": {
                       "type": "array",
@@ -7694,7 +7694,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -7904,7 +7904,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -8202,7 +8202,7 @@
             }
           },
           "401": {
-            "description": "El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -8367,7 +8367,7 @@
     },
     {
       "url": "https://apidev.tiendadepuntos.com",
-      "description": "Desarrollo"
+      "description": "QA"
     }
   ],
   "components": {

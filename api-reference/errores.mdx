@@ -39,16 +39,16 @@ En los errores de validación (`400`), el campo `errors` trae el detalle campo p
 
 | Código | Qué significa | Qué hacer |
 | --- | --- | --- |
-| `400` | Datos inválidos, o una regla de negocio que no se cumple (canje ya entregado, código de validación incorrecto, tope de operadores del plan alcanzado). | Revisá `errors` y `message`. No reintentar sin corregir. |
-| `401` | El header `x-api-key` está presente pero no corresponde a ningún comercio (`Api key is invalid`). | Revisá la key. No reintentes con la misma. |
+| `400` | Datos inválidos, o una regla de negocio que no se cumple (canje ya entregado, código de validación incorrecto, tope de operadores del plan alcanzado, `pointItems` vacío o ítems que no suman puntos). | Revisá `errors` y `message`. No reintentar sin corregir. |
+| `401` | Falta `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`). | Revisá el header. No reintentes con la misma key. |
 | `403` | El `branch_id` que mandaste no pertenece a tu comercio. | Verificá los IDs con `GET /external/branch`. |
-| `404` | Falta el header `x-api-key` (`Api Key is required`), **o** el recurso no existe. | Mirá el `message` para distinguir los casos. |
+| `404` | La key es válida y el recurso no existe (cliente, premio, nivel, ítem de puntos). | Mirá el `message`. |
 | `409` | Ya existe una operación con ese `external_id`, o el dato que querés guardar está tomado: el email o documento de un cliente, la tarjeta de afiliado, los `minPoints` de un nivel. | Si es por `external_id`, **no reintentes**: los puntos ya se acreditaron. En el resto, corregí el dato. |
 | `429` | Superaste el rate limit. | Esperá y reintentá con backoff. |
 | `500` | Error del lado nuestro. | Reintentá con backoff. Si persiste, escribinos. |
 
 <Note>
-  Una key presente pero inválida responde `401` con `Api key is invalid`. El `404` cubre otros dos casos: falta el header `x-api-key` (`Api Key is required`) y el recurso inexistente (`Level not found`, `Client not found`, `Sucursal no encontrada`).
+  Sin header, o con el header vacío, la respuesta es `401` y `Api Key is required`. Con una key que no corresponde a ningún comercio, también es `401`, con `Api key is invalid`. El `404` queda para un recurso que no existe en tu comercio (`Level not found`, `Client not found`, `PointsItem with id 12 not found`).
 </Note>
 
 ## Idempotencia

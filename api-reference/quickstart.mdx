@@ -6,7 +6,7 @@ description: "De cero a sumar puntos en una venta real, paso a paso."
 Esta guía arma la integración más común: que tu POS sume puntos automáticamente cuando un cliente compra. Al final vas a tener el flujo completo, incluida la anulación de ventas.
 
 <Info>
-  Todos los ejemplos apuntan a `https://apidev.tiendadepuntos.com`. Cambiá a `https://api.tiendadepuntos.com` recién cuando el flujo esté probado: las operaciones de puntos afectan saldos reales.
+  Todos los ejemplos apuntan a QA, `https://apidev.tiendadepuntos.com`. Cambiá a `https://api.tiendadepuntos.com` recién cuando el flujo esté probado: las operaciones de puntos afectan saldos reales.
 </Info>
 
 ## 1. Verificá tu API key
@@ -170,7 +170,23 @@ Respuesta:
 }
 ```
 
-### Los tres campos que importan
+Si en el panel cargaste ítems de puntos, podés mandar sus ids en `pointItems` en vez del monto. Repetir un id suma una unidad más. Cuando viene `pointItems`, el `amount` del body se ignora y el monto de la operación es la suma de los montos de esos ítems.
+
+```json
+{
+  "pointItems": [12, 12, 37],
+  "external_id": "FAC-A-0001-00012346",
+  "client": {
+    "email": "ana@ejemplo.com",
+    "first_name": "Ana",
+    "last_name": "Pérez"
+  }
+}
+```
+
+En esa respuesta, `points.selectedRewardType` es `"items"`. Un id que no existe en tu comercio, o que fue eliminado, responde `404` con `PointsItem with id 12 not found`.
+
+### Los campos que importan
 
 <AccordionGroup>
   <Accordion title="external_id — la clave de idempotencia" defaultOpen>
@@ -182,6 +198,11 @@ Respuesta:
     Necesitás al menos uno de los dos: `email` o `dni`. Si el cliente no existe todavía, se crea automáticamente con los datos que mandes. Mandá también `first_name` y `last_name` para que el alta quede prolija.
 
     Si preferís que la operación falle en vez de dar de alta clientes desconocidos, agregá `"ignoreCreateClient": true`.
+  </Accordion>
+  <Accordion title="pointItems — sumar por ítems del catálogo">
+    Array opcional de ids de ítems de puntos que ya cargaste en el panel. No hay un endpoint para listarlos: los ids los ves en el panel.
+
+    De 1 a 100 enteros positivos. `[12, 12, 37]` son dos unidades del ítem 12 y una del 37. Si los ítems no suman puntos, la API responde `400`.
   </Accordion>
   <Accordion title="origin — trazabilidad">
     Identifica de qué sistema vino la operación, para los reportes del panel. Si integrás un sistema propio, usá `external-integration`.
