@@ -258,6 +258,12 @@ curl "https://apidev.tiendadepuntos.com/external/clients/search?query=juanma@mai
 
 El campo `score` de la respuesta es el saldo de puntos disponible. La búsqueda es por coincidencia exacta de email o de número de documento; si no encuentra a nadie devuelve `404`.
 
+La respuesta también dice si el cliente ya completó su registro en la plataforma (`registered`). Si todavía no lo hizo, `register_url` trae el link para que lo complete, ya armado con el subdominio o el dominio propio de tu comercio. Podés mandárselo por WhatsApp o imprimirlo como QR en el ticket.
+
+<Warning>
+  `register_url` funciona como una credencial: quien lo abra puede definir la contraseña de la cuenta del cliente y usar sus puntos. Mandáselo solo al cliente y no lo guardes en tu base ni lo registres en logs. Cuando el cliente completa el registro, el link deja de funcionar y el campo viene en `null`.
+</Warning>
+
 ## 5. Entregá canjes en el mostrador
 
 Cuando un cliente llega con el código de un premio, son dos llamadas: primero consultás qué pidió, después confirmás la entrega.

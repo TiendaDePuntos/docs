@@ -1773,17 +1773,18 @@
     },
     "/external/clients/search": {
       "get": {
-        "description": "Busca un único cliente del comercio por email exacto o por número de documento exacto. No hace búsqueda parcial. Si no encuentra al cliente devuelve 404 con el mensaje `Client not found`.",
+        "description": "Busca un único cliente del comercio por email exacto o por número de documento exacto. No hace búsqueda parcial. Si más de un cliente coincide, devuelve el más antiguo. Si no encuentra al cliente devuelve 404 con el mensaje `Client not found`.\n\nAdemás de los datos del cliente, indica si ya completó su registro (`registered`) y, si no, devuelve el link para que lo complete (`register_url`).\n\n**Atención**: `register_url` funciona como una credencial. Quien lo abra puede definir la contraseña de la cuenta del cliente y usar sus puntos. Mandáselo solo al cliente (por ejemplo, por WhatsApp o impreso en el ticket) y no lo guardes ni lo registres en logs.",
         "operationId": "ExternalClientController_search",
         "parameters": [
           {
             "name": "query",
             "required": true,
             "in": "query",
-            "description": "Email o número de documento del cliente.",
+            "description": "Email o número de documento exacto del cliente.",
             "schema": {
-              "type": "string",
-              "example": "juanma@mailinator.com"
+              "maxLength": 255,
+              "example": "juanma@mailinator.com",
+              "type": "string"
             }
           }
         ],
@@ -1808,7 +1809,7 @@
                       "example": "Request was successful"
                     },
                     "data": {
-                      "$ref": "#/components/schemas/ExternalClientOutputDto"
+                      "$ref": "#/components/schemas/ExternalClientSearchOutputDto"
                     }
                   },
                   "required": [
@@ -1909,7 +1910,7 @@
             }
           },
           "404": {
-            "description": "La key es válida y el recurso pedido no existe.",
+            "description": "Ningún cliente del comercio tiene ese email o documento.",
             "content": {
               "application/json": {
                 "schema": {
@@ -8808,6 +8809,177 @@
           "last_transaction",
           "purchases_counter",
           "reads_counter"
+        ]
+      },
+      "ExternalClientSearchOutputDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "ID del cliente en Tienda de Puntos",
+            "example": 84213
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre completo",
+            "example": "Juan Manuel Pérez"
+          },
+          "first_name": {
+            "type": "string",
+            "description": "Nombre",
+            "example": "Juan Manuel"
+          },
+          "last_name": {
+            "type": "string",
+            "description": "Apellido",
+            "example": "Pérez"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email",
+            "example": "juanma@mailinator.com",
+            "nullable": true
+          },
+          "dni": {
+            "type": "string",
+            "description": "Número de documento. Alias de `document_number`, se mantiene por compatibilidad.",
+            "example": "40100800",
+            "nullable": true
+          },
+          "document_number": {
+            "type": "string",
+            "description": "Número de documento",
+            "example": "40100800",
+            "nullable": true
+          },
+          "document_type": {
+            "type": "string",
+            "description": "Tipo de documento",
+            "example": "DNI",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "description": "Teléfono",
+            "example": "+541164593678",
+            "nullable": true
+          },
+          "gender": {
+            "type": "number",
+            "description": "Género. 0 = masculino, 1 = femenino, 2 = otro, 3 = sin datos.",
+            "enum": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "example": 0
+          },
+          "affiliate_card": {
+            "type": "string",
+            "description": "Número de tarjeta de afiliado",
+            "example": "00012345",
+            "nullable": true
+          },
+          "score": {
+            "type": "number",
+            "description": "Puntos disponibles del cliente",
+            "example": 1250
+          },
+          "total_score": {
+            "type": "number",
+            "description": "Puntos acumulados históricamente",
+            "example": 8400
+          },
+          "description": {
+            "type": "string",
+            "description": "Observaciones internas del comercio",
+            "example": null,
+            "nullable": true
+          },
+          "birthday": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Fecha de nacimiento",
+            "example": "1990-01-01T00:00:00.000Z",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "description": "Estado del cliente en el programa de fidelidad",
+            "enum": [
+              "SUSPEND",
+              "ACTIVE"
+            ],
+            "example": "ACTIVE"
+          },
+          "level": {
+            "description": "Nivel actual del cliente. `null` si el comercio no usa niveles o el cliente todavía no alcanzó el primero.",
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExternalClientLevelOutputDto"
+              }
+            ]
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Fecha de alta",
+            "example": "2026-02-14T12:30:00.000Z"
+          },
+          "last_transaction": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Fecha de la última transacción de puntos",
+            "example": "2026-07-28T18:05:00.000Z",
+            "nullable": true
+          },
+          "purchases_counter": {
+            "type": "number",
+            "description": "Cantidad de canjes realizados",
+            "example": 7
+          },
+          "reads_counter": {
+            "type": "number",
+            "description": "Cantidad de operaciones de suma de puntos",
+            "example": 32
+          },
+          "registered": {
+            "type": "boolean",
+            "description": "Si el cliente ya completó su registro en la plataforma (definió su contraseña o validó su email).",
+            "example": false
+          },
+          "register_url": {
+            "type": "string",
+            "description": "Link para que el cliente complete su registro. Ya apunta al subdominio o al dominio propio del comercio. `null` si el cliente ya está registrado.\n\n**Es una credencial**: quien lo abra puede definir la contraseña de la cuenta. Mandáselo solo al cliente y no lo guardes ni lo registres en logs.",
+            "example": "https://micomercio.tiendadepuntos.com/auth/register/4f1c9a2e-8b7d-4e3a-9c61-2d5f0b8a7e14/1532",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "first_name",
+          "last_name",
+          "email",
+          "dni",
+          "document_number",
+          "document_type",
+          "phone",
+          "gender",
+          "affiliate_card",
+          "score",
+          "total_score",
+          "description",
+          "birthday",
+          "status",
+          "created_at",
+          "last_transaction",
+          "purchases_counter",
+          "reads_counter",
+          "registered",
+          "register_url"
         ]
       },
       "CreateExternalClientDto": {
