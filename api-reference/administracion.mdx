@@ -1,9 +1,9 @@
 ---
 title: "Administrar el programa"
-description: "Crear y mantener niveles, premios, clientes y operadores desde tu sistema."
+description: "Crear y mantener niveles, premios, ítems de puntos, clientes y operadores desde tu sistema."
 ---
 
-Más allá de sumar puntos y entregar canjes, la API te deja administrar la configuración del programa: los niveles, el catálogo de premios, el padrón de clientes y el personal del comercio. Es lo mismo que hacés en el panel, con las mismas reglas de negocio.
+Más allá de sumar puntos y entregar canjes, la API te deja administrar la configuración del programa: los niveles, el catálogo de premios, los ítems de puntos, el padrón de clientes y el personal del comercio. Es lo mismo que hacés en el panel, con las mismas reglas de negocio.
 
 <Info>
   Todos los ejemplos apuntan a `https://apidev.tiendadepuntos.com` (QA). Estas llamadas escriben configuración real del comercio: probá contra QA antes de pasar a producción.
@@ -104,6 +104,60 @@ curl -X POST https://apidev.tiendadepuntos.com/external/products \
 
   Si el premio usa cupones personalizados (los que se cargan uno por uno desde el panel), no mandes `stock`: ese stock lo derivan los cupones y la API responde `400`.
 </Note>
+
+## Ítems de puntos
+
+Un ítem de puntos es un concepto del comercio con una equivalencia fija, en puntos o en pesos. Sirve para sumar sin tipear el monto de la venta: es lo que el cajero elige en la opción **Ítems** de Suma directa, y lo que mandás en `pointItems` al sumar o al simular una suma.
+
+<Note>
+  No confundir con los **premios** de `/external/products`, que son lo que el cliente canjea gastando puntos. Son catálogos distintos y no tienen relación entre sí.
+</Note>
+
+```bash
+curl -X POST https://apidev.tiendadepuntos.com/external/point-items \
+  -H "x-api-key: TU_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "name": "Café latte", "points": 50 }'
+```
+
+```json
+{
+  "success": true,
+  "status": 201,
+  "message": "Request was successful",
+  "data": {
+    "id": 87,
+    "name": "Café latte",
+    "points": 50,
+    "amount": null,
+    "branchId": null,
+    "createdAt": "2026-09-23T14:32:11.000Z",
+    "updatedAt": "2026-09-23T14:32:11.000Z"
+  }
+}
+```
+
+Guardá el `id` de la respuesta: es el identificador estable del ítem y el que usás después en `pointItems`.
+
+<AccordionGroup>
+  <Accordion title="points o amount, no los dos" defaultOpen>
+    `points` son puntos fijos, sin importar el precio. `amount` es una equivalencia en pesos que se convierte a puntos con la regla del comercio, igual que una compra por ese monto. Si mandás los dos, se ignora `amount`. Si no mandás ninguno, la API responde `400`. Los dos tienen que ser positivos.
+  </Accordion>
+  <Accordion title="Los ítems creados por API aplican a todo el comercio">
+    El alta no acepta sucursal: el ítem queda disponible en todas y viaja con `branchId: null`. Los ítems que el comercio limitó a una sucursal desde el panel conservan su `branchId`, y el `PUT` no lo modifica.
+  </Accordion>
+  <Accordion title="Listado y filtro por sucursal">
+    `GET /external/point-items` es un listado paginado (`{ data, meta, links }`, sin envelope). Se puede ordenar por `name`, `points`, `amount` o `createdAt`. Con el header `x-branch-id` devuelve los ítems de esa sucursal más los que aplican a todo el comercio. Si la sucursal no es de tu comercio, responde `404`.
+  </Accordion>
+</AccordionGroup>
+
+`PUT /external/point-items/{id}` es un **reemplazo total**: mandá el ítem completo, con las mismas reglas que el alta. Cambiar el valor de un ítem, o eliminarlo con `DELETE`, no altera las sumas ya hechas: cada operación guarda los puntos que se aplicaron en su momento.
+
+<Warning>
+  El comercio también puede editar y eliminar ítems desde su panel, incluidos los que creaste por API, y la API no te avisa. Un `404` en `GET /external/point-items/{id}` significa que el ítem ya no existe: no es un error transitorio. Volvé a sincronizar tu mapeo contra el listado en vez de reintentar.
+
+  Tampoco hay control de nombres duplicados. Antes de crear un ítem, fijate en el listado si ya existe.
+</Warning>
 
 ## Clientes
 

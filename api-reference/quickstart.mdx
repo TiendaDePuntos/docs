@@ -200,7 +200,7 @@ En esa respuesta, `points.selectedRewardType` es `"items"`. Un id que no existe 
     Si preferís que la operación falle en vez de dar de alta clientes desconocidos, agregá `"ignoreCreateClient": true`.
   </Accordion>
   <Accordion title="pointItems — sumar por ítems del catálogo">
-    Array opcional de ids de ítems de puntos que ya cargaste en el panel. No hay un endpoint para listarlos: los ids los ves en el panel.
+    Array opcional de ids de ítems de puntos del catálogo del comercio. Los ids salen de `GET /external/point-items`, y también podés crear y editar ítems desde tu sistema: ver la sección **Ítems de puntos** en [Administrar el programa](/api-reference/administracion).
 
     De 1 a 100 enteros positivos. `[12, 12, 37]` son dos unidades del ítem 12 y una del 37. Si los ítems no suman puntos, la API responde `400`.
   </Accordion>
@@ -208,6 +208,46 @@ En esa respuesta, `points.selectedRewardType` es `"items"`. Un id que no existe 
     Identifica de qué sistema vino la operación, para los reportes del panel. Si integrás un sistema propio, usá `external-integration`.
   </Accordion>
 </AccordionGroup>
+
+### Antes de cobrar: simulá la suma
+
+Si querés mostrarle al cliente cuántos puntos va a sumar antes de cerrar la venta, `POST /external/tags/add/preview` hace el mismo cálculo que la suma real, con bonificaciones de nivel y reglas de puntos incluidas, **sin acreditar nada**.
+
+```bash
+curl -X POST https://apidev.tiendadepuntos.com/external/tags/add/preview \
+  -H "x-api-key: TU_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "clientId": 84213, "amount": 55000, "branch_id": 1972 }'
+```
+
+```json
+{
+  "success": true,
+  "status": 200,
+  "message": "Request was successful",
+  "data": {
+    "points": {
+      "initialPointsToGive": 550,
+      "levelBonusPoints": 55,
+      "pointRulesBonusPoints": 0,
+      "totalPointsToGive": 605
+    },
+    "calculatedAt": "2026-09-23T14:32:11.000Z"
+  }
+}
+```
+
+Mandá **uno solo** de estos tres modos: `amount`, `pointItems` o `initialPointsToGive`. Si mandás ninguno o más de uno, la API responde `400`. Hay tres diferencias con la suma real:
+
+- El cliente se identifica por `clientId` y tiene que existir. Previsualizar no da de alta a nadie. El `clientId` lo sacás de `GET /external/clients/search`.
+- `pointItems` lleva la cantidad explícita: `[{ "id": 12, "quantity": 2 }]` acá equivale a `[12, 12]` en `POST /external/tags/add`.
+- `initialPointsToGive` (puntos directos, sin conversión) solo existe en la simulación. La suma real no lo acepta.
+
+<Warning>
+  La simulación **no reserva nada**. Si entre la simulación y la venta cambian las bonificaciones, el nivel del cliente o el catálogo de ítems, la suma real puede dar otro número. Mandá el mismo `branch_id` en las dos llamadas: hay bonificaciones que aplican solo a ciertas sucursales.
+</Warning>
+
+Un cliente suspendido responde `403`, igual que en la suma real. Si el valor enviado no alcanza para otorgar ni un punto, la respuesta es `400`.
 
 ## 3. Manejá la anulación de ventas
 
@@ -345,7 +385,7 @@ Además de entregar canjes que el cliente generó en la app, podés generarlos v
 Para canjear por dinero en vez de por un premio, `POST /external/exchange/money` con `moneyAmount` y `clientId`. Si el comercio tiene un mínimo configurado y no se alcanza, devuelve `409`.
 
 <Tip>
-  Los listados (`/external/products`, `/external/levels`, `/external/clients`, `/external/operators`, `/external/purchase`) devuelven `{ data, meta, links }` en la raíz, sin el envelope. Los premios están en `data`, no en `items`.
+  Los listados (`/external/products`, `/external/levels`, `/external/point-items`, `/external/clients`, `/external/operators`, `/external/purchase`) devuelven `{ data, meta, links }` en la raíz, sin el envelope. Los premios están en `data`, no en `items`.
 </Tip>
 
 ## Y después

@@ -29,11 +29,17 @@ Todos los endpoints públicos cuelgan de `/external`.
   <Card title="Sumar puntos" icon="plus" href="/api-reference/endpoints/puntos/sumar-puntos-a-un-cliente-por-una-compra">
     Acreditar puntos por el monto de una compra, con el cliente identificado por email o documento.
   </Card>
+  <Card title="Simular una suma" icon="calculator" href="/api-reference/endpoints/puntos/simular-una-suma-de-puntos">
+    Calcular cuántos puntos va a sumar una compra, con bonificaciones incluidas, sin acreditar nada.
+  </Card>
   <Card title="Administrar clientes" icon="users" href="/api-reference/endpoints/clientes/listar-clientes">
     Listar, dar de alta, editar y dar de baja clientes, con su saldo de puntos y su nivel.
   </Card>
   <Card title="Mantener el catálogo" icon="package" href="/api-reference/endpoints/premios/listar-premios">
     Crear y editar premios con su precio en puntos por nivel, y controlar su stock.
+  </Card>
+  <Card title="Mantener ítems de puntos" icon="list" href="/api-reference/administracion">
+    Crear y editar los conceptos con equivalencia fija que se usan para sumar sin tipear el monto.
   </Card>
   <Card title="Configurar niveles" icon="layers" href="/api-reference/endpoints/niveles/listar-niveles">
     Armar la escalera de niveles del programa y sus multiplicadores de puntos.
@@ -100,7 +106,7 @@ La mayoría de los endpoints envuelve el resultado en una estructura común:
 ```
 
 <Warning>
-  Los listados paginados **no** usan este envelope: devuelven `{ data, meta, links }` en la raíz. Son `GET /external/clients`, `/external/levels`, `/external/products`, `/external/operators` y `/external/purchase`. `GET /external/purchase/code/{code}` también devuelve el objeto directamente. Está aclarado en la ficha de cada uno.
+  Los listados paginados **no** usan este envelope: devuelven `{ data, meta, links }` en la raíz. Son `GET /external/clients`, `/external/levels`, `/external/products`, `/external/point-items`, `/external/operators` y `/external/purchase`. `GET /external/purchase/code/{code}` también devuelve el objeto directamente. Está aclarado en la ficha de cada uno.
 
   Además, el campo `status` de adentro del envelope no siempre coincide con el código HTTP de la respuesta. **Guiate por el código HTTP**, no por ese campo.
 </Warning>
@@ -135,6 +141,7 @@ No todos los `PUT` se comportan igual, y la diferencia importa:
 | --- | --- |
 | `PUT /external/levels/{id}` | Reemplazo total: mandá el nivel completo |
 | `PUT /external/products/{id}` | Reemplazo total: las ofertas y categorías que no vengan se eliminan |
+| `PUT /external/point-items/{id}` | Reemplazo total: mandá el ítem completo |
 | `PUT /external/clients/{id}` | Incremental: lo que no mandás queda como está |
 | `PUT /external/operators/{id}` | Incremental en los datos personales; `branches` reemplaza las asignaciones |
 

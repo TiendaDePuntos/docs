@@ -6199,6 +6199,249 @@
         }
       }
     },
+    "/external/tags/add/preview": {
+      "post": {
+        "description": "Devuelve cuántos puntos se acreditarían, con el desglose, **sin acreditar nada**. Sirve para mostrarle al cliente lo que va a sumar antes de cerrar la venta.\n\nMandá **uno** de estos tres: `amount` (monto de la compra), `initialPointsToGive` (puntos directos) o `pointItems` (ítems de puntos con sus cantidades, cuyos IDs salen de `GET /external/point-items`).\n\nA diferencia de `POST /external/tags/add`, el cliente se identifica por `clientId` y tiene que existir: previsualizar no da de alta a nadie.\n\n**No reserva nada.** El resultado es el de este momento: si cambian las bonificaciones, el nivel del cliente o el catálogo de ítems, la suma real puede dar distinto. Mandá el mismo `branch_id` que vas a usar después, porque hay bonificaciones por sucursal.\n\n**Cómo pasar de la simulación a la suma real**: `POST /external/tags/add` acepta `amount` o `pointItems`, pero con otro formato: allá `pointItems` es un array de ids donde la cantidad se expresa repitiendo el id (`[{ \"id\": 12, \"quantity\": 2 }]` acá equivale a `[12, 12]` allá). La suma real no acepta `initialPointsToGive`: si simulás por ese modo, no hay una acreditación equivalente por esta API.",
+        "operationId": "ExternalTagsController_previewPointOperation",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExternalDirectSumPreviewDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Desglose de los puntos que se acreditarían.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExternalDirectSumPreviewOutputDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Faltan los tres modos de carga, vinieron más de uno, o el valor enviado no alcanza para otorgar ni un punto.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "La operación no otorga ningún punto: el valor enviado no alcanza para sumar ni un punto con la configuración del comercio."
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "El cliente está suspendido, así que la suma real tampoco se acreditaría.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 403
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "El cliente al que estás intentando sumar puntos se encuentra suspendido"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "El cliente, la sucursal o alguno de los ítems no existe para este comercio.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Client not found"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Simular una suma de puntos",
+        "tags": [
+          "Puntos"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/puntos/simular-una-suma-de-puntos",
+          "metadata": {
+            "title": "Simular una suma de puntos",
+            "sidebarTitle": "Simular una suma de puntos"
+          }
+        }
+      }
+    },
     "/external/tags/cancel/{externalId}": {
       "put": {
         "description": "Revierte una operación de puntos identificada por el `external_id` con el que se creó. Se usa cuando se anula la venta en el sistema de origen. Descuenta los puntos que se habían acreditado.",
@@ -7110,6 +7353,1123 @@
           "metadata": {
             "title": "Validar el código ingresado por el cliente",
             "sidebarTitle": "Validar el código ingresado por el cliente"
+          }
+        }
+      }
+    },
+    "/external/point-items": {
+      "get": {
+        "description": "Devuelve los ítems de puntos del comercio, paginado.\n\nEl `id` de cada ítem es lo que después mandás para pedir la simulación de puntos.\n\nSi enviás el header `x-branch-id`, devuelve los ítems de esa sucursal más los que aplican a todo el comercio.\n\n**Atención**: este endpoint devuelve `{ data, meta, links }` en la raíz, sin el envelope `{ success, status, message, data }`.",
+        "operationId": "ExternalPointItemController_findAll",
+        "parameters": [
+          {
+            "name": "order",
+            "required": false,
+            "in": "query",
+            "description": "Campo por el que ordenar.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "name",
+                "points",
+                "amount",
+                "createdAt"
+              ]
+            }
+          },
+          {
+            "name": "x-branch-id",
+            "in": "header",
+            "description": "ID de la sucursal en la que se registra la operación. Si se omite, la operación queda asociada al comercio sin sucursal.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "example": 1972
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "example": 1
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Cantidad de resultados por página. Máximo 200.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 10,
+              "example": 10
+            }
+          },
+          {
+            "name": "query",
+            "required": false,
+            "in": "query",
+            "description": "Búsqueda parcial por nombre.",
+            "schema": {
+              "type": "string",
+              "example": "café"
+            }
+          },
+          {
+            "name": "direction",
+            "required": false,
+            "in": "query",
+            "description": "Sentido del orden. Solo aplica si se envía `order`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Página de ítems de puntos. Sin envelope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ExternalPointItemOutputDto"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "totalItems": {
+                          "type": "integer",
+                          "example": 128
+                        },
+                        "itemCount": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "itemsPerPage": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "totalPages": {
+                          "type": "integer",
+                          "example": 13
+                        },
+                        "currentPage": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "from": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "to": {
+                          "type": "integer",
+                          "example": 10
+                        }
+                      }
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "first": {
+                          "type": "string",
+                          "example": "external/point-items?page=1&limit=10"
+                        },
+                        "previous": {
+                          "type": "string",
+                          "nullable": true,
+                          "example": null
+                        },
+                        "next": {
+                          "type": "string",
+                          "nullable": true,
+                          "example": "external/point-items?page=2&limit=10"
+                        },
+                        "last": {
+                          "type": "string",
+                          "example": "external/point-items?page=13&limit=10"
+                        },
+                        "path": {
+                          "type": "string",
+                          "example": "external/point-items"
+                        },
+                        "firstPageUrl": {
+                          "type": "string",
+                          "example": "external/point-items?page=1&limit=10"
+                        },
+                        "lastPageUrl": {
+                          "type": "string",
+                          "example": "external/point-items?page=13&limit=10"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La key es válida y el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Client not found"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Listar ítems de puntos",
+        "tags": [
+          "Ítems de puntos"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/items-de-puntos/listar-items-de-puntos",
+          "metadata": {
+            "title": "Listar ítems de puntos",
+            "sidebarTitle": "Listar ítems de puntos"
+          }
+        }
+      },
+      "post": {
+        "description": "Crea un ítem en el catálogo del comercio.\n\nMandá `points` (puntos fijos) **o** `amount` (equivalencia en pesos, que se convierte con la regla del comercio). Si mandás los dos, se ignora `amount`. Si no mandás ninguno, la API responde 400.\n\nEl ítem se crea disponible en todas las sucursales.\n\nGuardá el `id` de la respuesta: es con lo que después identificás el ítem.",
+        "operationId": "ExternalPointItemController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExternalPointItemDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ítem creado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 201
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExternalPointItemOutputDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La key es válida y el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Client not found"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Crear un ítem de puntos",
+        "tags": [
+          "Ítems de puntos"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/items-de-puntos/crear-un-item-de-puntos",
+          "metadata": {
+            "title": "Crear un ítem de puntos",
+            "sidebarTitle": "Crear un ítem de puntos"
+          }
+        }
+      }
+    },
+    "/external/point-items/{id}": {
+      "get": {
+        "description": "Devuelve un ítem de puntos por su ID.\n\nUn **404** acá significa que el ítem ya no existe: el comercio lo puede eliminar desde su panel, igual que cualquier otro ítem. No lo trates como un error transitorio — es la señal de que tenés que volver a sincronizar el mapeo contra tu catálogo.",
+        "operationId": "ExternalPointItemController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID del ítem de puntos en Tienda de Puntos.",
+            "schema": {
+              "type": "integer",
+              "example": 87
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ítem encontrado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExternalPointItemOutputDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La key es válida y el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Client not found"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Obtener un ítem de puntos",
+        "tags": [
+          "Ítems de puntos"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/items-de-puntos/obtener-un-item-de-puntos",
+          "metadata": {
+            "title": "Obtener un ítem de puntos",
+            "sidebarTitle": "Obtener un ítem de puntos"
+          }
+        }
+      },
+      "put": {
+        "description": "Reemplaza los datos de un ítem. **No es un patch**: mandá siempre el ítem completo, con las mismas reglas que el alta.\n\nCambiar el valor de un ítem no altera las sumas ya realizadas: cada operación guarda los puntos que se aplicaron en su momento.\n\nLa sucursal del ítem no se modifica por esta API.",
+        "operationId": "ExternalPointItemController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID del ítem de puntos en Tienda de Puntos.",
+            "schema": {
+              "type": "integer",
+              "example": 87
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateExternalPointItemDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ítem actualizado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExternalPointItemOutputDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La key es válida y el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Client not found"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Actualizar un ítem de puntos",
+        "tags": [
+          "Ítems de puntos"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/items-de-puntos/actualizar-un-item-de-puntos",
+          "metadata": {
+            "title": "Actualizar un ítem de puntos",
+            "sidebarTitle": "Actualizar un ítem de puntos"
+          }
+        }
+      },
+      "delete": {
+        "description": "Elimina un ítem del catálogo. Las sumas ya realizadas con ese ítem no se tocan: el historial conserva los puntos que se aplicaron.",
+        "operationId": "ExternalPointItemController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID del ítem de puntos en Tienda de Puntos.",
+            "schema": {
+              "type": "integer",
+              "example": 87
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ítem eliminado. `data` viaja en `null`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La key es válida y el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Client not found"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Eliminar un ítem de puntos",
+        "tags": [
+          "Ítems de puntos"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/items-de-puntos/eliminar-un-item-de-puntos",
+          "metadata": {
+            "title": "Eliminar un ítem de puntos",
+            "sidebarTitle": "Eliminar un ítem de puntos"
           }
         }
       }
@@ -9835,6 +11195,60 @@
           "applyPointRulesBonus"
         ]
       },
+      "ExternalPreviewPointsDto": {
+        "type": "object",
+        "properties": {
+          "initialPointsToGive": {
+            "type": "number",
+            "description": "Puntos base, antes de cualquier bonificación.",
+            "example": 40
+          },
+          "levelBonusPoints": {
+            "type": "number",
+            "description": "Puntos extra por el nivel del cliente. `0` si no tiene nivel o no multiplica.",
+            "example": 8
+          },
+          "pointRulesBonusPoints": {
+            "type": "number",
+            "description": "Puntos extra por las bonificaciones activas del comercio.",
+            "example": 12
+          },
+          "totalPointsToGive": {
+            "type": "number",
+            "description": "Total que se acreditaría: la suma de los tres anteriores.",
+            "example": 60
+          }
+        },
+        "required": [
+          "initialPointsToGive",
+          "levelBonusPoints",
+          "pointRulesBonusPoints",
+          "totalPointsToGive"
+        ]
+      },
+      "ExternalDirectSumPreviewOutputDto": {
+        "type": "object",
+        "properties": {
+          "points": {
+            "description": "Desglose de los puntos.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExternalPreviewPointsDto"
+              }
+            ]
+          },
+          "calculatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Momento del cálculo. El preview no reserva ni congela nada: si entre la simulación y la suma real cambian las bonificaciones, el nivel del cliente o el catálogo de ítems, el resultado puede variar.",
+            "example": "2026-09-21T14:32:11.000Z"
+          }
+        },
+        "required": [
+          "points",
+          "calculatedAt"
+        ]
+      },
       "CreateExternalPointOfferDto": {
         "type": "object",
         "properties": {
@@ -10105,6 +11519,60 @@
           "client"
         ]
       },
+      "ExternalPointItemLineDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "ID del ítem de puntos. Sale de `GET /external/point-items`.",
+            "example": 87
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Unidades de ese ítem en la venta. Si se omite, se asume 1.",
+            "example": 2,
+            "default": 1
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "ExternalDirectSumPreviewDto": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "number",
+            "description": "ID del cliente en Tienda de Puntos. A diferencia de `POST /external/tags/add`, acá es obligatorio y el cliente tiene que existir: previsualizar no da de alta a nadie.",
+            "example": 84512
+          },
+          "amount": {
+            "type": "number",
+            "description": "Monto de la compra en pesos. Se convierte a puntos con la regla del comercio, igual que en `POST /external/tags/add`. Tiene que ser mayor a cero: el preview no simula restas.",
+            "example": 4000
+          },
+          "initialPointsToGive": {
+            "type": "number",
+            "description": "Puntos base, sin convertir. Se usan tal cual llegan.",
+            "example": 50
+          },
+          "pointItems": {
+            "description": "Ítems de puntos de la venta, con sus cantidades. Cada ítem aporta sus puntos fijos o su equivalencia en pesos, según cómo lo haya configurado el comercio.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalPointItemLineDto"
+            }
+          },
+          "branch_id": {
+            "type": "number",
+            "description": "Sucursal de la venta. Cambia el resultado: hay bonificaciones que aplican solo a ciertas sucursales. Mandá la misma que vas a usar después en la suma real.",
+            "example": 1972
+          }
+        },
+        "required": [
+          "clientId"
+        ]
+      },
       "PollingQrListItemDto": {
         "type": "object",
         "properties": {
@@ -10192,6 +11660,108 @@
         },
         "required": [
           "code"
+        ]
+      },
+      "ExternalPointItemOutputDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "ID del ítem en Tienda de Puntos. Es el identificador que tenés que guardar de tu lado para después pedir la simulación de puntos.",
+            "example": 87
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre del ítem.",
+            "example": "Café latte"
+          },
+          "points": {
+            "type": "number",
+            "description": "Puntos fijos que otorga. Viaja en `null` si el ítem se definió por monto.",
+            "example": 50,
+            "nullable": true
+          },
+          "amount": {
+            "type": "number",
+            "description": "Equivalencia en pesos. Viaja en `null` si el ítem se definió por puntos.",
+            "example": 3500,
+            "nullable": true
+          },
+          "branchId": {
+            "type": "number",
+            "description": "Sucursal a la que está limitado el ítem. Los ítems creados por esta API son globales del comercio y viajan en `null`.",
+            "example": 1972,
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Fecha de alta.",
+            "example": "2026-09-21T14:32:11.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Fecha de la última modificación.",
+            "example": "2026-09-21T14:32:11.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "points",
+          "amount",
+          "branchId",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateExternalPointItemDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nombre del ítem, tal como lo va a ver el cajero en Suma directa.",
+            "example": "Café latte",
+            "maxLength": 255
+          },
+          "points": {
+            "type": "number",
+            "description": "Puntos fijos que otorga el ítem, sin importar su precio. Mandá `points` **o** `amount`: si mandás los dos, se ignora `amount`.",
+            "example": 50
+          },
+          "amount": {
+            "type": "number",
+            "description": "Equivalencia en pesos del ítem. Tienda de Puntos la convierte a puntos con la regla de conversión del comercio, igual que una compra por ese monto.",
+            "example": 3500
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateExternalPointItemDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nombre del ítem, tal como lo va a ver el cajero en Suma directa.",
+            "example": "Café latte",
+            "maxLength": 255
+          },
+          "points": {
+            "type": "number",
+            "description": "Puntos fijos que otorga el ítem, sin importar su precio. Mandá `points` **o** `amount`: si mandás los dos, se ignora `amount`.",
+            "example": 50
+          },
+          "amount": {
+            "type": "number",
+            "description": "Equivalencia en pesos del ítem. Tienda de Puntos la convierte a puntos con la regla de conversión del comercio, igual que una compra por ese monto.",
+            "example": 3500
+          }
+        },
+        "required": [
+          "name"
         ]
       },
       "ExternalPurchaseProductOutputDto": {

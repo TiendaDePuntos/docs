@@ -72,11 +72,12 @@ curl -X PUT https://api.tiendadepuntos.com/external/tags/cancel/FAC-A-0001-00012
 
 ## Rate limits
 
-Los límites se aplican por comercio, no por API key ni por IP.
+Cada límite se cuenta de forma distinta, según la columna de la tabla.
 
 | Endpoints | Límite |
 | --- | --- |
-| `/external/tags/*` | 10 requests por segundo |
+| `/external/tags/*` | 10 requests por segundo, por IP de origen |
+| `POST /external/tags/add/preview` | 30 requests por segundo, por IP de origen. Es un cupo aparte: simular no consume el de la suma real |
 | `GET /external/validation-code/qrs`<br/>`GET /external/validation-code/{qrId}/current` | 5 requests por minuto por cada sucursal, con un mínimo de 5 |
 | `POST /external/validation-code/{qrId}/validate` | 10 intentos por minuto |
 
