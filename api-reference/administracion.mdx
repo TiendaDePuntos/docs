@@ -6,7 +6,7 @@ description: "Crear y mantener niveles, premios, ítems de puntos, clientes y op
 Más allá de sumar puntos y entregar canjes, la API te deja administrar la configuración del programa: los niveles, el catálogo de premios, los ítems de puntos, el padrón de clientes y el personal del comercio. Es lo mismo que hacés en el panel, con las mismas reglas de negocio.
 
 <Info>
-  Todos los ejemplos apuntan a `https://apidev.tiendadepuntos.com` (QA). Estas llamadas escriben configuración real del comercio: probá contra QA antes de pasar a producción.
+  Todos los ejemplos apuntan a `https://api-qa.tiendadepuntos.com` (QA). Estas llamadas escriben configuración real del comercio: probá contra QA antes de pasar a producción.
 </Info>
 
 ## El orden importa
@@ -33,7 +33,7 @@ Los recursos se referencian entre sí, así que si vas a armar un programa desde
 Un nivel se identifica por sus `minPoints`: son los puntos acumulados que un cliente necesita para alcanzarlo, y no pueden repetirse entre niveles del mismo comercio.
 
 ```bash
-curl -X POST https://apidev.tiendadepuntos.com/external/levels \
+curl -X POST https://api-qa.tiendadepuntos.com/external/levels \
   -H "x-api-key: TU_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -58,7 +58,7 @@ El `pointsMultiplier` es la bonificación de puntos de ese nivel: `1.5` signific
 Un premio se compone de sus datos (nombre, descripciones, imagen) más el array `offers`, que es el precio en puntos por nivel:
 
 ```bash
-curl -X POST https://apidev.tiendadepuntos.com/external/products \
+curl -X POST https://api-qa.tiendadepuntos.com/external/products \
   -H "x-api-key: TU_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -114,7 +114,7 @@ Un ítem de puntos es un concepto del comercio con una equivalencia fija, en pun
 </Note>
 
 ```bash
-curl -X POST https://apidev.tiendadepuntos.com/external/point-items \
+curl -X POST https://api-qa.tiendadepuntos.com/external/point-items \
   -H "x-api-key: TU_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{ "name": "Café latte", "points": 50 }'
@@ -164,7 +164,7 @@ Guardá el `id` de la respuesta: es el identificador estable del ítem y el que 
 El alta por API dispara los mismos automatismos que el panel: puntos de bienvenida si el comercio los tiene configurados, asignación de nivel inicial y email de bienvenida.
 
 ```bash
-curl -X POST https://apidev.tiendadepuntos.com/external/clients \
+curl -X POST https://api-qa.tiendadepuntos.com/external/clients \
   -H "x-api-key: TU_API_KEY" \
   -H "Content-Type: application/json" \
   -H "x-branch-id: 1972" \
@@ -186,7 +186,7 @@ Hace falta al menos `email` o `documentNumber`: son las claves con las que Tiend
 A diferencia de niveles y premios, `PUT /external/clients/{id}` es **incremental**: lo que no mandás queda como está.
 
 ```bash
-curl -X PUT https://apidev.tiendadepuntos.com/external/clients/84213 \
+curl -X PUT https://api-qa.tiendadepuntos.com/external/clients/84213 \
   -H "x-api-key: TU_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{ "phone": "+541164593679" }'
@@ -201,7 +201,7 @@ curl -X PUT https://apidev.tiendadepuntos.com/external/clients/84213 \
 `DELETE /external/clients/{id}` **programa** la baja, no la ejecuta en el momento. El cliente entra en un período de gracia de 30 días: deja de aparecer en la operación y, al cumplirse el plazo, sus datos personales se anonimizan de forma irreversible.
 
 ```bash
-curl -X DELETE https://apidev.tiendadepuntos.com/external/clients/84213 \
+curl -X DELETE https://api-qa.tiendadepuntos.com/external/clients/84213 \
   -H "x-api-key: TU_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{ "reasons": ["REQUESTED_BY_CLIENT"] }'
@@ -220,7 +220,7 @@ Los motivos son obligatorios y quedan en el registro de auditoría de la baja. V
 Los operadores son las personas del comercio que usan el panel y la app de caja.
 
 ```bash
-curl -X POST https://apidev.tiendadepuntos.com/external/operators \
+curl -X POST https://api-qa.tiendadepuntos.com/external/operators \
   -H "x-api-key: TU_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{

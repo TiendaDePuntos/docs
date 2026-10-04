@@ -6,7 +6,7 @@ description: "De cero a sumar puntos en una venta real, paso a paso."
 Esta guía arma la integración más común: que tu POS sume puntos automáticamente cuando un cliente compra. Al final vas a tener el flujo completo, incluida la anulación de ventas.
 
 <Info>
-  Todos los ejemplos apuntan a QA, `https://apidev.tiendadepuntos.com`. Cambiá a `https://api.tiendadepuntos.com` recién cuando el flujo esté probado: las operaciones de puntos afectan saldos reales.
+  Todos los ejemplos apuntan a QA, `https://api-qa.tiendadepuntos.com`. Cambiá a `https://api.tiendadepuntos.com` recién cuando el flujo esté probado: las operaciones de puntos afectan saldos reales.
 </Info>
 
 ## 1. Verificá tu API key
@@ -16,12 +16,12 @@ Antes que nada, confirmá que la key funciona y traé los IDs de tus sucursales:
 <CodeGroup>
 
 ```bash cURL
-curl https://apidev.tiendadepuntos.com/external/branch \
+curl https://api-qa.tiendadepuntos.com/external/branch \
   -H "x-api-key: TU_API_KEY"
 ```
 
 ```javascript Node.js
-const res = await fetch('https://apidev.tiendadepuntos.com/external/branch', {
+const res = await fetch('https://api-qa.tiendadepuntos.com/external/branch', {
   headers: { 'x-api-key': process.env.TDP_API_KEY },
 });
 
@@ -34,7 +34,7 @@ import os
 import requests
 
 res = requests.get(
-    "https://apidev.tiendadepuntos.com/external/branch",
+    "https://api-qa.tiendadepuntos.com/external/branch",
     headers={"x-api-key": os.environ["TDP_API_KEY"]},
     timeout=15,
 )
@@ -73,7 +73,7 @@ Esta es la llamada central de la integración:
 <CodeGroup>
 
 ```bash cURL
-curl -X POST https://apidev.tiendadepuntos.com/external/tags/add \
+curl -X POST https://api-qa.tiendadepuntos.com/external/tags/add \
   -H "x-api-key: TU_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -91,7 +91,7 @@ curl -X POST https://apidev.tiendadepuntos.com/external/tags/add \
 ```
 
 ```javascript Node.js
-const res = await fetch('https://apidev.tiendadepuntos.com/external/tags/add', {
+const res = await fetch('https://api-qa.tiendadepuntos.com/external/tags/add', {
   method: 'POST',
   headers: {
     'x-api-key': process.env.TDP_API_KEY,
@@ -122,7 +122,7 @@ console.log(`Cliente ${data.clientId} — operación ${data.pointOperationId}`);
 
 ```python Python
 res = requests.post(
-    "https://apidev.tiendadepuntos.com/external/tags/add",
+    "https://api-qa.tiendadepuntos.com/external/tags/add",
     headers={"x-api-key": os.environ["TDP_API_KEY"]},
     json={
         "amount": 55000,
@@ -214,7 +214,7 @@ En esa respuesta, `points.selectedRewardType` es `"items"`. Un id que no existe 
 Si querés mostrarle al cliente cuántos puntos va a sumar antes de cerrar la venta, `POST /external/tags/add/preview` hace el mismo cálculo que la suma real, con bonificaciones de nivel y reglas de puntos incluidas, **sin acreditar nada**.
 
 ```bash
-curl -X POST https://apidev.tiendadepuntos.com/external/tags/add/preview \
+curl -X POST https://api-qa.tiendadepuntos.com/external/tags/add/preview \
   -H "x-api-key: TU_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{ "clientId": 84213, "amount": 55000, "branch_id": 1972 }'
@@ -256,13 +256,13 @@ Si se anula la factura, revertí los puntos con el mismo `external_id`:
 <CodeGroup>
 
 ```bash cURL
-curl -X PUT https://apidev.tiendadepuntos.com/external/tags/cancel/FAC-A-0001-00012345 \
+curl -X PUT https://api-qa.tiendadepuntos.com/external/tags/cancel/FAC-A-0001-00012345 \
   -H "x-api-key: TU_API_KEY"
 ```
 
 ```javascript Node.js
 const res = await fetch(
-  `https://apidev.tiendadepuntos.com/external/tags/cancel/${externalId}`,
+  `https://api-qa.tiendadepuntos.com/external/tags/cancel/${externalId}`,
   { method: 'PUT', headers: { 'x-api-key': process.env.TDP_API_KEY } },
 );
 
@@ -273,7 +273,7 @@ if (res.status === 404) {
 
 ```python Python
 res = requests.put(
-    f"https://apidev.tiendadepuntos.com/external/tags/cancel/{external_id}",
+    f"https://api-qa.tiendadepuntos.com/external/tags/cancel/{external_id}",
     headers={"x-api-key": os.environ["TDP_API_KEY"]},
     timeout=15,
 )
@@ -292,7 +292,7 @@ Un `404` acá significa que no hay ninguna operación activa con ese identificad
 Para mostrar los puntos disponibles en la pantalla de la caja:
 
 ```bash
-curl "https://apidev.tiendadepuntos.com/external/clients/search?query=juanma@mailinator.com" \
+curl "https://api-qa.tiendadepuntos.com/external/clients/search?query=juanma@mailinator.com" \
   -H "x-api-key: TU_API_KEY"
 ```
 
@@ -311,7 +311,7 @@ Cuando un cliente llega con el código de un premio, son dos llamadas: primero c
 <Steps>
   <Step title="Consultá qué premio es">
     ```bash
-    curl https://apidev.tiendadepuntos.com/external/purchase/code/A1B2C3 \
+    curl https://api-qa.tiendadepuntos.com/external/purchase/code/A1B2C3 \
       -H "x-api-key: TU_API_KEY"
     ```
 
@@ -319,7 +319,7 @@ Cuando un cliente llega con el código de un premio, son dos llamadas: primero c
   </Step>
   <Step title="Confirmá la entrega">
     ```bash
-    curl -X POST https://apidev.tiendadepuntos.com/external/purchase/redeem/A1B2C3 \
+    curl -X POST https://api-qa.tiendadepuntos.com/external/purchase/redeem/A1B2C3 \
       -H "x-api-key: TU_API_KEY" \
       -H "x-branch-id: 1972"
     ```
@@ -339,7 +339,7 @@ Además de entregar canjes que el cliente generó en la app, podés generarlos v
 <Steps>
   <Step title="Traé el catálogo">
     ```bash
-    curl "https://apidev.tiendadepuntos.com/external/products?isEnabled=true&limit=50" \
+    curl "https://api-qa.tiendadepuntos.com/external/products?isEnabled=true&limit=50" \
       -H "x-api-key: TU_API_KEY" \
       -H "x-branch-id: 1972"
     ```
@@ -362,7 +362,7 @@ Además de entregar canjes que el cliente generó en la app, podés generarlos v
   </Step>
   <Step title="Generá el canje">
     ```bash
-    curl -X POST https://apidev.tiendadepuntos.com/external/exchange/product \
+    curl -X POST https://api-qa.tiendadepuntos.com/external/exchange/product \
       -H "x-api-key: TU_API_KEY" \
       -H "x-branch-id: 1972" \
       -H "Content-Type: application/json" \

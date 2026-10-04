@@ -16,7 +16,7 @@ https://api.tiendadepuntos.com
 ```
 
 ```bash QA
-https://apidev.tiendadepuntos.com
+https://api-qa.tiendadepuntos.com
 ```
 
 </CodeGroup>
@@ -152,7 +152,7 @@ No todos los `PUT` se comportan igual, y la diferencia importa:
     Se genera desde el panel, en **Configuración → Integraciones**. Ver [Autenticación](/api-reference/autenticacion).
   </Step>
   <Step title="Probá contra QA">
-    Usá `https://apidev.tiendadepuntos.com` hasta que el flujo esté cerrado. Las operaciones de puntos afectan saldos reales de clientes.
+    Usá `https://api-qa.tiendadepuntos.com` hasta que el flujo esté cerrado. Las operaciones de puntos afectan saldos reales de clientes.
   </Step>
   <Step title="Revisá el manejo de errores">
     Sobre todo los 409 por `external_id` repetido y los 429 por rate limit. Ver [Errores](/api-reference/errores).

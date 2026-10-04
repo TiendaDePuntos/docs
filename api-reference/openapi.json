@@ -9727,7 +9727,7 @@
       "description": "Producción"
     },
     {
-      "url": "https://apidev.tiendadepuntos.com",
+      "url": "https://api-qa.tiendadepuntos.com",
       "description": "QA"
     }
   ],
