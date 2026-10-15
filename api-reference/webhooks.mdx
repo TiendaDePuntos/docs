@@ -1,0 +1,496 @@
+---
+title: "Recibir avisos con webhooks"
+description: "Enterate al instante de canjes y cambios de clientes: eventos, firma, reintentos y cómo configurarlos."
+---
+
+Un webhook es una URL de tu sistema a la que Tienda de Puntos le hace un `POST` cada vez que pasa algo en tu programa: un cliente canjea un premio, se da de alta un cliente, etc. Así no tenés que consultar la API cada tanto.
+
+Un ejemplo típico: tu ERP recibe el aviso de un canje, descuenta el stock y emite el comprobante; después tu POS marca el canje como entregado cuando el cliente retira el premio.
+
+<Info>
+  Los ejemplos de gestión apuntan a `https://api-qa.tiendadepuntos.com`. Probá primero contra QA: un webhook activo empieza a enviar datos de tus clientes a la URL que configures.
+</Info>
+
+## Qué eventos hay
+
+| Evento | Cuándo sale |
+| --- | --- |
+| `redemption.created` | Un cliente canjea un premio o puntos por dinero, desde el portal, el panel, la API o el popup de TiendaNube. |
+| `redemption.delivered` | El canje se marca como entregado (por ejemplo con `POST /external/purchase/redeem/{code}` o desde el panel). |
+| `redemption.canceled` | Se cancela un canje. También sale cuando se da de baja definitiva a un cliente con canjes pendientes. |
+| `client.created` | Se da de alta un cliente: registro, panel, API o importación. |
+| `client.updated` | Se editan los datos de un cliente o se cambia su estado (activo o suspendido). |
+| `client.deleted` | Se anonimiza un cliente (baja definitiva). No sale al programar la baja. |
+| `webhook.test` | Solo cuando apretás **Enviar prueba**. No se puede suscribir. |
+
+Cada webhook elige a qué eventos se suscribe. En los eventos de canje podés filtrar por premios: si elegís premios concretos, los canjes de dinero **no** se envían a ese webhook.
+
+<Note>
+  Si un canje se crea directamente como entregado, recibís solo `redemption.created` con `status` en `delivered`, sin un `redemption.delivered` aparte.
+</Note>
+
+<Warning>
+  `client.updated` no se dispara cuando cambian los puntos o el nivel de un cliente, así que `currentPoints`, `totalAccumulatedPoints` y `level` pueden estar desactualizados en los avisos de cliente. No los uses como fuente de verdad del saldo: consultalo con `GET /external/clients`.
+</Warning>
+
+## Qué recibís
+
+Cada aviso es un `POST` con `Content-Type: application/json` y esta estructura:
+
+| Campo | Descripción |
+| --- | --- |
+| `id` | Identificador único del evento (UUID). Es el mismo que viaja en `X-TDP-Event-Id`. |
+| `type` | Tipo de evento. |
+| `apiVersion` | Versión del formato. Hoy `1`. |
+| `occurredAt` | Cuándo ocurrió, ISO 8601 en UTC. |
+| `data` | El contenido, según el evento. |
+
+### Headers
+
+| Header | Ejemplo | Qué es |
+| --- | --- | --- |
+| `Content-Type` | `application/json` | |
+| `User-Agent` | `TiendaDePuntos-Webhooks/1` | |
+| `X-TDP-Event-Id` | `3f0c1c52-8f43-5e0e-9f0a-2b7a0f1d6c11` | Id del evento. Es el mismo en todos los reintentos: usalo para deduplicar. |
+| `X-TDP-Event-Type` | `redemption.created` | Tipo de evento. |
+| `X-TDP-Delivery-Attempt` | `1` | Número de intento (1 es el primero). |
+| `X-TDP-Timestamp` | `1760454129` | Momento del envío, en segundos Unix. Cambia en cada intento. |
+| `X-TDP-Signature` | `t=1760454129,v1=5257a8...` | Firma para verificar que el aviso es nuestro. |
+
+### Canje de un premio
+
+```json
+{
+  "id": "3f0c1c52-8f43-5e0e-9f0a-2b7a0f1d6c11",
+  "type": "redemption.created",
+  "apiVersion": 1,
+  "occurredAt": "2026-10-14T15:02:09.412Z",
+  "data": {
+    "redemption": {
+      "id": 48213,
+      "code": "A1B2C3",
+      "type": "product",
+      "status": "pending",
+      "points": 500,
+      "origin": "client",
+      "expirationDate": "2026-11-13T15:02:09.000Z",
+      "createdAt": "2026-10-14T15:02:09.000Z",
+      "branch": { "id": 1972, "name": "Sucursal Centro" }
+    },
+    "product": {
+      "id": 771,
+      "name": "Café con medialuna",
+      "shortDescription": "Café a elección y una medialuna",
+      "description": "Válido de lunes a viernes.",
+      "imageUrl": "https://images.tiendadepuntos.com/720x405_max/cafe.jpg",
+      "kind": "product",
+      "customParams": { "sku": "CAFE-001", "discount_type": "percentage", "discount_value": "10" }
+    },
+    "money": null,
+    "client": {
+      "id": 90311,
+      "firstName": "Lucía",
+      "lastName": "Pérez",
+      "email": "lucia.perez@ejemplo.com",
+      "documentType": "DNI",
+      "documentNumber": "30123456"
+    }
+  }
+}
+```
+
+- `redemption.code` es el código que el cliente presenta y el que usás para marcar el canje como entregado.
+- `redemption.status`: `pending`, `delivered` o `canceled`. Es el estado del canje **al momento de armar el aviso**.
+- `redemption.origin`: `client` (portal), `operator` (panel), `integration` (API pública), `tiendanube-widget` o `legacy` (canjes anteriores a este dato).
+- `redemption.branch` es `null` si el canje no tiene sucursal.
+- `product.kind`: `product`, `gift_card`, `personalized_coupon` o `external_coupon`.
+- `product.customParams` son los parámetros que cargaste en el premio (por ejemplo el SKU de tu sistema). `{}` si no tiene. Los canjes posteriores a este lanzamiento informan el premio como estaba **al canjear**; en canjes anteriores se informa el premio actual.
+- `redemption.delivered` y `redemption.canceled` llevan la misma estructura, con el `status` correspondiente.
+
+### Canje de dinero
+
+Cuando el cliente canjea puntos por dinero no hay premio: `product` es `null` y viene `money`.
+
+```json
+{
+  "id": "9c4e7a10-52b1-5d3f-8e21-7a6c0b9d4f32",
+  "type": "redemption.created",
+  "apiVersion": 1,
+  "occurredAt": "2026-10-14T16:20:45.100Z",
+  "data": {
+    "redemption": {
+      "id": 48250,
+      "code": "Z9Y8X7",
+      "type": "money",
+      "status": "pending",
+      "points": 2000,
+      "origin": "operator",
+      "expirationDate": null,
+      "createdAt": "2026-10-14T16:20:45.000Z",
+      "branch": null
+    },
+    "product": null,
+    "money": { "amount": 5000, "currency": "ARS" },
+    "client": {
+      "id": 90311,
+      "firstName": "Lucía",
+      "lastName": "Pérez",
+      "email": "lucia.perez@ejemplo.com",
+      "documentType": "DNI",
+      "documentNumber": "30123456"
+    }
+  }
+}
+```
+
+### Cliente
+
+`client.created` y `client.updated` traen una foto completa del cliente, no solo lo que cambió:
+
+```json
+{
+  "id": "b1f6d2a4-0c3e-4a7b-9d58-3e2f1a6c7b90",
+  "type": "client.updated",
+  "apiVersion": 1,
+  "occurredAt": "2026-10-14T17:05:33.870Z",
+  "data": {
+    "client": {
+      "id": 90311,
+      "firstName": "Lucía",
+      "lastName": "Pérez",
+      "email": "lucia.perez@ejemplo.com",
+      "phone": "+5491155550000",
+      "documentType": "DNI",
+      "documentNumber": "30123456",
+      "birthDate": "1990-05-17",
+      "gender": "female",
+      "status": "active",
+      "level": { "id": 3, "name": "Nivel 2" },
+      "currentPoints": 1250,
+      "totalAccumulatedPoints": 8300,
+      "marketingConsent": { "email": true, "push": false, "whatsapp": true },
+      "registeredAt": "2026-01-20T12:00:00.000Z",
+      "updatedAt": "2026-10-14T17:05:33.000Z"
+    }
+  }
+}
+```
+
+- `gender`: `male`, `female`, `other` o `unspecified`. `status`: `active` o `suspended`. `level` es `null` si el cliente no tiene nivel. `birthDate` es una fecha sin hora (`AAAA-MM-DD`).
+- `marketingConsent.email` es `false` si el cliente se dio de baja de los mails, aunque haya aceptado antes.
+- Los datos que no tenga el cliente vienen en `null`.
+
+### Baja de un cliente
+
+`client.deleted` trae solo el id. Los datos personales de ese cliente ya no existen en Tienda de Puntos y tampoco tendrías que conservarlos:
+
+```json
+{
+  "id": "e0a1b2c3-4d5e-5f60-8a7b-9c0d1e2f3a4b",
+  "type": "client.deleted",
+  "apiVersion": 1,
+  "occurredAt": "2026-10-14T18:00:00.000Z",
+  "data": { "client": { "id": 90311 } }
+}
+```
+
+Si el cliente tenía canjes pendientes, antes recibís un `redemption.canceled` por cada uno, con `client` reducido a `{ "id": 90311 }`.
+
+### Evento de prueba
+
+```json
+{
+  "id": "5d2f9e1a-7b3c-4e86-a0d1-2c4b6f8a9e10",
+  "type": "webhook.test",
+  "apiVersion": 1,
+  "occurredAt": "2026-10-14T15:00:00.000Z",
+  "data": {
+    "test": true,
+    "message": "Evento de prueba de Tienda de Puntos. No representa datos reales."
+  }
+}
+```
+
+## Verificá la firma
+
+Antes de procesar un aviso, comprobá que lo mandamos nosotros. El header `X-TDP-Signature` tiene esta forma:
+
+```text
+X-TDP-Signature: t=1760454129,v1=5257a869e7ecebeda32affa62cdca3fa51cad7e77a0e56ff536d0ce8e108d8bd
+```
+
+- `t` es el timestamp del envío (el mismo valor que `X-TDP-Timestamp`).
+- `v1` es el HMAC-SHA256, en hexadecimal, de `t + "." + cuerpo`, usando tu secreto de firma (el texto completo, incluido el prefijo `whsec_`) como clave.
+
+Para verificarlo:
+
+<Steps>
+  <Step title="Tomá el cuerpo crudo">
+    Usá los bytes exactos que llegaron, **antes** de parsear el JSON. Si lo parseás y lo volvés a serializar, la firma no coincide.
+  </Step>
+  <Step title="Calculá el HMAC">
+    HMAC-SHA256 con tu secreto sobre el texto `t` + `.` + cuerpo, en hexadecimal.
+  </Step>
+  <Step title="Compará con todos los v1">
+    Comparalo en tiempo constante contra **cada** `v1` del header. Alcanza con que uno coincida. Durante una rotación de secreto el header trae dos `v1` (ver más abajo).
+  </Step>
+  <Step title="Chequeá el timestamp">
+    Rechazá el aviso si `t` se aleja de tu hora actual más de la tolerancia (sugerimos 5 minutos). Evita que alguien reenvíe un aviso capturado. Cada reintento lleva un timestamp y una firma nuevos, así que un reintento legítimo no se rechaza.
+  </Step>
+</Steps>
+
+<CodeGroup>
+
+```javascript Node.js (Express)
+const crypto = require('crypto');
+const express = require('express');
+
+const app = express();
+const SECRET = process.env.TDP_WEBHOOK_SECRET; // whsec_...
+const TOLERANCE_SECONDS = 300;
+
+// Necesitamos el cuerpo crudo para firmar: no uses express.json() en esta ruta.
+app.post('/webhooks/tdp', express.raw({ type: 'application/json' }), (req, res) => {
+  const header = req.get('X-TDP-Signature') || '';
+  const parts = header.split(',').map(p => p.trim().split('='));
+  const timestamp = parts.find(([k]) => k === 't')?.[1];
+  const signatures = parts.filter(([k]) => k === 'v1').map(([, v]) => v);
+
+  if (!timestamp || signatures.length === 0) {
+    return res.status(400).send('Firma ausente');
+  }
+
+  const age = Math.abs(Date.now() / 1000 - Number(timestamp));
+  if (!Number.isFinite(age) || age > TOLERANCE_SECONDS) {
+    return res.status(400).send('Timestamp fuera de tolerancia');
+  }
+
+  const expected = crypto
+    .createHmac('sha256', SECRET)
+    .update(`${timestamp}.${req.body.toString('utf8')}`)
+    .digest('hex');
+
+  const isValid = signatures.some(
+    sig =>
+      sig.length === expected.length &&
+      crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected)),
+  );
+  if (!isValid) {
+    return res.status(400).send('Firma inválida');
+  }
+
+  const event = JSON.parse(req.body.toString('utf8'));
+  // Procesá el evento (deduplicá por event.id) y respondé rápido.
+  res.sendStatus(200);
+});
+```
+
+```python Python (Flask)
+import hashlib
+import hmac
+import os
+import time
+
+from flask import Flask, abort, request
+
+app = Flask(__name__)
+SECRET = os.environ["TDP_WEBHOOK_SECRET"]  # whsec_...
+TOLERANCE_SECONDS = 300
+
+
+@app.post("/webhooks/tdp")
+def tdp_webhook():
+    header = request.headers.get("X-TDP-Signature", "")
+    parts = [p.strip().split("=", 1) for p in header.split(",") if "=" in p]
+    timestamp = next((v for k, v in parts if k == "t"), None)
+    signatures = [v for k, v in parts if k == "v1"]
+    if not timestamp or not signatures:
+        abort(400)
+
+    try:
+        age = abs(time.time() - int(timestamp))
+    except ValueError:
+        abort(400)
+    if age > TOLERANCE_SECONDS:
+        abort(400)
+
+    body = request.get_data()  # bytes crudos, antes de parsear
+    expected = hmac.new(
+        SECRET.encode("utf-8"),
+        timestamp.encode("utf-8") + b"." + body,
+        hashlib.sha256,
+    ).hexdigest()
+
+    if not any(hmac.compare_digest(sig, expected) for sig in signatures):
+        abort(400)
+
+    event = request.get_json(force=True)
+    # Procesá el evento (deduplicá por event["id"]) y respondé rápido.
+    return "", 200
+```
+
+</CodeGroup>
+
+### Rotación del secreto
+
+Podés generar un secreto nuevo en cualquier momento (panel o `POST /external/webhooks/{id}/rotate-secret`). Se muestra una sola vez. Durante las **24 horas** siguientes firmamos cada aviso con el secreto nuevo y con el anterior, y el header trae dos firmas:
+
+```text
+X-TDP-Signature: t=1760454129,v1=<firma con el secreto nuevo>,v1=<firma con el secreto anterior>
+```
+
+Por eso hay que comparar contra todos los `v1`: así podés cambiar el secreto en tu sistema sin perder avisos, con cualquiera de los dos configurados.
+
+## Cómo responder
+
+- Respondé con un **2xx** lo antes posible (tenemos un timeout total de 10 segundos). Con cualquier 2xx damos el aviso por entregado; el cuerpo de tu respuesta se ignora.
+- Si procesás algo pesado, guardá el evento y respondé enseguida; procesalo después.
+- No seguimos redirecciones: un `301`/`302` cuenta como error y no se reintenta. Configurá la URL final.
+
+## Reintentos
+
+Si tu sistema no responde 2xx, reintentamos: **1 envío + 12 reintentos en unas 48 horas**, con espera creciente y una variación aleatoria de ±15 %.
+
+| Reintento | Espera desde la falla anterior | Acumulado aprox. |
+| --- | --- | --- |
+| 1 | 1 min | 1 min |
+| 2 | 2,5 min | 3,5 min |
+| 3 | 6 min | 10 min |
+| 4 | 16 min | 25 min |
+| 5 | 39 min | 1 h 05 |
+| 6 | 1 h 38 | 2 h 43 |
+| 7 | 4 h 04 | 6 h 47 |
+| 8 | 8 h 15 | 15 h |
+| 9 | 8 h 15 | 23 h 15 |
+| 10 | 8 h 15 | 31 h 30 |
+| 11 | 8 h 15 | 39 h 45 |
+| 12 | 8 h 15 | 48 h |
+
+Qué se reintenta y qué no:
+
+| Respuesta | Qué hacemos |
+| --- | --- |
+| `2xx` | Entregado. |
+| `5xx`, `408`, timeout, error de red, de DNS o de TLS | Reintentamos según la tabla. |
+| `429` | Reintentamos esperando lo que indique `Retry-After` (hasta 8 h 15 min como máximo) o la espera de la tabla, la que sea mayor. No consume un reintento. |
+| `3xx` y el resto de los `4xx` | No reintentamos: la entrega queda como fallida definitiva. |
+
+Cuando se agotan los reintentos, la entrega queda como fallida definitiva. Podés ver el historial en el panel y **reenviarla a mano** desde ahí.
+
+<Warning>
+  Si un webhook falla durante **72 horas seguidas** sin ninguna respuesta exitosa, lo deshabilitamos solos y avisamos por mail a los administradores y a los operadores con acceso a Integraciones. Mientras esté deshabilitado no le enviamos avisos nuevos, y los que ocurran en ese período no se envían después. Volvé a habilitarlo desde el panel o con la API cuando tu sistema esté andando.
+</Warning>
+
+## Entrega: lo que tu sistema tiene que tolerar
+
+- **Puede llegar más de una vez** (entrega "al menos una vez"). Guardá el `X-TDP-Event-Id` (o el campo `id`) de lo que ya procesaste y descartá los repetidos. Es el mismo valor en todos los reintentos y en los reenvíos manuales.
+- **El orden no está garantizado.** Un reintento puede llegar después de un aviso más nuevo. Guiate por `occurredAt` y por el estado que trae cada aviso, no por el orden de llegada.
+- **`redemption.canceled` puede llegar después de `redemption.delivered`**: un canje ya entregado se puede cancelar. Si tu sistema ya había entregado el premio, decidí qué hacer en ese caso.
+- Un reintento o un reenvío manual manda el **mismo contenido** que el original (con timestamp y firma nuevos).
+
+## Marcá el canje como entregado
+
+Cuando el cliente retira el premio, marcá el canje con el `code` que recibiste en `redemption.code`:
+
+```bash
+curl -X POST https://api-qa.tiendadepuntos.com/external/purchase/redeem/A1B2C3 \
+  -H "x-api-key: TU_API_KEY"
+```
+
+Eso dispara un `redemption.delivered`. Si dos cajas intentan validar el mismo código a la vez, una sola lo logra y la otra recibe un `409`.
+
+<Warning>
+  No uses `POST /external/product-coupons/consume` para esto: los cupones que se entregan por un canje ya quedan consumidos y ese endpoint responde `COUPON_ALREADY_USED`. Marcar el uso se hace siempre con `POST /external/purchase/redeem/{code}`.
+</Warning>
+
+## Requisitos de la URL
+
+- Tiene que ser **`https://`**, con certificado válido.
+- **Puerto 443** (el implícito de https). No se aceptan otros puertos.
+- Sin usuario ni contraseña en la URL (`https://usuario:clave@...`). Si necesitás autenticar nuestros avisos, verificá la firma.
+- Un servidor **público en internet**: rechazamos `localhost`, nombres internos (`.local`, `.internal`, sin dominio) y cualquier dirección IP privada o reservada. La validación se repite en cada envío.
+- Hasta 2048 caracteres.
+
+Para desarrollar en tu máquina, usá un túnel que te dé una URL pública con https.
+
+La API devuelve `400` con `data.code` igual a `WEBHOOK_URL_REJECTED` y un `data.reason`: `malformed`, `too_long`, `not_https`, `has_credentials`, `non_standard_port` o `not_public`.
+
+## Cómo gestionarlos
+
+Tenés hasta **5 webhooks** por comercio (cuentan los deshabilitados). Cada uno tiene su URL, su secreto, los eventos a los que se suscribe y, opcionalmente, un filtro por premios. Se pueden manejar de dos formas.
+
+### Desde el panel
+
+En **Configuración → Integraciones → Webhooks** podés crearlos, editarlos, habilitarlos o deshabilitarlos, rotar el secreto, enviar un evento de prueba, ver el historial de entregas y reenviar una entrega. El secreto se muestra una sola vez al crearlo o rotarlo: copialo en ese momento.
+
+<Note>
+  El panel muestra el contenido de cada entrega solo a quienes tienen permiso para ver clientes, porque incluye datos personales.
+</Note>
+
+### Desde la API
+
+Con tu API key (`x-api-key`):
+
+| Endpoint | Qué hace |
+| --- | --- |
+| `GET /external/webhooks` | Lista tus webhooks. |
+| `GET /external/webhooks/{id}` | Trae uno. |
+| `POST /external/webhooks` | Crea uno y devuelve el `secret` **una sola vez**. |
+| `PUT /external/webhooks/{id}` | Reemplaza la configuración (no es un patch) y permite `isEnabled`. |
+| `DELETE /external/webhooks/{id}` | Lo elimina y cancela las entregas pendientes. |
+| `POST /external/webhooks/{id}/rotate-secret` | Genera un secreto nuevo (24 h de convivencia con el anterior). |
+
+```bash
+curl -X POST https://api-qa.tiendadepuntos.com/external/webhooks \
+  -H "x-api-key: TU_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "ERP central",
+    "url": "https://erp.ejemplo.com.ar/webhooks/tdp",
+    "events": ["redemption.created", "redemption.delivered", "redemption.canceled"],
+    "productIds": null
+  }'
+```
+
+`productIds` en `null` (o sin enviar) significa todos los premios y también los canjes de dinero. Con una lista de ids de premios, solo se envían los canjes de esos premios.
+
+Respuesta:
+
+```json
+{
+  "success": true,
+  "status": 201,
+  "message": "Request was successful",
+  "data": {
+    "id": 12,
+    "name": "ERP central",
+    "url": "https://erp.ejemplo.com.ar/webhooks/tdp",
+    "events": ["redemption.created", "redemption.delivered", "redemption.canceled"],
+    "productIds": null,
+    "apiVersion": 1,
+    "isEnabled": true,
+    "disabledReason": null,
+    "disabledAt": null,
+    "secretRotationEndsAt": null,
+    "health": { "lastSuccessAt": null, "failingSince": null },
+    "createdAt": "2026-10-14T15:00:00.000Z",
+    "updatedAt": "2026-10-14T15:00:00.000Z",
+    "secret": "whsec_Qm9ndXNTZWNyZXRvRGVFamVtcGxvLVNvbG9Eb2N1bWVudGFjaW9u"
+  }
+}
+```
+
+<Warning>
+  Guardá el `secret` apenas lo recibís: no se vuelve a mostrar. Si lo perdés, rotalo.
+</Warning>
+
+Notas de la API:
+
+- Crear un webhook, o cambiarle la URL, avisa por mail a los administradores del comercio (un webhook nuevo puede sacar datos de tus clientes hacia afuera).
+- Los webhooks necesitan que las integraciones estén habilitadas en tu cuenta. Si no lo están, crear, editar y probar devuelven `403` con `data.code` igual a `PLAN_INTEGRATIONS_NOT_ALLOWED`; eliminar siempre se puede.
+- Superar el tope de 5 devuelve `400` con `data.code` igual a `WEBHOOK_LIMIT_REACHED`.
+- El listado `GET /external/webhooks` devuelve `{ data, meta, links }` sin el envelope `success/status/message`.
+
+## Datos personales
+
+Los avisos de canje y de cliente incluyen datos personales (nombre, email, documento). Tratalos conforme a la Ley 25.326 de Protección de Datos Personales: guardá solo lo que necesites y borrá los datos del cliente cuando recibas su `client.deleted`.

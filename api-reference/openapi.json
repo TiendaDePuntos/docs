@@ -9712,6 +9712,1475 @@
           }
         }
       }
+    },
+    "/external/webhooks": {
+      "get": {
+        "description": "Devuelve los webhooks del comercio (habilitados y deshabilitados), ordenados por `id`. Nunca incluye el secreto de firma.\n\n**Atención**: este endpoint devuelve `{ data, meta, links }` en la raíz, sin el envelope `{ success, status, message, data }`.",
+        "operationId": "ExternalOutgoingWebhookController_findAll",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Página de webhooks. Sin envelope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ExternalWebhookEndpointOutputDto"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "totalItems": {
+                          "type": "integer",
+                          "example": 128
+                        },
+                        "itemCount": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "itemsPerPage": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "totalPages": {
+                          "type": "integer",
+                          "example": 13
+                        },
+                        "currentPage": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "from": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "to": {
+                          "type": "integer",
+                          "example": 10
+                        }
+                      }
+                    },
+                    "links": {
+                      "type": "object",
+                      "properties": {
+                        "first": {
+                          "type": "string",
+                          "example": "external/webhooks?page=1&limit=10"
+                        },
+                        "previous": {
+                          "type": "string",
+                          "nullable": true,
+                          "example": null
+                        },
+                        "next": {
+                          "type": "string",
+                          "nullable": true,
+                          "example": "external/webhooks?page=2&limit=10"
+                        },
+                        "last": {
+                          "type": "string",
+                          "example": "external/webhooks?page=13&limit=10"
+                        },
+                        "path": {
+                          "type": "string",
+                          "example": "external/webhooks"
+                        },
+                        "firstPageUrl": {
+                          "type": "string",
+                          "example": "external/webhooks?page=1&limit=10"
+                        },
+                        "lastPageUrl": {
+                          "type": "string",
+                          "example": "external/webhooks?page=13&limit=10"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La key es válida y el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Client not found"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Listar webhooks",
+        "tags": [
+          "Webhooks"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/webhooks/listar-webhooks",
+          "metadata": {
+            "title": "Listar webhooks",
+            "sidebarTitle": "Listar webhooks"
+          }
+        }
+      },
+      "post": {
+        "description": "Registra una URL para recibir avisos de canjes y clientes. Hasta 5 webhooks por comercio (cuentan los deshabilitados).\n\nLa respuesta incluye el `secret` de firma **una sola vez**: guardalo para verificar el header `X-TDP-Signature` de cada aviso. Los administradores del comercio reciben un mail avisando del alta.\n\nLa URL se rechaza (400, `data.code` = `WEBHOOK_URL_REJECTED`) si no es `https://`, lleva usuario o contraseña, usa un puerto distinto de 443 o no resuelve a una IP pública. `data.reason` dice cuál: `malformed`, `too_long`, `not_https`, `has_credentials`, `non_standard_port` o `not_public`.",
+        "operationId": "ExternalOutgoingWebhookController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExternalWebhookEndpointDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Webhook creado, con el secreto de firma.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 201
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExternalWebhookEndpointWithSecretOutputDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "El plan del comercio no incluye integraciones (`data.code` = `PLAN_INTEGRATIONS_NOT_ALLOWED`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 403
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "El plan del comercio no incluye integraciones."
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La key es válida y el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Client not found"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Más de 10 altas por minuto.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 429
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Rate limit excedido. Intente más tarde."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Crear un webhook",
+        "tags": [
+          "Webhooks"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/webhooks/crear-un-webhook",
+          "metadata": {
+            "title": "Crear un webhook",
+            "sidebarTitle": "Crear un webhook"
+          }
+        }
+      }
+    },
+    "/external/webhooks/{id}": {
+      "get": {
+        "description": "Devuelve un webhook del comercio. Si no existe, o es de otro comercio, responde 404 con `Webhook not found`.",
+        "operationId": "ExternalOutgoingWebhookController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID del webhook en Tienda de Puntos.",
+            "schema": {
+              "type": "integer",
+              "example": 12
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Webhook encontrado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExternalWebhookEndpointOutputDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La key es válida y el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Client not found"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Obtener un webhook",
+        "tags": [
+          "Webhooks"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/webhooks/obtener-un-webhook",
+          "metadata": {
+            "title": "Obtener un webhook",
+            "sidebarTitle": "Obtener un webhook"
+          }
+        }
+      },
+      "put": {
+        "description": "Reemplaza la configuración del webhook. **No es un patch**: `name` y `productIds` que no envíes quedan vacíos (sin nombre, todos los premios). `isEnabled` es opcional y, si se omite, conserva el estado actual. La URL se vuelve a validar y, si cambia, los administradores del comercio reciben un mail avisando.",
+        "operationId": "ExternalOutgoingWebhookController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID del webhook en Tienda de Puntos.",
+            "schema": {
+              "type": "integer",
+              "example": 12
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateExternalWebhookEndpointDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook actualizado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExternalWebhookEndpointOutputDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "El plan del comercio no incluye integraciones (`data.code` = `PLAN_INTEGRATIONS_NOT_ALLOWED`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 403
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "El plan del comercio no incluye integraciones."
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La key es válida y el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Client not found"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Más de 10 actualizaciones por minuto.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 429
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Rate limit excedido. Intente más tarde."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Actualizar un webhook",
+        "tags": [
+          "Webhooks"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/webhooks/actualizar-un-webhook",
+          "metadata": {
+            "title": "Actualizar un webhook",
+            "sidebarTitle": "Actualizar un webhook"
+          }
+        }
+      },
+      "delete": {
+        "description": "Deja de enviar avisos a esa URL y cancela las entregas pendientes. Libera el cupo del comercio. Funciona aunque el plan no incluya integraciones.",
+        "operationId": "ExternalOutgoingWebhookController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID del webhook en Tienda de Puntos.",
+            "schema": {
+              "type": "integer",
+              "example": 12
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Webhook eliminado. `data` viaja en `null`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La key es válida y el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Client not found"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Eliminar un webhook",
+        "tags": [
+          "Webhooks"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/webhooks/eliminar-un-webhook",
+          "metadata": {
+            "title": "Eliminar un webhook",
+            "sidebarTitle": "Eliminar un webhook"
+          }
+        }
+      }
+    },
+    "/external/webhooks/{id}/rotate-secret": {
+      "post": {
+        "description": "Genera un secreto nuevo y lo devuelve **una sola vez**. Durante 24 h cada aviso se firma con el nuevo y con el anterior (dos `v1=` en `X-TDP-Signature`), para que puedas actualizar tu sistema sin perder avisos.",
+        "operationId": "ExternalOutgoingWebhookController_rotateSecret",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID del webhook en Tienda de Puntos.",
+            "schema": {
+              "type": "integer",
+              "example": 12
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Secreto rotado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExternalWebhookSecretOutputDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La key es válida y el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Client not found"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Se rotó al mismo tiempo desde otro lado. Reintentá.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 409
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "El secreto se rotó al mismo tiempo desde otro lado. Volvé a intentarlo."
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Más de 5 rotaciones por minuto.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 429
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Rate limit excedido. Intente más tarde."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Rotar el secreto de firma",
+        "tags": [
+          "Webhooks"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/webhooks/rotar-el-secreto-de-firma",
+          "metadata": {
+            "title": "Rotar el secreto de firma",
+            "sidebarTitle": "Rotar el secreto de firma"
+          }
+        }
+      }
     }
   },
   "info": {
@@ -10693,8 +12162,8 @@
           },
           "image": {
             "type": "string",
-            "description": "URL de la imagen principal.",
-            "example": "https://tdp-products.s3.amazonaws.com/771.png",
+            "description": "URL pública de la imagen principal. Si el premio se cargó con una URL propia, se devuelve tal cual; si la imagen se subió desde el panel, es la URL de nuestro CDN.",
+            "example": "https://images.tiendadepuntos.com/720x405_max/rWnXIk4rTa.png",
             "nullable": true
           },
           "isEnabled": {
@@ -10724,6 +12193,16 @@
             "example": null,
             "nullable": true
           },
+          "customParams": {
+            "type": "object",
+            "description": "Parámetros personalizados del premio. Objeto vacío si no tiene. Viajan en los webhooks de canje.",
+            "example": {
+              "sku": "CAFE-001"
+            },
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string",
@@ -10745,6 +12224,7 @@
           "stock",
           "offers",
           "categories",
+          "customParams",
           "createdAt",
           "updatedAt"
         ]
@@ -10857,6 +12337,19 @@
             "description": "Días que tiene el cliente para usar el cupón de canje. Omitilo para que el canje no venza.",
             "example": 30,
             "nullable": true
+          },
+          "customParams": {
+            "type": "object",
+            "description": "Parámetros personalizados del premio: pares clave-valor de texto que Tienda de Puntos no interpreta y que viajan en los webhooks de canje (por ejemplo, el SKU de tu sistema). Hasta 20 claves con el formato `^[a-z0-9_]{1,40}$` y valores de hasta 255 caracteres. En `PUT`, si lo omitís se conservan los actuales; `null` o `{}` los borran.",
+            "example": {
+              "sku": "CAFE-001",
+              "discount_type": "percentage",
+              "discount_value": "10"
+            },
+            "additionalProperties": {
+              "type": "string"
+            },
+            "nullable": true
           }
         },
         "required": [
@@ -10951,6 +12444,19 @@
             "type": "number",
             "description": "Días que tiene el cliente para usar el cupón de canje. Omitilo para que el canje no venza.",
             "example": 30,
+            "nullable": true
+          },
+          "customParams": {
+            "type": "object",
+            "description": "Parámetros personalizados del premio: pares clave-valor de texto que Tienda de Puntos no interpreta y que viajan en los webhooks de canje (por ejemplo, el SKU de tu sistema). Hasta 20 claves con el formato `^[a-z0-9_]{1,40}$` y valores de hasta 255 caracteres. En `PUT`, si lo omitís se conservan los actuales; `null` o `{}` los borran.",
+            "example": {
+              "sku": "CAFE-001",
+              "discount_type": "percentage",
+              "discount_value": "10"
+            },
+            "additionalProperties": {
+              "type": "string"
+            },
             "nullable": true
           },
           "offers": {
@@ -11962,6 +13468,352 @@
         "required": [
           "moneyAmount",
           "clientId"
+        ]
+      },
+      "CreateExternalWebhookEndpointDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nombre para reconocerlo en el panel. Si se omite o va vacío, queda sin nombre.",
+            "nullable": true,
+            "maxLength": 100,
+            "example": "ERP central"
+          },
+          "url": {
+            "type": "string",
+            "description": "URL que recibe los avisos con un POST. Tiene que ser `https://`, sin usuario ni contraseña, en el puerto 443 y resolver a una IP pública. Máximo 2048 caracteres.",
+            "maxLength": 2048,
+            "example": "https://mi-sistema.com/webhooks/tdp"
+          },
+          "events": {
+            "type": "array",
+            "description": "Eventos a los que se suscribe. Al menos uno, sin repetir.",
+            "example": [
+              "redemption.created",
+              "redemption.delivered"
+            ],
+            "items": {
+              "type": "string",
+              "enum": [
+                "redemption.created",
+                "redemption.delivered",
+                "redemption.canceled",
+                "client.created",
+                "client.updated",
+                "client.deleted"
+              ]
+            }
+          },
+          "productIds": {
+            "description": "IDs de premios del comercio para filtrar los eventos de canje. `null` u omitido: todos los premios y los canjes de dinero. Con una lista, los canjes de dinero no se envían.",
+            "nullable": true,
+            "example": [
+              101,
+              102
+            ],
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "required": [
+          "url",
+          "events"
+        ]
+      },
+      "ExternalWebhookEndpointHealthOutputDto": {
+        "type": "object",
+        "properties": {
+          "lastSuccessAt": {
+            "type": "string",
+            "description": "Último envío respondido con 2xx.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "failingSince": {
+            "type": "string",
+            "description": "Desde cuándo falla sin interrupción. `null` si el último envío fue exitoso.",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "lastSuccessAt",
+          "failingSince"
+        ]
+      },
+      "ExternalWebhookEndpointOutputDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 12
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "example": "ERP central"
+          },
+          "url": {
+            "type": "string",
+            "example": "https://mi-sistema.com/webhooks/tdp"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "redemption.created",
+                "redemption.delivered",
+                "redemption.canceled",
+                "client.created",
+                "client.updated",
+                "client.deleted"
+              ]
+            }
+          },
+          "productIds": {
+            "description": "`null`: todos los premios y los canjes de dinero.",
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "apiVersion": {
+            "type": "number",
+            "description": "Versión del formato de los payloads.",
+            "example": 1
+          },
+          "isEnabled": {
+            "type": "boolean",
+            "example": true
+          },
+          "disabledReason": {
+            "type": "string",
+            "description": "`manual` o `auto_failing` (72 h seguidas fallando). `null` si está habilitado.",
+            "enum": [
+              "manual",
+              "auto_failing"
+            ],
+            "nullable": true
+          },
+          "disabledAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "secretRotationEndsAt": {
+            "type": "string",
+            "description": "Mientras dure la rotación, se firma también con el secreto anterior hasta esta fecha.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "health": {
+            "$ref": "#/components/schemas/ExternalWebhookEndpointHealthOutputDto"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url",
+          "events",
+          "productIds",
+          "apiVersion",
+          "isEnabled",
+          "disabledReason",
+          "disabledAt",
+          "secretRotationEndsAt",
+          "health",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ExternalWebhookEndpointWithSecretOutputDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 12
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "example": "ERP central"
+          },
+          "url": {
+            "type": "string",
+            "example": "https://mi-sistema.com/webhooks/tdp"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "redemption.created",
+                "redemption.delivered",
+                "redemption.canceled",
+                "client.created",
+                "client.updated",
+                "client.deleted"
+              ]
+            }
+          },
+          "productIds": {
+            "description": "`null`: todos los premios y los canjes de dinero.",
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "apiVersion": {
+            "type": "number",
+            "description": "Versión del formato de los payloads.",
+            "example": 1
+          },
+          "isEnabled": {
+            "type": "boolean",
+            "example": true
+          },
+          "disabledReason": {
+            "type": "string",
+            "description": "`manual` o `auto_failing` (72 h seguidas fallando). `null` si está habilitado.",
+            "enum": [
+              "manual",
+              "auto_failing"
+            ],
+            "nullable": true
+          },
+          "disabledAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "secretRotationEndsAt": {
+            "type": "string",
+            "description": "Mientras dure la rotación, se firma también con el secreto anterior hasta esta fecha.",
+            "format": "date-time",
+            "nullable": true
+          },
+          "health": {
+            "$ref": "#/components/schemas/ExternalWebhookEndpointHealthOutputDto"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "secret": {
+            "type": "string",
+            "description": "Secreto de firma. Se muestra solo en esta respuesta: guardalo.",
+            "example": "whsec_3q2-7wEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url",
+          "events",
+          "productIds",
+          "apiVersion",
+          "isEnabled",
+          "disabledReason",
+          "disabledAt",
+          "secretRotationEndsAt",
+          "health",
+          "createdAt",
+          "updatedAt",
+          "secret"
+        ]
+      },
+      "ExternalWebhookSecretOutputDto": {
+        "type": "object",
+        "properties": {
+          "secret": {
+            "type": "string",
+            "description": "Secreto nuevo. Se muestra solo en esta respuesta."
+          },
+          "previousSecretExpiresAt": {
+            "type": "string",
+            "description": "Hasta cuándo se sigue firmando también con el secreto anterior.",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "secret",
+          "previousSecretExpiresAt"
+        ]
+      },
+      "UpdateExternalWebhookEndpointDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nombre para reconocerlo en el panel. Si se omite o va vacío, queda sin nombre.",
+            "nullable": true,
+            "maxLength": 100,
+            "example": "ERP central"
+          },
+          "url": {
+            "type": "string",
+            "description": "URL que recibe los avisos con un POST. Tiene que ser `https://`, sin usuario ni contraseña, en el puerto 443 y resolver a una IP pública. Máximo 2048 caracteres.",
+            "maxLength": 2048,
+            "example": "https://mi-sistema.com/webhooks/tdp"
+          },
+          "events": {
+            "type": "array",
+            "description": "Eventos a los que se suscribe. Al menos uno, sin repetir.",
+            "example": [
+              "redemption.created",
+              "redemption.delivered"
+            ],
+            "items": {
+              "type": "string",
+              "enum": [
+                "redemption.created",
+                "redemption.delivered",
+                "redemption.canceled",
+                "client.created",
+                "client.updated",
+                "client.deleted"
+              ]
+            }
+          },
+          "productIds": {
+            "description": "IDs de premios del comercio para filtrar los eventos de canje. `null` u omitido: todos los premios y los canjes de dinero. Con una lista, los canjes de dinero no se envían.",
+            "nullable": true,
+            "example": [
+              101,
+              102
+            ],
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "isEnabled": {
+            "type": "boolean",
+            "description": "Habilita o deshabilita el webhook. Si se omite, conserva el estado actual. Al habilitarlo se limpia el historial de fallas.",
+            "example": true
+          }
+        },
+        "required": [
+          "url",
+          "events"
         ]
       }
     }
