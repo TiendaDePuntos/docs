@@ -1,0 +1,407 @@
+---
+title: "Premios con variantes y stock por SKU"
+description: "Crear premios con talle, color u otras opciones, sincronizar el stock de cada SKU desde tu sistema y canjear la variante elegida."
+---
+
+Un premio puede tener **variantes**: hasta 3 opciones (Talle, Color, Material…) y una variante por cada combinación de valores, cada una con su propio SKU y su propio stock. Es el mismo modelo que usan Tiendanube y Shopify. Los premios sin variantes siguen funcionando exactamente igual.
+
+Esta guía arma el flujo típico de una integración con un ERP o un sistema de stock:
+
+<Steps>
+  <Step title="Creás el premio con sus variantes">
+    `POST /external/products` con `options` y `variants`, cada variante con el SKU de tu sistema.
+  </Step>
+  <Step title="Resolvés SKU → variante">
+    `GET /external/products/variants?sku=...` te dice a qué premio y variante corresponde cada SKU.
+  </Step>
+  <Step title="Sincronizás el stock">
+    `PATCH /external/products/variants/stock` fija el stock de cada SKU en valor absoluto.
+  </Step>
+  <Step title="Canjeás y cancelás">
+    El canje lleva el `productVariantId` (y las respuestas del formulario, si el premio tiene uno). Si tu sistema no puede cumplir el pedido, lo cancelás por API.
+  </Step>
+</Steps>
+
+<Info>
+  Todos los ejemplos apuntan a `https://api-qa.tiendadepuntos.com` (QA). Estas llamadas escriben el catálogo real del comercio: probá contra QA antes de pasar a producción.
+</Info>
+
+## 1. Creá el premio con sus variantes
+
+```bash
+curl -X POST https://api-qa.tiendadepuntos.com/external/products \
+  -H "x-api-key: TU_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Remera básica",
+    "shortDescription": "Remera de algodón",
+    "images": [
+      "https://mi-cdn.com/premios/remera-frente.jpg",
+      "https://mi-cdn.com/premios/remera-espalda.jpg"
+    ],
+    "offers": [{ "levelId": 3, "points": 12000 }],
+    "options": [
+      { "name": "Talle", "values": ["S", "M"] },
+      { "name": "Color", "values": ["Negro"] }
+    ],
+    "variants": [
+      { "sku": "REM-NEGRO-S", "stock": 4, "optionValues": { "Talle": "S", "Color": "Negro" } },
+      { "sku": "REM-NEGRO-M", "stock": 0, "optionValues": { "Talle": "M", "Color": "Negro" } }
+    ]
+  }'
+```
+
+La respuesta trae el premio con `stock.type: "per_variant"` y cada variante con su `id`, que es el `productVariantId` que vas a usar para canjear:
+
+```json
+{
+  "success": true,
+  "status": 201,
+  "message": "Request was successful",
+  "data": {
+    "id": 771,
+    "name": "Remera básica",
+    "image": "https://mi-cdn.com/premios/remera-frente.jpg",
+    "images": [
+      "https://mi-cdn.com/premios/remera-frente.jpg",
+      "https://mi-cdn.com/premios/remera-espalda.jpg"
+    ],
+    "stock": { "controlled": true, "available": 4, "type": "per_variant" },
+    "options": [
+      { "name": "Talle", "values": ["S", "M"] },
+      { "name": "Color", "values": ["Negro"] }
+    ],
+    "variants": [
+      { "id": 501, "sku": "REM-NEGRO-S", "stock": 4, "isEnabled": true, "image": null,
+        "optionValues": { "Talle": "S", "Color": "Negro" } },
+      { "id": 502, "sku": "REM-NEGRO-M", "stock": 0, "isEnabled": true, "image": null,
+        "optionValues": { "Talle": "M", "Color": "Negro" } }
+    ],
+    "redemptionFormId": null
+  }
+}
+```
+
+<AccordionGroup>
+  <Accordion title="options y variants — cómo se arma el conjunto" defaultOpen>
+    El conjunto final de variantes es **la combinación de todos los valores de las opciones**. Si una combinación no viene en `variants`, se crea igual con stock `0` y sin SKU (o se conserva tal cual, si ya existía). Una variante cuya combinación deja de existir —porque quitaste un valor o una opción— se elimina.
+
+    `optionValues` tiene que nombrar exactamente un valor por cada opción, con los mismos nombres que usaste en `options`.
+  </Accordion>
+  <Accordion title="SKU">
+    Opcional para el comercio, pero sin SKU no podés sincronizar el stock de esa variante. Hasta 64 caracteres, sin espacios, **único en el comercio** entre las variantes vigentes y sin distinguir mayúsculas (`rem-negro-s` y `REM-NEGRO-S` son el mismo SKU).
+  </Accordion>
+  <Accordion title="Stock del premio">
+    Con variantes, el stock del premio es la **suma de las variantes habilitadas** y `stock.available` se ignora. `stock.controlled` tiene que ser `true` o no venir: con `false` la API responde `400` `VARIANTS_REQUIRE_STOCK_CONTROL`.
+
+    Cuando la suma llega a `0`, el premio se deshabilita solo; cuando vuelve a haber stock, se habilita solo. Un premio que el comercio apagó a mano desde el panel queda apagado aunque le cargues stock.
+  </Accordion>
+  <Accordion title="isEnabled e image de cada variante">
+    `isEnabled` es `true` si no lo mandás. Una variante deshabilitada no se puede canjear y no suma al stock del premio. `image` es una URL pública opcional; si no la mandás queda en `null`.
+  </Accordion>
+  <Accordion title="images — galería del premio">
+    De 0 a 5 URLs públicas, en orden. La primera pasa a ser `image` (se ignora el `image` del body). `[]` vacía la galería. Más de 5 responde `400` `PRODUCT_IMAGES_LIMIT_EXCEEDED`.
+  </Accordion>
+  <Accordion title="Con qué premios es compatible">
+    Con premios con stock global. No se puede usar en gift cards, cupones externos ni cupones personalizados: la API responde `400` `VARIANTS_INCOMPATIBLE_PRODUCT`, con el motivo en `data.reason` (`gift_card`, `external_coupon` o `personalized_coupon`).
+  </Accordion>
+</AccordionGroup>
+
+### Al actualizar el premio
+
+`PUT /external/products/{id}` es de reemplazo total, pero las variantes **no se borran por omisión**:
+
+- Si omitís `options` y `variants`, el premio conserva las que tenía (y `stock.available` se sigue ignorando).
+- Para volver a stock global, mandá `options: []` y `variants: []`. El stock global queda con la suma que tenían las variantes, o con `stock.available` si lo mandás.
+- Las variantes se reconocen **por su combinación** (`optionValues`), no por el SKU. Así podés cambiarle el SKU a una variante sin perder su stock ni sus canjes.
+- En una variante existente, `sku` omitido conserva el actual y `sku: null` lo borra. `image` omitido la deja en `null`: si la variante tenía imagen, volvé a mandarla.
+- `images` omitido conserva la galería; `image` reemplaza solo la principal.
+
+<Note>
+  Los canjes guardan una foto de la variante (id, SKU y opciones). Editar o eliminar una variante después no cambia lo que dice un canje ya hecho ni sus webhooks.
+</Note>
+
+## 2. Resolvé SKU → variante
+
+Si tu sistema trabaja con SKU, no hace falta recorrer todo el catálogo para saber a qué premio corresponde cada uno:
+
+```bash
+curl "https://api-qa.tiendadepuntos.com/external/products/variants?sku=REM-NEGRO-S,REM-NEGRO-XL" \
+  -H "x-api-key: TU_API_KEY"
+```
+
+```json
+{
+  "success": true,
+  "status": 200,
+  "message": "Request was successful",
+  "data": {
+    "variants": [
+      {
+        "variantId": 501,
+        "productId": 771,
+        "productName": "Remera básica",
+        "sku": "REM-NEGRO-S",
+        "stock": 4,
+        "isEnabled": true,
+        "image": null,
+        "options": [
+          { "name": "Talle", "value": "S" },
+          { "name": "Color", "value": "Negro" }
+        ]
+      }
+    ],
+    "notFound": ["REM-NEGRO-XL"]
+  }
+}
+```
+
+- De 1 a 200 SKUs por llamada, separados por coma. Sin `sku` o con más de 200, la respuesta es `400`.
+- La comparación no distingue mayúsculas.
+- Solo devuelve variantes vigentes de premios no eliminados de tu comercio. El resto va a `notFound`.
+
+## 3. Sincronizá el stock
+
+```bash
+curl -X PATCH https://api-qa.tiendadepuntos.com/external/products/variants/stock \
+  -H "x-api-key: TU_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "items": [
+      { "sku": "REM-NEGRO-S", "available": 7 },
+      { "sku": "REM-NEGRO-M", "available": 0 },
+      { "sku": "REM-NEGRO-XL", "available": 3 }
+    ]
+  }'
+```
+
+`available` es un **valor absoluto**: reemplaza el stock de la variante (`stock = available`), no suma ni resta. Así, repetir la misma llamada deja el mismo resultado.
+
+La respuesta es `200` aunque algunos SKUs fallen. Revisá siempre las tres listas:
+
+```json
+{
+  "success": true,
+  "status": 200,
+  "message": "Request was successful",
+  "data": {
+    "updated": [
+      { "sku": "REM-NEGRO-S", "productId": 771, "variantId": 501, "stock": 7 },
+      { "sku": "REM-NEGRO-M", "productId": 771, "variantId": 502, "stock": 0 }
+    ],
+    "notFound": ["REM-NEGRO-XL"],
+    "errors": []
+  }
+}
+```
+
+| Lista | Qué significa |
+| --- | --- |
+| `updated` | SKUs actualizados, con el premio, la variante y el stock que quedó. |
+| `notFound` | SKUs que no corresponden a ninguna variante vigente del comercio. |
+| `errors` | SKUs que no se actualizaron, con el motivo en `message`. |
+
+Los `message` posibles en `errors`:
+
+| `message` | Qué pasó |
+| --- | --- |
+| `SKU repetido en el lote.` | El SKU vino más de una vez en `items`. No se aplica **ninguna** de sus apariciones: mandalo una sola vez. |
+| `El premio no controla stock por variante.` | El SKU existe, pero el premio ya no es por variante. |
+| `No se pudo actualizar el stock de este premio.` | Falló la escritura de ese premio. Es seguro reintentar esos SKUs. |
+
+Cada premio se actualiza en su propia transacción: un premio con error no frena al resto, pero dentro de un mismo premio se aplican todos sus SKUs o ninguno. Después de actualizar, el stock del premio pasa a ser la suma de sus variantes habilitadas y se aplica la misma regla de siempre: con suma `0` se deshabilita, y al reponer stock se vuelve a habilitar (salvo que el comercio lo haya apagado a mano).
+
+- De 1 a 200 items por llamada. Para catálogos más grandes, partí la sincronización en lotes.
+- `available` es un entero entre `0` y `1.000.000`.
+- El `400` es solo por validación del body (falta `items`, más de 200, SKU con espacios, `available` fuera de rango).
+
+## 4. Canjeá la variante elegida
+
+En un premio por variante, el canje necesita el `productVariantId` (el `id` de `variants[]` de `GET /external/products`):
+
+```bash
+curl -X POST https://api-qa.tiendadepuntos.com/external/exchange/product \
+  -H "x-api-key: TU_API_KEY" \
+  -H "x-branch-id: 1972" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "productOfferId": 4412,
+    "clientId": 84213,
+    "productVariantId": 501
+  }'
+```
+
+Antes de descontar puntos o stock, la API valida que la variante sea del premio, esté habilitada y tenga stock. Si dos canjes compiten por la última unidad, uno pasa y el otro recibe `409` `PRODUCT_VARIANT_OUT_OF_STOCK`.
+
+| HTTP | `data.code` | Cuándo |
+| --- | --- | --- |
+| `400` | `PRODUCT_VARIANT_REQUIRED` | El premio es por variante y no mandaste `productVariantId`. |
+| `400` | `PRODUCT_VARIANT_NOT_ALLOWED` | Mandaste `productVariantId` en un premio sin variantes. |
+| `400` | `PRODUCT_VARIANT_NOT_FOUND` | La variante no existe, fue eliminada o es de otro premio. |
+| `409` | `PRODUCT_VARIANT_UNAVAILABLE` | La variante está deshabilitada. |
+| `409` | `PRODUCT_VARIANT_OUT_OF_STOCK` | La variante no tiene stock. |
+
+### Premios con formulario previo al canje
+
+Un premio puede tener asignado un **formulario** que el cliente completa al canjear (por ejemplo, el domicilio de entrega). Los formularios se crean en el panel; por API solo se asignan a un premio con `redemptionFormId` en `POST`/`PUT /external/products` (en `PUT`, omitido no lo toca y `null` lo saca).
+
+Al canjear por API, mandá las respuestas en `formAnswers`, un objeto con la `key` de cada campo:
+
+```json
+{
+  "productOfferId": 4412,
+  "clientId": 84213,
+  "productVariantId": 501,
+  "formAnswers": {
+    "entrega_calle": "Av. Corrientes",
+    "entrega_numero": "1234",
+    "entrega_provincia": "CABA",
+    "acepto_condiciones": true
+  }
+}
+```
+
+- Hasta 30 respuestas. Los valores son texto (hasta 1000 caracteres), número o booleano.
+- Si el premio no tiene formulario, `formAnswers` se ignora.
+- Si falta un obligatorio o una respuesta no valida, la API responde `400` `REDEMPTION_FORM_INVALID` y **no descuenta nada**. `errors` trae un mensaje por campo y `data.fieldErrors` el código de cada error:
+
+```json
+{
+  "statusCode": 400,
+  "message": "Revisá los datos del formulario.",
+  "errors": {
+    "entrega_calle": "Este campo es obligatorio.",
+    "entrega_codigo_postal": "Máximo 8 caracteres.",
+    "foo": "Campo desconocido."
+  },
+  "data": {
+    "code": "REDEMPTION_FORM_INVALID",
+    "fieldErrors": {
+      "entrega_calle": { "code": "required" },
+      "entrega_codigo_postal": { "code": "max_length", "maxLength": 8 },
+      "foo": { "code": "unknown_field" }
+    }
+  }
+}
+```
+
+| `fieldErrors[key].code` | Regla |
+| --- | --- |
+| `required` | Falta, es `null` o es texto vacío en un campo obligatorio. |
+| `must_be_checked` | Un campo sí/no obligatorio que no vino en `true`. |
+| `invalid_type` | El valor no es del tipo del campo. En los numéricos se acepta un número o un texto numérico. |
+| `max_length` | Texto más largo que el máximo del campo (viene `maxLength`). |
+| `invalid_phone` | Teléfono con caracteres no válidos o fuera de 6 a 30 caracteres. |
+| `min` / `max` | Número fuera del rango del campo. |
+| `not_integer` | El campo pide un número entero. |
+| `invalid_option` | En una lista, un valor que no es una de las opciones. |
+| `unknown_field` | Una `key` que no está en el formulario. |
+
+### Lo que devuelve el canje
+
+La respuesta del canje, `GET /external/purchase`, `GET /external/purchase/code/{code}` y `POST /external/purchase/redeem/{code}` suman `variant` y `formResponse`. Los dos son `null` cuando no aplican:
+
+```json
+{
+  "id": 45012,
+  "code": "A1B2C3",
+  "status": "pending",
+  "type": "product",
+  "points": 12000,
+  "product": { "id": 771, "name": "Remera básica" },
+  "variant": {
+    "id": 501,
+    "sku": "REM-NEGRO-S",
+    "options": [
+      { "name": "Talle", "value": "S" },
+      { "name": "Color", "value": "Negro" }
+    ]
+  },
+  "formResponse": {
+    "formId": 7,
+    "formName": "Domicilio de entrega",
+    "answers": [
+      { "key": "entrega_calle", "label": "Calle", "type": "text", "value": "Av. Corrientes", "displayValue": "Av. Corrientes" },
+      { "key": "entrega_provincia", "label": "Provincia", "type": "select", "value": "CABA", "displayValue": "Ciudad Autónoma de Buenos Aires" }
+    ]
+  }
+}
+```
+
+`value` es el valor crudo (en una lista, el `value` de la opción) y `displayValue` el texto para mostrar (la etiqueta de la opción, o "Sí"/"No"). `variant` es la foto al momento del canje.
+
+## 5. Cancelá un canje por API
+
+Si tu sistema no puede cumplir un canje (por ejemplo, el SKU no existe en tu depósito), cancelalo con un motivo:
+
+```bash
+curl -X PUT https://api-qa.tiendadepuntos.com/external/purchase/45012/cancel \
+  -H "x-api-key: TU_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "reason": "Sin stock en el depósito para el SKU REM-NEGRO-S" }'
+```
+
+- `reason` es obligatorio, de 1 a 255 caracteres. Queda registrado en el canje con el actor "API pública".
+- Le devuelve los puntos al cliente, repone el stock de la variante y del premio (y rehabilita el premio si se había apagado por falta de stock), dispara el webhook `redemption.canceled` y le avisa al cliente.
+- Responde `200` con el canje releído después de cancelar.
+
+| HTTP | `data.code` | Qué hacer |
+| --- | --- | --- |
+| `409` | `PURCHASE_ALREADY_CANCELED` | El canje ya estaba cancelado. Tratalo como éxito: reintentar es seguro. |
+| `409` | `PURCHASE_ALREADY_DELIVERED` | El canje ya fue entregado y no se puede cancelar por la API. |
+| `404` | — | No existe un canje con ese id en tu comercio. |
+| `400` | — | El canje no admite cancelación (tiene una integración externa o es un código personalizado). El motivo viene en `message`. |
+| `503` | — | Hay otra operación sobre el mismo canje en curso. Reintentá la misma llamada en unos segundos. |
+
+## Webhooks de canje
+
+Los avisos `redemption.created`, `redemption.delivered` y `redemption.canceled` suman `product.images`, `variant` (id, SKU y opciones) y `form` (respuestas crudas en `answers` y textos para mostrar en `labels`, por `key`). Todo sale de la foto del canje, no del premio actual. El detalle está en [Recibir avisos con webhooks](/api-reference/webhooks#canje-con-variante-y-formulario).
+
+Si tu sistema solo procesa premios con SKU, filtrá por `data.variant.sku` distinto de `null`.
+
+## Límites
+
+| Qué | Límite |
+| --- | --- |
+| Opciones por premio | 3 |
+| Valores por opción | 30 (nombre de opción y valor, hasta 40 caracteres cada uno) |
+| Variantes por premio | 100 |
+| SKU | Hasta 64 caracteres, sin espacios, único en el comercio sin distinguir mayúsculas |
+| Imágenes por premio | 5 |
+| SKUs por consulta (`GET .../variants`) | 200 |
+| Items por sincronización (`PATCH .../variants/stock`) | 200 |
+| `available` y `stock` de cada variante | Entero entre `0` y `1.000.000` |
+| Respuestas de formulario (`formAnswers`) | 30, texto de hasta 1000 caracteres |
+| Motivo de cancelación | 1 a 255 caracteres |
+
+## Errores con `data.code`
+
+Los errores de esta funcionalidad traen un código estable en `data.code`, además del `message` en español. Usá el código para decidir qué hacer; el `message` puede cambiar de redacción.
+
+| `data.code` | HTTP | `message` |
+| --- | --- | --- |
+| `VARIANTS_REQUIRED` | 400 | Un premio con stock por variante necesita al menos una variante. |
+| `VARIANTS_REQUIRE_STOCK_CONTROL` | 400 | Un premio con variantes tiene que controlar stock. |
+| `VARIANTS_INCOMPATIBLE_PRODUCT` | 400 | Este tipo de premio no admite variantes. (`data.reason`) |
+| `VARIANT_LIMIT_EXCEEDED` | 400 | Un premio admite hasta 3 opciones, 30 valores por opción y 100 variantes. |
+| `VARIANT_OPTION_VALUES_INVALID` | 400 | Cada variante tiene que tener un valor por cada opción. |
+| `SKU_ALREADY_IN_USE` | 400 | El SKU {sku} ya lo usa otra variante del comercio. (`data.sku`, `data.conflictProductId`) |
+| `SKU_DUPLICATED_IN_REQUEST` | 400 | El SKU {sku} está repetido. (`data.sku`) |
+| `PRODUCT_IMAGES_LIMIT_EXCEEDED` | 400 | Un premio admite hasta 5 imágenes. |
+| `REDEMPTION_FORM_NOT_FOUND` | 400 | No se encontró el formulario. |
+| `REDEMPTION_FORM_INCOMPATIBLE_PRODUCT` | 400 | Este tipo de premio no admite formulario de canje. (`data.reason`) |
+| `PRODUCT_VARIANT_REQUIRED` | 400 | Elegí una variante del premio. |
+| `PRODUCT_VARIANT_NOT_ALLOWED` | 400 | Este premio no tiene variantes. |
+| `PRODUCT_VARIANT_NOT_FOUND` | 400 | La variante no pertenece a este premio. |
+| `PRODUCT_VARIANT_UNAVAILABLE` | 409 | La variante elegida no está disponible. |
+| `PRODUCT_VARIANT_OUT_OF_STOCK` | 409 | La variante elegida no tiene stock. |
+| `REDEMPTION_FORM_INVALID` | 400 | Revisá los datos del formulario. (`data.fieldErrors`) |
+| `PURCHASE_ALREADY_CANCELED` | 409 | El canje ya fue cancelado. |
+| `PURCHASE_ALREADY_DELIVERED` | 409 | El canje ya fue entregado y no se puede cancelar por la API. |
+| `FEATURE_UNAVAILABLE` | 503 | Esta función todavía no está disponible. |
+
+<Note>
+  `FEATURE_UNAVAILABLE` indica que las variantes, la galería o los formularios todavía no están habilitados en ese ambiente. Los premios y canjes sin variantes siguen funcionando igual. Si lo ves en producción, escribinos.
+</Note>
+
+¿Trabás en algún punto? Escribinos a [hola@tiendadepuntos.com](mailto:hola@tiendadepuntos.com).
