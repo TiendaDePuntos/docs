@@ -3592,7 +3592,7 @@
             "in": "query",
             "description": "SKUs a buscar, separados por coma (de 1 a 200). La comparación no distingue mayúsculas.",
             "schema": {
-              "example": "MBREMFNEJ.S,MBREMFNEJ.M",
+              "example": "REM-NEGRO-S,REM-NEGRO-M",
               "type": "string"
             }
           }
@@ -12754,7 +12754,7 @@
             "type": "object",
             "description": "Parámetros para integraciones que carga el comercio en el panel (clave-valor de texto), por ejemplo el código de la sucursal en su sistema. `{}` si no tiene.",
             "example": {
-              "tarco_tienda": "ABASTO"
+              "erp_store_code": "CENTRO"
             },
             "additionalProperties": {
               "type": "string"
@@ -12892,7 +12892,7 @@
           },
           "sku": {
             "type": "string",
-            "example": "MBREMFNEJ.S",
+            "example": "REM-NEGRO-S",
             "nullable": true
           },
           "stock": {
@@ -13087,11 +13087,11 @@
           },
           "productName": {
             "type": "string",
-            "example": "Remera Billabong"
+            "example": "Remera básica"
           },
           "sku": {
             "type": "string",
-            "example": "MBREMFNEJ.S"
+            "example": "REM-NEGRO-S"
           },
           "stock": {
             "type": "number",
@@ -13154,7 +13154,7 @@
         "properties": {
           "sku": {
             "type": "string",
-            "example": "MBREMFNEJ.S"
+            "example": "REM-NEGRO-S"
           },
           "productId": {
             "type": "number",
@@ -13181,7 +13181,7 @@
         "properties": {
           "sku": {
             "type": "string",
-            "example": "MBREMFNEJ.M"
+            "example": "REM-NEGRO-M"
           },
           "message": {
             "type": "string",
@@ -13231,7 +13231,7 @@
           "sku": {
             "type": "string",
             "description": "SKU de la variante (sin distinguir mayúsculas).",
-            "example": "MBREMFNEJ.S"
+            "example": "REM-NEGRO-S"
           },
           "available": {
             "type": "number",
@@ -13331,7 +13331,7 @@
           "sku": {
             "type": "string",
             "description": "SKU de la variante: hasta 64 caracteres, sin espacios, único en el comercio (sin distinguir mayúsculas). Es el que usás después en `PATCH /external/products/variants/stock`. En `PUT`, si lo omitís se conserva el actual; `null` lo borra.",
-            "example": "MBREMFNEJ.S",
+            "example": "REM-NEGRO-S",
             "nullable": true
           },
           "stock": {
@@ -14533,7 +14533,7 @@
           "sku": {
             "type": "string",
             "description": "SKU de la variante al momento del canje.",
-            "example": "MBREMFNEJ.S",
+            "example": "REM-NEGRO-S",
             "nullable": true
           },
           "options": {
