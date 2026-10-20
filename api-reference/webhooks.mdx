@@ -83,9 +83,12 @@ Cada aviso es un `POST` con `Content-Type: application/json` y esta estructura:
       "shortDescription": "Café a elección y una medialuna",
       "description": "Válido de lunes a viernes.",
       "imageUrl": "https://images.tiendadepuntos.com/720x405_max/cafe.jpg",
+      "images": ["https://images.tiendadepuntos.com/720x405_max/cafe.jpg"],
       "kind": "product",
       "customParams": { "sku": "CAFE-001", "discount_type": "percentage", "discount_value": "10" }
     },
+    "variant": null,
+    "form": null,
     "money": null,
     "client": {
       "id": 90311,
@@ -105,11 +108,91 @@ Cada aviso es un `POST` con `Content-Type: application/json` y esta estructura:
 - `redemption.branch` es `null` si el canje no tiene sucursal.
 - `product.kind`: `product`, `gift_card`, `personalized_coupon` o `external_coupon`.
 - `product.customParams` son los parámetros que cargaste en el premio (por ejemplo el SKU de tu sistema). `{}` si no tiene. Los canjes posteriores a este lanzamiento informan el premio como estaba **al canjear**; en canjes anteriores se informa el premio actual.
+- `product.images` es la galería del premio al canjear, como URLs públicas; la primera coincide con `imageUrl`. En canjes anteriores a la galería viene `[imageUrl]`, o `[]` si el premio no tenía imagen.
+- `variant` y `form` son `null` cuando el premio no tiene variantes ni formulario (ver el ejemplo siguiente).
 - `redemption.delivered` y `redemption.canceled` llevan la misma estructura, con el `status` correspondiente.
+
+### Canje con variante y formulario
+
+Si el premio tiene [variantes](/api-reference/variantes-stock-sku) o un formulario previo al canje, el aviso suma la variante elegida y las respuestas del cliente:
+
+```json
+{
+  "id": "7a2d4c19-3e5b-5f80-9c61-0b8e2d7f4a53",
+  "type": "redemption.created",
+  "apiVersion": 1,
+  "occurredAt": "2026-10-26T15:00:00.412Z",
+  "data": {
+    "redemption": {
+      "id": 45012,
+      "code": "A1B2C3",
+      "type": "product",
+      "status": "pending",
+      "points": 12000,
+      "origin": "client",
+      "expirationDate": null,
+      "createdAt": "2026-10-26T15:00:00.000Z",
+      "branch": null
+    },
+    "product": {
+      "id": 771,
+      "name": "Remera básica",
+      "shortDescription": "Remera de algodón",
+      "description": null,
+      "imageUrl": "https://mi-cdn.com/premios/remera-frente.jpg",
+      "images": [
+        "https://mi-cdn.com/premios/remera-frente.jpg",
+        "https://mi-cdn.com/premios/remera-espalda.jpg"
+      ],
+      "kind": "product",
+      "customParams": {}
+    },
+    "variant": {
+      "id": 501,
+      "sku": "REM-NEGRO-S",
+      "options": [
+        { "name": "Talle", "value": "S" },
+        { "name": "Color", "value": "Negro" }
+      ]
+    },
+    "form": {
+      "id": 7,
+      "name": "Domicilio de entrega",
+      "answers": {
+        "entrega_calle": "Av. Corrientes",
+        "entrega_numero": "1234",
+        "entrega_provincia": "CABA",
+        "acepto_condiciones": true
+      },
+      "labels": {
+        "entrega_calle": "Av. Corrientes",
+        "entrega_numero": "1234",
+        "entrega_provincia": "Ciudad Autónoma de Buenos Aires",
+        "acepto_condiciones": "Sí"
+      }
+    },
+    "money": null,
+    "client": {
+      "id": 90311,
+      "firstName": "Lucía",
+      "lastName": "Pérez",
+      "email": "lucia.perez@ejemplo.com",
+      "documentType": "DNI",
+      "documentNumber": "30123456"
+    }
+  }
+}
+```
+
+- `variant`: la variante canjeada, con su `sku` y sus opciones **al momento del canje** (editar la variante después no cambia el aviso). `sku` puede ser `null` si la variante no tenía SKU. Es `null` si el premio no tiene variantes.
+- `form.answers`: las respuestas crudas por `key` del campo (texto, número o booleano). En un campo de lista, es el `value` de la opción elegida.
+- `form.labels`: el texto para mostrar de cada respuesta, por `key`: la etiqueta de la opción en una lista, "Sí"/"No" en un campo sí/no y el valor tal cual en el resto. Los campos opcionales que el cliente dejó vacíos no vienen, salvo los sí/no, que vienen en `false`.
+- `form` es `null` si el premio no tiene formulario y también cuando el cliente fue dado de baja definitiva: las respuestas se borran al anonimizarlo, incluso de las entregas ya guardadas.
+- Si tu sistema solo procesa premios con SKU, filtrá por `data.variant.sku` distinto de `null`.
 
 ### Canje de dinero
 
-Cuando el cliente canjea puntos por dinero no hay premio: `product` es `null` y viene `money`.
+Cuando el cliente canjea puntos por dinero no hay premio: `product`, `variant` y `form` son `null` y viene `money`.
 
 ```json
 {
@@ -130,6 +213,8 @@ Cuando el cliente canjea puntos por dinero no hay premio: `product` es `null` y 
       "branch": null
     },
     "product": null,
+    "variant": null,
+    "form": null,
     "money": { "amount": 5000, "currency": "ARS" },
     "client": {
       "id": 90311,
