@@ -57,14 +57,19 @@ Respuesta:
       "name": "Sucursal Centro",
       "isEnabled": true,
       "branchType": "physical",
-      "ubication": "Av. Corrientes 1234, CABA"
+      "ubication": "Av. Corrientes 1234, CABA",
+      "customParams": { "codigo_erp": "SUC-001" }
     },
-    { "id": 1973, "name": "Sucursal Norte", "isEnabled": true, "branchType": "physical" }
+    { "id": 1973, "name": "Sucursal Norte", "isEnabled": true, "branchType": "physical", "customParams": {} }
   ]
 }
 ```
 
 Guardá el `id` que corresponda en la configuración de cada caja. Es un dato que no cambia, así que alcanza con traerlo una vez. Si ya lo tenés y solo querés verificar una sucursal, `GET /external/branch/{id}` devuelve una sola.
+
+<Tip>
+  Si tu sistema identifica las sucursales con su propio código, el comercio puede cargarlo en el panel, en **Parámetros para integraciones** de cada sucursal. Viaja en `customParams`: pares clave-valor de texto (hasta 20 claves con formato `^[a-z0-9_]{1,40}$` y valores de hasta 255 caracteres), `{}` si la sucursal no tiene. Así podés mapear tu código a nuestro `id` sin mantener una tabla a mano.
+</Tip>
 
 ## 2. Sumá puntos en una venta
 
@@ -350,11 +355,13 @@ Además de entregar canjes que el cliente generó en la app, podés generarlos v
     {
       "id": 771,
       "name": "Café gratis",
-      "stock": { "controlled": true, "available": 12 },
+      "stock": { "controlled": true, "available": 12, "type": "global" },
       "offers": [
         { "productOfferId": 4412, "points": 500, "levelId": 3, "levelName": "Nivel 2" },
         { "productOfferId": 4413, "points": 400, "levelId": 4, "levelName": "Nivel 3" }
-      ]
+      ],
+      "variants": [],
+      "redemptionFormId": null
     }
     ```
 
@@ -370,6 +377,23 @@ Además de entregar canjes que el cliente generó en la app, podés generarlos v
     ```
 
     Descuenta los puntos y devuelve el canje con su `code`.
+
+    Si el premio tiene variantes (`stock.type: "per_variant"`), sumá el `productVariantId` de la variante elegida. Si tiene un formulario previo al canje (`redemptionFormId` distinto de `null`), sumá las respuestas en `formAnswers`:
+
+    ```bash
+    curl -X POST https://api-qa.tiendadepuntos.com/external/exchange/product \
+      -H "x-api-key: TU_API_KEY" \
+      -H "x-branch-id: 1972" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "productOfferId": 4412,
+        "clientId": 84213,
+        "productVariantId": 501,
+        "formAnswers": { "entrega_calle": "Av. Corrientes", "entrega_numero": "1234" }
+      }'
+    ```
+
+    Si falta la variante, o una respuesta obligatoria del formulario, la API responde `400` con `data.code` `PRODUCT_VARIANT_REQUIRED` o `REDEMPTION_FORM_INVALID`, sin descontar nada. El detalle está en [Premios con variantes y stock por SKU](/api-reference/variantes-stock-sku).
   </Step>
   <Step title="Entregá el premio">
     Con ese `code`, llamá a `POST /external/purchase/redeem/{code}` como en el paso anterior.
@@ -381,6 +405,8 @@ Además de entregar canjes que el cliente generó en la app, podés generarlos v
 
   El motivo es que registrar una entrega requiere identificar al operador que la hizo, y una API key representa a un sistema, no a una persona.
 </Warning>
+
+Si después no podés entregar el premio y el canje sigue pendiente, cancelalo con `PUT /external/purchase/{id}/cancel` y un `reason`: le devuelve los puntos al cliente y repone el stock. Ver la sección de cancelación en [Premios con variantes y stock por SKU](/api-reference/variantes-stock-sku).
 
 Para canjear por dinero en vez de por un premio, `POST /external/exchange/money` con `moneyAmount` y `clientId`. Si el comercio tiene un mínimo configurado y no se alcanza, devuelve `409`.
 

@@ -84,13 +84,19 @@ curl -X POST https://api-qa.tiendadepuntos.com/external/products \
   <Accordion title="stock — control de unidades">
     Con `controlled: false` el premio no lleva control de stock y se puede canjear sin límite de unidades. Con `controlled: true`, al llegar `available` a `0` Tienda de Puntos **deshabilita el premio** automáticamente.
   </Accordion>
-  <Accordion title="image — solo la URL">
+  <Accordion title="image e images — solo la URL">
     Tienda de Puntos no descarga la imagen: guarda la URL que le mandes. Tiene que ser pública y estable. Si la omitís, el premio queda sin imagen.
+
+    Para una galería, mandá `images` con hasta 5 URLs en orden: la primera pasa a ser `image`.
   </Accordion>
   <Accordion title="maxPurchases — tope por cliente">
     Máximo de canjes que puede hacer un mismo cliente de ese premio. Omitilo para no poner tope.
   </Accordion>
 </AccordionGroup>
+
+<Tip>
+  Si el premio viene en talles, colores u otras opciones, cada combinación puede tener su SKU y su stock. Ver [Premios con variantes y stock por SKU](/api-reference/variantes-stock-sku).
+</Tip>
 
 ### Al actualizar un premio
 
@@ -98,6 +104,7 @@ curl -X POST https://api-qa.tiendadepuntos.com/external/products \
 
 - Las ofertas se **reconcilian por nivel**: la que ya cubría un `levelId` conserva su `productOfferId`, así que los códigos que tengas guardados siguen sirviendo. Las ofertas de niveles que no vengan en `offers` se eliminan.
 - Lo mismo con `categoryIds`: las categorías que no mandes se desasocian del premio.
+- En cambio, `customParams`, la galería (`images`), el formulario previo al canje (`redemptionFormId`) y las variantes (`options` y `variants`) **no se borran por omisión**: si no los mandás, se conservan.
 
 <Note>
   Las opciones que la API pública no expone —mensaje post canje, restricción temporal, tope mensual de canjes, cupones de integración con Tiendanube o WooCommerce— **se conservan** como estaban. No hace falta mandarlas para no perderlas.
@@ -252,6 +259,8 @@ En el `PUT` los datos personales son incrementales, pero si mandás `branches` *
 <AccordionGroup>
   <Accordion title="Crear o editar sucursales">
     Las sucursales se administran desde el panel: el alta genera el QR de registro y valida el tope del plan. La API solo las lee (`GET /external/branch` y `GET /external/branch/{id}`).
+
+    Lo mismo con sus parámetros para integraciones: el comercio los carga en el panel y la API los devuelve en `customParams` (por ejemplo, el código de la sucursal en tu sistema).
   </Accordion>
   <Accordion title="Crear grupos de permisos">
     Se definen en el panel, permiso por permiso. La API los referencia por `id` pero no los crea.
