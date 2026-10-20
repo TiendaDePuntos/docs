@@ -3384,7 +3384,7 @@
         }
       },
       "post": {
-        "description": "Crea un premio en el catálogo del comercio.\n\nCada premio necesita al menos una oferta en `offers`: es el precio en puntos, y podés poner uno distinto por nivel. Los `levelId` salen de `GET /external/levels`; una oferta sin `levelId` es el precio para los clientes sin nivel.\n\nEl premio se crea disponible en todas las sucursales. Si mandás `stock.controlled: true` con `available: 0`, el premio nace deshabilitado.",
+        "description": "Crea un premio en el catálogo del comercio.\n\nCada premio necesita al menos una oferta en `offers`: es el precio en puntos, y podés poner uno distinto por nivel. Los `levelId` salen de `GET /external/levels`; una oferta sin `levelId` es el precio para los clientes sin nivel.\n\nEl premio se crea disponible en todas las sucursales. Si mandás `stock.controlled: true` con `available: 0`, el premio nace deshabilitado.\n\nCon `options` y `variants` el premio controla stock por variante: su stock es la suma de las variantes habilitadas, y cada SKU se actualiza después con `PATCH /external/products/variants/stock`.",
         "operationId": "ExternalProductCatalogController_create",
         "parameters": [],
         "requestBody": {
@@ -3577,6 +3577,405 @@
           "metadata": {
             "title": "Crear un premio",
             "sidebarTitle": "Crear un premio"
+          }
+        }
+      }
+    },
+    "/external/products/variants": {
+      "get": {
+        "description": "Resuelve SKUs de tu sistema a variantes de premios de Tienda de Puntos, sin recorrer todo el catálogo. Devuelve cada variante con su premio, opciones y stock, y en `notFound` los SKUs que no existen en el comercio. Hasta 200 SKUs por llamada.",
+        "operationId": "ExternalProductCatalogController_findVariantsBySku",
+        "parameters": [
+          {
+            "name": "sku",
+            "required": true,
+            "in": "query",
+            "description": "SKUs a buscar, separados por coma (de 1 a 200). La comparación no distingue mayúsculas.",
+            "schema": {
+              "example": "MBREMFNEJ.S,MBREMFNEJ.M",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Variantes encontradas y SKUs no encontrados.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExternalVariantLookupResultOutputDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La key es válida y el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Client not found"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Buscar variantes por SKU",
+        "tags": [
+          "Premios"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/premios/buscar-variantes-por-sku",
+          "metadata": {
+            "title": "Buscar variantes por SKU",
+            "sidebarTitle": "Buscar variantes por SKU"
+          }
+        }
+      }
+    },
+    "/external/products/variants/stock": {
+      "patch": {
+        "description": "Fija el stock de variantes por SKU, en valor absoluto (`stock = available`). Hasta 200 SKUs por llamada.\n\nDespués de actualizar, el stock del premio pasa a ser la suma de sus variantes habilitadas: si queda en 0 el premio se deshabilita solo, y se vuelve a habilitar cuando repone stock (salvo que el comercio lo haya apagado a mano).\n\nCada premio se actualiza en su propia transacción: un SKU con error no frena al resto. La respuesta es 200 aunque haya errores parciales: revisá `notFound` y `errors`.",
+        "operationId": "ExternalProductCatalogController_updateVariantsStock",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateVariantsStockDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado por SKU.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExternalVariantStockUpdateResultOutputDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "La key es válida y el recurso pedido no existe.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Client not found"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Actualizar stock por SKU",
+        "tags": [
+          "Premios"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/premios/actualizar-stock-por-sku",
+          "metadata": {
+            "title": "Actualizar stock por SKU",
+            "sidebarTitle": "Actualizar stock por SKU"
           }
         }
       }
@@ -3781,7 +4180,7 @@
         }
       },
       "put": {
-        "description": "Reemplaza los datos de un premio. **No es un patch**: mandá siempre el premio completo.\n\nLas ofertas se reconcilian por nivel: la oferta que ya cubría un `levelId` conserva su `productOfferId`, y las ofertas de niveles que no vengan en `offers` se eliminan. Lo mismo con `categoryIds`: las categorías que no vengan se desasocian.\n\nLas opciones que la API pública no expone (mensaje post canje, restricción temporal, tope mensual de canjes, cupones de integración) se conservan como estaban.",
+        "description": "Reemplaza los datos de un premio. **No es un patch**: mandá siempre el premio completo.\n\nLas ofertas se reconcilian por nivel: la oferta que ya cubría un `levelId` conserva su `productOfferId`, y las ofertas de niveles que no vengan en `offers` se eliminan. Lo mismo con `categoryIds`: las categorías que no vengan se desasocian.\n\nLas opciones que la API pública no expone (mensaje post canje, restricción temporal, tope mensual de canjes, cupones de integración) se conservan como estaban.\n\nTampoco se borran por omisión: `customParams`, la galería (`images`), el formulario (`redemptionFormId`) y las variantes. Si omitís `options` y `variants`, el premio conserva las que tenía; para volver a stock global mandá `options: []` y `variants: []`.",
         "operationId": "ExternalProductCatalogController_update",
         "parameters": [
           {
@@ -5821,6 +6220,9 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "El QR se está reclamando en este momento. No se aplicó ningún cambio: es seguro reintentar en unos segundos."
           }
         },
         "security": [
@@ -7359,7 +7761,7 @@
     },
     "/external/point-items": {
       "get": {
-        "description": "Devuelve los ítems de puntos del comercio, paginado.\n\nEl `id` de cada ítem es lo que después mandás para pedir la simulación de puntos.\n\nSi enviás el header `x-branch-id`, devuelve los ítems de esa sucursal más los que aplican a todo el comercio.\n\n**Atención**: este endpoint devuelve `{ data, meta, links }` en la raíz, sin el envelope `{ success, status, message, data }`.",
+        "description": "Devuelve los ítems de puntos del comercio, paginado.\n\nEl `id` de cada ítem es lo que después mandás para pedir la simulación de puntos.\n\nSi enviás el header `x-branch-id`, devuelve los ítems de esa sucursal más los que aplican a todo el comercio. Si el header no es un ID numérico positivo, responde 400.\n\n**Atención**: este endpoint devuelve `{ data, meta, links }` en la raíz, sin el envelope `{ success, status, message, data }`.",
         "operationId": "ExternalPointItemController_findAll",
         "parameters": [
           {
@@ -9157,6 +9559,304 @@
           "metadata": {
             "title": "Consultar un canje por código",
             "sidebarTitle": "Consultar un canje por código"
+          }
+        }
+      }
+    },
+    "/external/purchase/{id}/cancel": {
+      "put": {
+        "description": "Cancela un canje pendiente: le devuelve los puntos al cliente, repone el stock del premio (y de la variante, si tenía) y dispara el webhook `redemption.canceled` y el aviso al cliente.\n\nEl motivo queda registrado con el actor \"API pública\". Un canje ya entregado no se puede cancelar por la API.\n\nReintentar es seguro: si el canje ya estaba cancelado responde 409 `PURCHASE_ALREADY_CANCELED`, que podés tratar como éxito.",
+        "operationId": "ExternalPurchaseController_cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID del canje.",
+            "schema": {
+              "type": "integer",
+              "example": 45012
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelExternalPurchaseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Canje cancelado, releído después de cancelar.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Request was successful"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/ExternalPurchaseOutputDto"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El cuerpo o los parámetros no pasaron la validación.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Error de validación"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Falta el header `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Api key is invalid"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No existe un canje con ese id en este comercio.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Canje no encontrado"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "El canje ya estaba cancelado (`data.code: PURCHASE_ALREADY_CANCELED`) o ya fue entregado (`data.code: PURCHASE_ALREADY_DELIVERED`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 409
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "El canje ya fue cancelado."
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Hay otra operación sobre el mismo canje en curso. Es transitorio: reintentá la misma llamada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 503
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2026-07-31T14:05:12.431Z"
+                    },
+                    "path": {
+                      "type": "string",
+                      "example": "/external/tags/add"
+                    },
+                    "method": {
+                      "type": "string",
+                      "example": "POST"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "No se pudo cancelar el canje en este momento. Reintentá en unos segundos."
+                    },
+                    "errors": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "data": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Cancelar un canje",
+        "tags": [
+          "Canjes"
+        ],
+        "x-mint": {
+          "href": "/api-reference/endpoints/canjes/cancelar-un-canje",
+          "metadata": {
+            "title": "Cancelar un canje",
+            "sidebarTitle": "Cancelar un canje"
           }
         }
       }
@@ -12049,6 +12749,16 @@
             "format": "date-time",
             "type": "string",
             "example": "2026-06-01T09:15:00.000Z"
+          },
+          "customParams": {
+            "type": "object",
+            "description": "Parámetros para integraciones que carga el comercio en el panel (clave-valor de texto), por ejemplo el código de la sucursal en su sistema. `{}` si no tiene.",
+            "example": {
+              "tarco_tienda": "ABASTO"
+            },
+            "additionalProperties": {
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -12076,13 +12786,26 @@
           },
           "available": {
             "type": "number",
-            "description": "Unidades disponibles. Solo tiene sentido cuando `controlled` es `true`.",
+            "description": "Unidades disponibles. Solo tiene sentido cuando `controlled` es `true`. En `per_variant` es la suma del stock de las variantes habilitadas.",
             "example": 12
+          },
+          "type": {
+            "type": "string",
+            "description": "Cómo se controla el stock: `no_control` (ilimitado), `global`, `per_branch` (por sucursal), `personalized_coupon` (cupones cargados en el panel) o `per_variant` (por variante: ver `variants`).",
+            "enum": [
+              "no_control",
+              "global",
+              "per_branch",
+              "personalized_coupon",
+              "per_variant"
+            ],
+            "example": "global"
           }
         },
         "required": [
           "controlled",
-          "available"
+          "available",
+          "type"
         ]
       },
       "ExternalProductOfferOutputDto": {
@@ -12133,6 +12856,77 @@
         "required": [
           "id",
           "name"
+        ]
+      },
+      "ExternalProductOptionOutputDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Talle"
+          },
+          "values": {
+            "example": [
+              "S",
+              "M",
+              "L"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "values"
+        ]
+      },
+      "ExternalProductVariantOutputDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "ID de la variante. Es el `productVariantId` del canje.",
+            "example": 501
+          },
+          "sku": {
+            "type": "string",
+            "example": "MBREMFNEJ.S",
+            "nullable": true
+          },
+          "stock": {
+            "type": "number",
+            "example": 4
+          },
+          "isEnabled": {
+            "type": "boolean",
+            "example": true
+          },
+          "image": {
+            "type": "string",
+            "description": "URL pública de la imagen de la variante.",
+            "example": null,
+            "nullable": true
+          },
+          "optionValues": {
+            "type": "object",
+            "example": {
+              "Talle": "S",
+              "Color": "Negro"
+            },
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "sku",
+          "stock",
+          "isEnabled",
+          "image",
+          "optionValues"
         ]
       },
       "ExternalProductOutputDto": {
@@ -12203,6 +12997,36 @@
               "type": "string"
             }
           },
+          "images": {
+            "description": "Galería del premio en orden, como URLs públicas. La primera es `image`. `[]` si no tiene imagen.",
+            "example": [
+              "https://images.tiendadepuntos.com/720x405_max/rWnXIk4rTa.png"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "options": {
+            "description": "Opciones del premio (Talle, Color…). `[]` si no tiene variantes.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalProductOptionOutputDto"
+            }
+          },
+          "variants": {
+            "description": "Variantes del premio, habilitadas y deshabilitadas. `[]` si no tiene. El `id` es el `productVariantId` que se manda al canjear.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalProductVariantOutputDto"
+            }
+          },
+          "redemptionFormId": {
+            "type": "number",
+            "description": "Formulario previo al canje asignado. `null` si no tiene.",
+            "example": null,
+            "nullable": true
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string",
@@ -12225,8 +13049,216 @@
           "offers",
           "categories",
           "customParams",
+          "images",
+          "options",
+          "variants",
+          "redemptionFormId",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "ExternalVariantOptionValueOutputDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Talle"
+          },
+          "value": {
+            "type": "string",
+            "example": "S"
+          }
+        },
+        "required": [
+          "name",
+          "value"
+        ]
+      },
+      "ExternalVariantLookupOutputDto": {
+        "type": "object",
+        "properties": {
+          "variantId": {
+            "type": "number",
+            "example": 501
+          },
+          "productId": {
+            "type": "number",
+            "example": 771
+          },
+          "productName": {
+            "type": "string",
+            "example": "Remera Billabong"
+          },
+          "sku": {
+            "type": "string",
+            "example": "MBREMFNEJ.S"
+          },
+          "stock": {
+            "type": "number",
+            "example": 4
+          },
+          "isEnabled": {
+            "type": "boolean",
+            "example": true
+          },
+          "image": {
+            "type": "string",
+            "example": null,
+            "nullable": true
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalVariantOptionValueOutputDto"
+            }
+          }
+        },
+        "required": [
+          "variantId",
+          "productId",
+          "productName",
+          "sku",
+          "stock",
+          "isEnabled",
+          "image",
+          "options"
+        ]
+      },
+      "ExternalVariantLookupResultOutputDto": {
+        "type": "object",
+        "properties": {
+          "variants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalVariantLookupOutputDto"
+            }
+          },
+          "notFound": {
+            "description": "SKUs pedidos que no corresponden a ninguna variante del comercio.",
+            "example": [
+              "XX.1"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "variants",
+          "notFound"
+        ]
+      },
+      "ExternalVariantStockUpdatedOutputDto": {
+        "type": "object",
+        "properties": {
+          "sku": {
+            "type": "string",
+            "example": "MBREMFNEJ.S"
+          },
+          "productId": {
+            "type": "number",
+            "example": 771
+          },
+          "variantId": {
+            "type": "number",
+            "example": 501
+          },
+          "stock": {
+            "type": "number",
+            "example": 7
+          }
+        },
+        "required": [
+          "sku",
+          "productId",
+          "variantId",
+          "stock"
+        ]
+      },
+      "ExternalVariantStockErrorOutputDto": {
+        "type": "object",
+        "properties": {
+          "sku": {
+            "type": "string",
+            "example": "MBREMFNEJ.M"
+          },
+          "message": {
+            "type": "string",
+            "description": "Motivo: \"SKU repetido en el lote.\", \"El premio no controla stock por variante.\" o \"No se pudo actualizar el stock de este premio.\" (reintentable).",
+            "example": "SKU repetido en el lote."
+          }
+        },
+        "required": [
+          "sku",
+          "message"
+        ]
+      },
+      "ExternalVariantStockUpdateResultOutputDto": {
+        "type": "object",
+        "properties": {
+          "updated": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalVariantStockUpdatedOutputDto"
+            }
+          },
+          "notFound": {
+            "example": [
+              "XX.1"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalVariantStockErrorOutputDto"
+            }
+          }
+        },
+        "required": [
+          "updated",
+          "notFound",
+          "errors"
+        ]
+      },
+      "ExternalVariantStockItemDto": {
+        "type": "object",
+        "properties": {
+          "sku": {
+            "type": "string",
+            "description": "SKU de la variante (sin distinguir mayúsculas).",
+            "example": "MBREMFNEJ.S"
+          },
+          "available": {
+            "type": "number",
+            "description": "Stock disponible, en valor absoluto: reemplaza el stock actual de la variante.",
+            "example": 7,
+            "minimum": 0,
+            "maximum": 1000000
+          }
+        },
+        "required": [
+          "sku",
+          "available"
+        ]
+      },
+      "UpdateVariantsStockDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "De 1 a 200 SKUs con su stock.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalVariantStockItemDto"
+            }
+          }
+        },
+        "required": [
+          "items"
         ]
       },
       "ExternalProductOfferInputDto": {
@@ -12265,6 +13297,78 @@
         },
         "required": [
           "controlled"
+        ]
+      },
+      "ExternalProductOptionInputDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nombre de la opción, único en el premio.",
+            "example": "Talle"
+          },
+          "values": {
+            "description": "Valores de la opción (de 1 a 30), únicos dentro de la opción.",
+            "example": [
+              "S",
+              "M",
+              "L"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "values"
+        ]
+      },
+      "ExternalProductVariantInputDto": {
+        "type": "object",
+        "properties": {
+          "sku": {
+            "type": "string",
+            "description": "SKU de la variante: hasta 64 caracteres, sin espacios, único en el comercio (sin distinguir mayúsculas). Es el que usás después en `PATCH /external/products/variants/stock`. En `PUT`, si lo omitís se conserva el actual; `null` lo borra.",
+            "example": "MBREMFNEJ.S",
+            "nullable": true
+          },
+          "stock": {
+            "type": "number",
+            "description": "Stock de la variante.",
+            "example": 4,
+            "minimum": 0,
+            "maximum": 1000000
+          },
+          "isEnabled": {
+            "type": "boolean",
+            "description": "Si es `false`, la variante no se puede canjear y no suma al stock del premio.",
+            "example": true,
+            "default": true
+          },
+          "image": {
+            "type": "string",
+            "description": "URL pública de la imagen de la variante.",
+            "example": null,
+            "nullable": true,
+            "default": null
+          },
+          "optionValues": {
+            "type": "object",
+            "description": "Un valor por cada opción del premio: `{ [nombre de la opción]: valor }`.",
+            "example": {
+              "Talle": "S",
+              "Color": "Negro"
+            },
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "stock",
+          "optionValues"
         ]
       },
       "CreateExternalProductDto": {
@@ -12349,6 +13453,37 @@
             "additionalProperties": {
               "type": "string"
             },
+            "nullable": true
+          },
+          "images": {
+            "description": "Galería del premio: de 0 a 5 URLs públicas, en orden. Si viene con imágenes, la primera pasa a ser `image` (se ignora el `image` del body). `[]` vacía la galería. En `PUT`, si lo omitís la galería se conserva y `image` reemplaza solo la principal.",
+            "example": [
+              "https://mi-cdn.com/remera-1.jpg",
+              "https://mi-cdn.com/remera-2.jpg"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "options": {
+            "description": "Opciones del premio (hasta 3; cada una con hasta 30 valores). Con opciones o variantes el premio controla stock por variante. En `PUT`, si omitís `options` y `variants` se conservan las actuales; `options: []` y `variants: []` vuelven a stock global.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalProductOptionInputDto"
+            }
+          },
+          "variants": {
+            "description": "Variantes (hasta 100). El conjunto final es la combinación de todos los valores de las opciones: una combinación sin entrada acá se crea con stock 0 (o se conserva si ya existía) y una variante cuya combinación ya no existe se elimina. Con variantes, `stock.available` se ignora: el stock del premio es la suma de las variantes habilitadas, y `stock.controlled` tiene que ser `true` u omitirse.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalProductVariantInputDto"
+            }
+          },
+          "redemptionFormId": {
+            "type": "number",
+            "description": "ID de un formulario previo al canje del comercio (se crean desde el panel). En `PUT`, si lo omitís no se toca; `null` lo saca.",
+            "example": 7,
             "nullable": true
           }
         },
@@ -12457,6 +13592,37 @@
             "additionalProperties": {
               "type": "string"
             },
+            "nullable": true
+          },
+          "images": {
+            "description": "Galería del premio: de 0 a 5 URLs públicas, en orden. Si viene con imágenes, la primera pasa a ser `image` (se ignora el `image` del body). `[]` vacía la galería. En `PUT`, si lo omitís la galería se conserva y `image` reemplaza solo la principal.",
+            "example": [
+              "https://mi-cdn.com/remera-1.jpg",
+              "https://mi-cdn.com/remera-2.jpg"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "options": {
+            "description": "Opciones del premio (hasta 3; cada una con hasta 30 valores). Con opciones o variantes el premio controla stock por variante. En `PUT`, si omitís `options` y `variants` se conservan las actuales; `options: []` y `variants: []` vuelven a stock global.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalProductOptionInputDto"
+            }
+          },
+          "variants": {
+            "description": "Variantes (hasta 100). El conjunto final es la combinación de todos los valores de las opciones: una combinación sin entrada acá se crea con stock 0 (o se conserva si ya existía) y una variante cuya combinación ya no existe se elimina. Con variantes, `stock.available` se ignora: el stock del premio es la suma de las variantes habilitadas, y `stock.controlled` tiene que ser `true` u omitirse.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalProductVariantInputDto"
+            }
+          },
+          "redemptionFormId": {
+            "type": "number",
+            "description": "ID de un formulario previo al canje del comercio (se crean desde el panel). En `PUT`, si lo omitís no se toca; `null` lo saca.",
+            "example": 7,
             "nullable": true
           },
           "offers": {
@@ -13012,7 +14178,9 @@
               "woocommerce",
               "shopify",
               "desktop-app",
-              "dux"
+              "dux",
+              "maxirest",
+              "empretienda"
             ]
           },
           "extra_data": {
@@ -13227,7 +14395,7 @@
         "properties": {
           "name": {
             "type": "string",
-            "description": "Nombre del ítem, tal como lo va a ver el cajero en Suma directa.",
+            "description": "Nombre del ítem, tal como lo va a ver el cajero en Suma directa. Se recortan los espacios del principio y del final; un nombre vacío o de solo espacios responde 400.",
             "example": "Café latte",
             "maxLength": 255
           },
@@ -13251,7 +14419,7 @@
         "properties": {
           "name": {
             "type": "string",
-            "description": "Nombre del ítem, tal como lo va a ver el cajero en Suma directa.",
+            "description": "Nombre del ítem, tal como lo va a ver el cajero en Suma directa. Se recortan los espacios del principio y del final; un nombre vacío o de solo espacios responde 400.",
             "example": "Café latte",
             "maxLength": 255
           },
@@ -13337,6 +14505,127 @@
           "name"
         ]
       },
+      "ExternalPurchaseVariantOptionOutputDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Talle"
+          },
+          "value": {
+            "type": "string",
+            "example": "S"
+          }
+        },
+        "required": [
+          "name",
+          "value"
+        ]
+      },
+      "ExternalPurchaseVariantOutputDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "ID de la variante canjeada.",
+            "example": 501
+          },
+          "sku": {
+            "type": "string",
+            "description": "SKU de la variante al momento del canje.",
+            "example": "MBREMFNEJ.S",
+            "nullable": true
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalPurchaseVariantOptionOutputDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "sku",
+          "options"
+        ]
+      },
+      "ExternalPurchaseFormAnswerOutputDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Clave del campo del formulario.",
+            "example": "entrega_calle"
+          },
+          "label": {
+            "type": "string",
+            "example": "Calle"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "text",
+              "textarea",
+              "number",
+              "phone",
+              "select",
+              "boolean"
+            ],
+            "example": "text"
+          },
+          "value": {
+            "description": "Valor crudo: texto, número o booleano. En `select` es el `value` de la opción.",
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              }
+            ],
+            "example": "Av. Corrientes"
+          },
+          "displayValue": {
+            "type": "string",
+            "description": "Valor para mostrar: la etiqueta de la opción en `select`, \"Sí\"/\"No\" en `boolean`.",
+            "example": "Av. Corrientes"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "type",
+          "value",
+          "displayValue"
+        ]
+      },
+      "ExternalPurchaseFormResponseOutputDto": {
+        "type": "object",
+        "properties": {
+          "formId": {
+            "type": "number",
+            "example": 7
+          },
+          "formName": {
+            "type": "string",
+            "example": "Domicilio de entrega"
+          },
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalPurchaseFormAnswerOutputDto"
+            }
+          }
+        },
+        "required": [
+          "formId",
+          "formName",
+          "answers"
+        ]
+      },
       "ExternalPurchaseOutputDto": {
         "type": "object",
         "properties": {
@@ -13407,6 +14696,24 @@
               }
             ]
           },
+          "variant": {
+            "description": "Variante canjeada (foto al momento del canje: no cambia si después se edita la variante). `null` si el premio no tiene variantes.",
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExternalPurchaseVariantOutputDto"
+              }
+            ]
+          },
+          "formResponse": {
+            "description": "Respuestas del formulario previo al canje, en el orden del formulario. `null` si el premio no tenía formulario.",
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExternalPurchaseFormResponseOutputDto"
+              }
+            ]
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string",
@@ -13428,8 +14735,25 @@
           "product",
           "client",
           "branch",
+          "variant",
+          "formResponse",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "CancelExternalPurchaseDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "description": "Motivo de la cancelación (hasta 255 caracteres). Queda registrado en el canje junto con el actor \"API pública\".",
+            "example": "El proveedor rechazó el pedido: SKU inexistente",
+            "minLength": 1,
+            "maxLength": 255
+          }
+        },
+        "required": [
+          "reason"
         ]
       },
       "ExternalExchangeProductDto": {
@@ -13444,6 +14768,21 @@
             "type": "number",
             "description": "ID del cliente que canjea. Se obtiene de `GET /external/clients/search`.",
             "example": 84213
+          },
+          "productVariantId": {
+            "type": "number",
+            "description": "ID de la variante elegida (`variants[].id` de `GET /external/products`). Obligatorio si el premio controla stock por variante; si el premio no tiene variantes, la API responde 400.",
+            "example": 501
+          },
+          "formAnswers": {
+            "type": "object",
+            "description": "Respuestas del formulario previo al canje, por `key` del campo (valores texto, número o sí/no; hasta 30). Obligatorio si el premio tiene un formulario con campos obligatorios: si falta o no valida, la API responde 400 `REDEMPTION_FORM_INVALID` con el error por campo y no descuenta nada. Se ignora si el premio no tiene formulario.",
+            "example": {
+              "entrega_calle": "Av. Corrientes",
+              "entrega_numero": "1234",
+              "entrega_provincia": "CABA"
+            },
+            "additionalProperties": true
           }
         },
         "required": [
@@ -13468,59 +14807,6 @@
         "required": [
           "moneyAmount",
           "clientId"
-        ]
-      },
-      "CreateExternalWebhookEndpointDto": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Nombre para reconocerlo en el panel. Si se omite o va vacío, queda sin nombre.",
-            "nullable": true,
-            "maxLength": 100,
-            "example": "ERP central"
-          },
-          "url": {
-            "type": "string",
-            "description": "URL que recibe los avisos con un POST. Tiene que ser `https://`, sin usuario ni contraseña, en el puerto 443 y resolver a una IP pública. Máximo 2048 caracteres.",
-            "maxLength": 2048,
-            "example": "https://mi-sistema.com/webhooks/tdp"
-          },
-          "events": {
-            "type": "array",
-            "description": "Eventos a los que se suscribe. Al menos uno, sin repetir.",
-            "example": [
-              "redemption.created",
-              "redemption.delivered"
-            ],
-            "items": {
-              "type": "string",
-              "enum": [
-                "redemption.created",
-                "redemption.delivered",
-                "redemption.canceled",
-                "client.created",
-                "client.updated",
-                "client.deleted"
-              ]
-            }
-          },
-          "productIds": {
-            "description": "IDs de premios del comercio para filtrar los eventos de canje. `null` u omitido: todos los premios y los canjes de dinero. Con una lista, los canjes de dinero no se envían.",
-            "nullable": true,
-            "example": [
-              101,
-              102
-            ],
-            "type": "array",
-            "items": {
-              "type": "number"
-            }
-          }
-        },
-        "required": [
-          "url",
-          "events"
         ]
       },
       "ExternalWebhookEndpointHealthOutputDto": {
@@ -13756,6 +15042,59 @@
         "required": [
           "secret",
           "previousSecretExpiresAt"
+        ]
+      },
+      "CreateExternalWebhookEndpointDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nombre para reconocerlo en el panel. Si se omite o va vacío, queda sin nombre.",
+            "nullable": true,
+            "maxLength": 100,
+            "example": "ERP central"
+          },
+          "url": {
+            "type": "string",
+            "description": "URL que recibe los avisos con un POST. Tiene que ser `https://`, sin usuario ni contraseña, en el puerto 443 y resolver a una IP pública. Máximo 2048 caracteres.",
+            "maxLength": 2048,
+            "example": "https://mi-sistema.com/webhooks/tdp"
+          },
+          "events": {
+            "type": "array",
+            "description": "Eventos a los que se suscribe. Al menos uno, sin repetir.",
+            "example": [
+              "redemption.created",
+              "redemption.delivered"
+            ],
+            "items": {
+              "type": "string",
+              "enum": [
+                "redemption.created",
+                "redemption.delivered",
+                "redemption.canceled",
+                "client.created",
+                "client.updated",
+                "client.deleted"
+              ]
+            }
+          },
+          "productIds": {
+            "description": "IDs de premios del comercio para filtrar los eventos de canje. `null` u omitido: todos los premios y los canjes de dinero. Con una lista, los canjes de dinero no se envían.",
+            "nullable": true,
+            "example": [
+              101,
+              102
+            ],
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "required": [
+          "url",
+          "events"
         ]
       },
       "UpdateExternalWebhookEndpointDto": {
