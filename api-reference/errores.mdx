@@ -47,6 +47,10 @@ En los errores de validación (`400`), el campo `errors` trae el detalle campo p
 | `429` | Superaste el rate limit. | Esperá y reintentá con backoff. |
 | `500` | Error del lado nuestro. | Reintentá con backoff. Si persiste, escribinos. |
 
+Algunos errores traen además un código estable en `data.code` (por ejemplo `SKU_ALREADY_IN_USE`, `PRODUCT_VARIANT_OUT_OF_STOCK` o `PURCHASE_ALREADY_CANCELED`), con datos extra en el mismo objeto `data`. Usá el código para decidir qué hacer: el `message` puede cambiar de redacción. La lista de los de variantes, formularios y cancelación está en [Premios con variantes y stock por SKU](/api-reference/variantes-stock-sku).
+
+Un `503` indica una operación que no se pudo tomar en ese momento (por ejemplo, otro canje del mismo premio en curso): no se aplicó ningún cambio y es seguro reintentar.
+
 <Note>
   Sin header, o con el header vacío, la respuesta es `401` y `Api Key is required`. Con una key que no corresponde a ningún comercio, también es `401`, con `Api key is invalid`. El `404` queda para un recurso que no existe en tu comercio (`Level not found`, `Client not found`, `PointsItem with id 12 not found`).
 </Note>
