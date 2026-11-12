@@ -20,7 +20,9 @@ Un ejemplo típico: tu ERP recibe el aviso de un canje, descuenta el stock y emi
 | `redemption.canceled` | Se cancela un canje. También sale cuando se da de baja definitiva a un cliente con canjes pendientes. |
 | `client.created` | Se da de alta un cliente: registro, panel, API o importación. |
 | `client.updated` | Se editan los datos de un cliente o se cambia su estado (activo o suspendido). |
-| `client.deleted` | Se anonimiza un cliente (baja definitiva). No sale al programar la baja. |
+| `client.soft_deleted` | Se elimina un cliente desde el panel o la app, sin anonimizarlo todavía. El cliente se puede restaurar hasta que se anonimice. |
+| `client.restored` | Se restaura un cliente que estaba eliminado. |
+| `client.deleted` | Se anonimiza un cliente (baja definitiva). No sale al eliminarlo: sale cuando se borran sus datos. |
 | `webhook.test` | Solo cuando apretás **Enviar prueba**. No se puede suscribir. |
 
 Cada webhook elige a qué eventos se suscribe. En los eventos de canje podés filtrar por premios: si elegís premios concretos, los canjes de dinero **no** se envían a ese webhook.
@@ -230,7 +232,7 @@ Cuando el cliente canjea puntos por dinero no hay premio: `product`, `variant` y
 
 ### Cliente
 
-`client.created` y `client.updated` traen una foto completa del cliente, no solo lo que cambió:
+`client.created`, `client.updated`, `client.soft_deleted` y `client.restored` traen una foto completa del cliente, no solo lo que cambió:
 
 ```json
 {
@@ -265,7 +267,14 @@ Cuando el cliente canjea puntos por dinero no hay premio: `product`, `variant` y
 - `marketingConsent.email` es `false` si el cliente se dio de baja de los mails, aunque haya aceptado antes.
 - Los datos que no tenga el cliente vienen en `null`.
 
-### Baja de un cliente
+### Eliminación y restauración de un cliente
+
+Un cliente eliminado pasa por dos etapas:
+
+1. **Eliminado, todavía restaurable.** Sale `client.soft_deleted` con la foto completa del cliente, en el mismo formato que `client.updated`. El `type` es lo que te indica que el cliente se eliminó: su `status` no cambia. Si espejás el padrón en otro sistema, dalo de baja ahí.
+2. **Anonimizado.** Pasado el período de gracia (o en el momento, si se elige la baja definitiva), se borran sus datos personales y sale `client.deleted`.
+
+Si el comercio restaura al cliente antes de que se anonimice, sale `client.restored` con la foto completa. Cada eliminación y cada restauración es un evento distinto, con su propio `id`: eliminar, restaurar y volver a eliminar al mismo cliente genera tres avisos. Una baja definitiva directa (sin período de gracia) no genera `client.soft_deleted`: sale solo `client.deleted`.
 
 `client.deleted` trae solo el id. Los datos personales de ese cliente ya no existen en Tienda de Puntos y tampoco tendrías que conservarlos:
 

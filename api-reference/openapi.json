@@ -6279,34 +6279,7 @@
                       "example": "Request was successful"
                     },
                     "data": {
-                      "type": "object",
-                      "properties": {
-                        "pointOperationId": {
-                          "type": "integer",
-                          "example": 998877
-                        },
-                        "clientId": {
-                          "type": "integer",
-                          "example": 84213
-                        },
-                        "points": {
-                          "type": "object",
-                          "properties": {
-                            "amount": {
-                              "type": "number",
-                              "example": 50
-                            },
-                            "totalPointsToGive": {
-                              "type": "integer",
-                              "example": 55
-                            },
-                            "initialPointsToGive": {
-                              "type": "integer",
-                              "example": 50
-                            }
-                          }
-                        }
-                      }
+                      "$ref": "#/components/schemas/ExternalPointOperationOutputDto"
                     }
                   },
                   "required": [
@@ -6407,7 +6380,7 @@
             }
           },
           "403": {
-            "description": "El `branch_id` enviado no pertenece al comercio de la API key.",
+            "description": "El cliente está suspendido: un cliente suspendido no acumula puntos.",
             "content": {
               "application/json": {
                 "schema": {
@@ -6432,7 +6405,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Branch with id 1972 does not belong to business with id 42"
+                      "example": "El cliente al que estás intentando sumar puntos se encuentra suspendido"
                     },
                     "errors": {
                       "type": "array",
@@ -6451,7 +6424,7 @@
             }
           },
           "404": {
-            "description": "Alguno de los ids de `pointItems` no existe, fue eliminado o no pertenece al comercio de la API key.",
+            "description": "El `branch_id` no existe o no pertenece al comercio de la API key (los dos casos responden igual, para no revelar sucursales de otros comercios), o alguno de los ids de `pointItems` no existe, fue eliminado o no pertenece al comercio.",
             "content": {
               "application/json": {
                 "schema": {
@@ -6476,7 +6449,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "PointsItem with id 12 not found"
+                      "example": "Branch with id 1972 does not exist"
                     },
                     "errors": {
                       "type": "array",
@@ -6881,34 +6854,7 @@
                       "example": "Request was successful"
                     },
                     "data": {
-                      "type": "object",
-                      "properties": {
-                        "pointOperationId": {
-                          "type": "integer",
-                          "example": 998877
-                        },
-                        "clientId": {
-                          "type": "integer",
-                          "example": 84213
-                        },
-                        "points": {
-                          "type": "object",
-                          "properties": {
-                            "amount": {
-                              "type": "number",
-                              "example": 50
-                            },
-                            "totalPointsToGive": {
-                              "type": "integer",
-                              "example": 55
-                            },
-                            "initialPointsToGive": {
-                              "type": "integer",
-                              "example": 50
-                            }
-                          }
-                        }
-                      }
+                      "$ref": "#/components/schemas/ExternalPointOperationOutputDto"
                     }
                   },
                   "required": [
@@ -9863,7 +9809,7 @@
     },
     "/external/exchange/product": {
       "post": {
-        "description": "Descuenta los puntos al cliente y genera un canje pendiente de entrega, con su código.\n\nEl canje **no queda entregado**: para eso, después llamá a `POST /external/purchase/redeem/{code}` con el `code` que devuelve esta llamada. La API pública no puede registrar un canje como entregado en un solo paso, porque esa operación exige un operador identificado.\n\nValidaciones que pueden fallar con 409: puntos insuficientes, premio deshabilitado, sin stock, nivel del cliente insuficiente o tope de canjes alcanzado.",
+        "description": "Descuenta los puntos al cliente y genera un canje pendiente de entrega, con su código.\n\nEl canje **no queda entregado**: para eso, después llamá a `POST /external/purchase/redeem/{code}` con el `code` que devuelve esta llamada. La API pública no puede registrar un canje como entregado en un solo paso, porque esa operación exige un operador identificado.\n\nValidaciones que pueden fallar con 409: puntos insuficientes, cliente suspendido, premio deshabilitado, sin stock, nivel del cliente insuficiente o tope de canjes alcanzado.",
         "operationId": "ExternalExchangeController_exchangeProduct",
         "parameters": [
           {
@@ -10053,7 +9999,7 @@
             }
           },
           "409": {
-            "description": "El canje no se pudo realizar: puntos insuficientes, premio no disponible, sin stock, nivel insuficiente o límite de canjes alcanzado. El `message` indica el caso.",
+            "description": "El canje no se pudo realizar: puntos insuficientes, cliente suspendido, premio no disponible, sin stock, nivel insuficiente o límite de canjes alcanzado. El `message` indica el caso.",
             "content": {
               "application/json": {
                 "schema": {
@@ -10078,7 +10024,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "El producto no se encuentra disponible."
+                      "example": "El cliente no tiene puntos suficientes para realizar el canje."
                     },
                     "errors": {
                       "type": "array",
@@ -10351,7 +10297,7 @@
             }
           },
           "409": {
-            "description": "Puntos insuficientes o monto por debajo del mínimo configurado.",
+            "description": "Puntos insuficientes, cliente suspendido o monto por debajo del mínimo configurado.",
             "content": {
               "application/json": {
                 "schema": {
@@ -13921,6 +13867,84 @@
           "calculatedAt"
         ]
       },
+      "ExternalPointOperationPointsDto": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "description": "Monto de la operación en pesos. En una suma por `pointItems` es la suma de los montos de los ítems.",
+            "example": 4000
+          },
+          "initialPointsToGive": {
+            "type": "integer",
+            "description": "Puntos base, antes de cualquier bonificación.",
+            "example": 40
+          },
+          "levelBonusPoints": {
+            "type": "integer",
+            "description": "Puntos extra por el nivel del cliente. `0` si no tiene nivel o no multiplica.",
+            "example": 0
+          },
+          "pointRulesBonusPoints": {
+            "type": "integer",
+            "description": "Puntos extra por las bonificaciones activas del comercio.",
+            "example": 40
+          },
+          "modifierExtraPoints": {
+            "type": "integer",
+            "description": "Puntos extra por los modificadores que un operador aplica a mano desde el panel. Una suma por API no aplica modificadores, así que en las operaciones creadas por esta API es siempre `0`.",
+            "example": 0
+          },
+          "totalPointsToGive": {
+            "type": "integer",
+            "description": "Total acreditado: los puntos base más todas las bonificaciones.",
+            "example": 80
+          },
+          "selectedRewardType": {
+            "type": "string",
+            "description": "Cómo se calcularon los puntos base: `money` en una suma por monto, `items` en una suma por `pointItems`.",
+            "enum": [
+              "points",
+              "money",
+              "items",
+              "none"
+            ],
+            "example": "money"
+          }
+        },
+        "required": [
+          "amount",
+          "initialPointsToGive",
+          "levelBonusPoints",
+          "pointRulesBonusPoints",
+          "modifierExtraPoints",
+          "totalPointsToGive",
+          "selectedRewardType"
+        ]
+      },
+      "ExternalPointOperationOutputDto": {
+        "type": "object",
+        "properties": {
+          "pointOperationId": {
+            "type": "integer",
+            "description": "ID de la operación de puntos.",
+            "example": 129787
+          },
+          "clientId": {
+            "type": "integer",
+            "description": "ID del cliente al que se le acreditaron los puntos.",
+            "example": 7370
+          },
+          "points": {
+            "$ref": "#/components/schemas/ExternalPointOperationPointsDto"
+          }
+        },
+        "required": [
+          "pointOperationId",
+          "clientId",
+          "points"
+        ]
+      },
       "CreateExternalPointOfferDto": {
         "type": "object",
         "properties": {
@@ -14102,7 +14126,7 @@
             "example": 50
           },
           "pointItems": {
-            "description": "IDs de los ítems de puntos ya cargados en el comercio. Si viene, los puntos se calculan a partir de los ítems y `amount` se ignora: el monto de la operación es la suma de los montos de los ítems. Repetí el mismo id para cargar más de una unidad (máximo 100 ids).",
+            "description": "IDs de los ítems de puntos ya cargados en el comercio. Si viene, los puntos se calculan a partir de los ítems y `amount` se ignora: el monto de la operación es la suma de los montos de los ítems. Repetí el mismo id para cargar más de una unidad (máximo 100 ids). Los ids van como números enteros: un string o un booleano responde 400.",
             "example": [
               12,
               12,
@@ -14856,7 +14880,9 @@
                 "redemption.canceled",
                 "client.created",
                 "client.updated",
-                "client.deleted"
+                "client.deleted",
+                "client.soft_deleted",
+                "client.restored"
               ]
             }
           },
@@ -14951,7 +14977,9 @@
                 "redemption.canceled",
                 "client.created",
                 "client.updated",
-                "client.deleted"
+                "client.deleted",
+                "client.soft_deleted",
+                "client.restored"
               ]
             }
           },
@@ -15075,7 +15103,9 @@
                 "redemption.canceled",
                 "client.created",
                 "client.updated",
-                "client.deleted"
+                "client.deleted",
+                "client.soft_deleted",
+                "client.restored"
               ]
             }
           },
@@ -15128,7 +15158,9 @@
                 "redemption.canceled",
                 "client.created",
                 "client.updated",
-                "client.deleted"
+                "client.deleted",
+                "client.soft_deleted",
+                "client.restored"
               ]
             }
           },
