@@ -53,6 +53,24 @@ Todos los endpoints públicos cuelgan de `/external`.
   <Card title="Gestionar operadores" icon="id-card" href="/api-reference/endpoints/operadores/listar-operadores">
     Dar de alta el personal del comercio y asignarle sucursales y permisos.
   </Card>
+  <Card title="Movimientos del cliente" icon="receipt" href="/api-reference/endpoints/movimientos/listar-movimientos-de-un-cliente">
+    Consultar el historial de puntos de un cliente y su resumen mensual.
+  </Card>
+  <Card title="Encuestas" icon="clipboard-list" href="/api-reference/endpoints/encuestas/listar-encuestas">
+    Listar las encuestas publicadas y registrar la respuesta de un cliente, que suma puntos.
+  </Card>
+  <Card title="Sorteos" icon="ticket" href="/api-reference/endpoints/sorteos/listar-sorteos-activos">
+    Mostrar los sorteos activos, inscribir clientes y consultar sus inscripciones.
+  </Card>
+  <Card title="Referidos" icon="user-plus" href="/api-reference/endpoints/referidos/listar-referidos-de-un-cliente">
+    Ver los amigos que invitó un cliente y el resumen de referidos.
+  </Card>
+  <Card title="Bonificaciones" icon="zap" href="/api-reference/endpoints/bonificaciones/listar-bonificaciones">
+    Listar los multiplicadores de puntos vigentes y ver cuál aplica a un cliente.
+  </Card>
+  <Card title="App de clientes" icon="smartphone" href="/api-reference/app-de-clientes">
+    Guía para armar una app propia donde tus clientes ven su saldo, canjean y participan.
+  </Card>
 </CardGroup>
 
 ## El flujo típico
@@ -106,7 +124,7 @@ La mayoría de los endpoints envuelve el resultado en una estructura común:
 ```
 
 <Warning>
-  Los listados paginados **no** usan este envelope: devuelven `{ data, meta, links }` en la raíz. Son `GET /external/clients`, `/external/levels`, `/external/products`, `/external/point-items`, `/external/operators` y `/external/purchase`. `GET /external/purchase/code/{code}` también devuelve el objeto directamente. Está aclarado en la ficha de cada uno.
+  Los listados paginados **no** usan este envelope: devuelven `{ data, meta, links }` en la raíz. Son `GET /external/clients`, `/external/levels`, `/external/products`, `/external/point-items`, `/external/operators`, `/external/purchase`, `/external/surveys`, `/external/point-rules` y, por cliente, `/external/clients/{clientId}/movements`, `/referrals` y `/raffle-inscriptions`. `GET /external/purchase/code/{code}` también devuelve el objeto directamente. Está aclarado en la ficha de cada uno.
 
   Además, el campo `status` de adentro del envelope no siempre coincide con el código HTTP de la respuesta. **Guiate por el código HTTP**, no por ese campo.
 </Warning>

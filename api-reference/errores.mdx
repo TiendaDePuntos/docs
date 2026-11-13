@@ -39,17 +39,18 @@ En los errores de validación (`400`), el campo `errors` trae el detalle campo p
 
 | Código | Qué significa | Qué hacer |
 | --- | --- | --- |
-| `400` | Datos inválidos, o una regla de negocio que no se cumple (canje ya entregado, código de validación incorrecto, tope de operadores del plan alcanzado, `pointItems` vacío o ítems que no suman puntos). | Revisá `errors` y `message`. No reintentar sin corregir. |
+| `400` | Datos inválidos, o una regla de negocio que no se cumple (canje ya entregado, código de validación incorrecto, tope de operadores del plan alcanzado, `pointItems` vacío o ítems que no suman puntos). En `GET /external/purchase`, `page`, `limit` o `clientId` que no son enteros mayores o iguales a 1. En encuestas: calificación fuera de 1 a 5, opción que no existe en la pregunta, pregunta sin responder, encuesta ya respondida o cliente suspendido. | Revisá `errors` y `message`. No reintentar sin corregir. |
 | `401` | Falta `x-api-key` (`Api Key is required`), o está presente pero no corresponde a ningún comercio (`Api key is invalid`). | Revisá el header. No reintentes con la misma key. |
-| `403` | El `branch_id` que mandaste no pertenece a tu comercio. | Verificá los IDs con `GET /external/branch`. |
+| `403` | El `branch_id` que mandaste no pertenece a tu comercio. O, con `data.code: BUSINESS_FEATURE_NOT_AVAILABLE`, la funcionalidad (encuestas, sorteos, referidos, bonificaciones) no está en el plan del comercio, **o** sí está pero el comercio no tiene ítems activos de ese tipo (por ejemplo, ninguna encuesta publicada). | Verificá los IDs con `GET /external/branch`. Si es `BUSINESS_FEATURE_NOT_AVAILABLE`, ocultá esa sección: no se resuelve reintentando. |
 | `404` | La key es válida y el recurso no existe (cliente, premio, nivel, ítem de puntos). | Mirá el `message`. |
-| `409` | Ya existe una operación con ese `external_id`, o el dato que querés guardar está tomado: el email o documento de un cliente, la tarjeta de afiliado, los `minPoints` de un nivel. | Si es por `external_id`, **no reintentes**: los puntos ya se acreditaron. En el resto, corregí el dato. |
+| `409` | Ya existe una operación con ese `external_id`, o el dato que querés guardar está tomado: el email o documento de un cliente, la tarjeta de afiliado, los `minPoints` de un nivel. | Si es por `external_id`, **no reintentes**: los puntos ya se acreditaron. En los 409 de sorteos (`Ya te inscribiste en este sorteo`, `El sorteo ha llegado al maximo de participantes`) **no hubo inscripción nueva** ni se descontaron puntos. En el resto, corregí el dato. |
+| `503` | Hay otra operación concurrente sobre el mismo recurso (un canje del mismo premio, una respuesta del mismo cliente a una encuesta, una inscripción a un sorteo). No se aplicó ningún cambio. | Es seguro reintentar en unos segundos. |
 | `429` | Superaste el rate limit. | Esperá y reintentá con backoff. |
 | `500` | Error del lado nuestro. | Reintentá con backoff. Si persiste, escribinos. |
 
 Algunos errores traen además un código estable en `data.code` (por ejemplo `SKU_ALREADY_IN_USE`, `PRODUCT_VARIANT_OUT_OF_STOCK` o `PURCHASE_ALREADY_CANCELED`), con datos extra en el mismo objeto `data`. Usá el código para decidir qué hacer: el `message` puede cambiar de redacción. La lista de los de variantes, formularios y cancelación está en [Premios con variantes y stock por SKU](/api-reference/variantes-stock-sku).
 
-Un `503` indica una operación que no se pudo tomar en ese momento (por ejemplo, otro canje del mismo premio en curso): no se aplicó ningún cambio y es seguro reintentar.
+Un `503` indica una operación que no se pudo tomar en ese momento (por ejemplo, otro canje del mismo premio en curso, o una respuesta a una encuesta o una inscripción a un sorteo del mismo cliente en curso): no se aplicó ningún cambio y es seguro reintentar en unos segundos. Si la operación concurrente sí se completó, el reintento recibe el error habitual (por ejemplo, el `409` de ya inscripto o el `400` de encuesta ya respondida).
 
 <Note>
   Sin header, o con el header vacío, la respuesta es `401` y `Api Key is required`. Con una key que no corresponde a ningún comercio, también es `401`, con `Api key is invalid`. El `404` queda para un recurso que no existe en tu comercio (`Level not found`, `Client not found`, `PointsItem with id 12 not found`).
@@ -110,10 +111,10 @@ Al superar el límite, la respuesta es un `429`:
 
 <AccordionGroup>
   <Accordion title="Reintentos con backoff exponencial">
-    Reintentá solo ante `429` y `5xx`, con esperas crecientes (1s, 2s, 4s...). Los `4xx` restantes no se resuelven reintentando.
+    Reintentá solo ante `429`, `503` y `5xx`, con esperas crecientes (1s, 2s, 4s...). Los `4xx` restantes no se resuelven reintentando.
   </Accordion>
-  <Accordion title="Nunca reintentes un 409">
-    Un `409` confirma que la operación ya existe. Marcala como exitosa en tu sistema.
+  <Accordion title="Nunca reintentes un 409 por external_id">
+    Un `409` por `external_id` confirma que la operación ya existe. Marcala como exitosa en tu sistema. Los demás `409` no significan lo mismo: en sorteos (`Ya te inscribiste en este sorteo`, `El sorteo ha llegado al maximo de participantes`) indican que **no** hubo una inscripción nueva, y en canjes (puntos insuficientes, sin stock) que el canje no se hizo.
   </Accordion>
   <Accordion title="Timeouts razonables">
     Usá un timeout de al menos 15 segundos. Sumar puntos dispara notificaciones y cálculo de bonificaciones, así que no siempre responde instantáneo.

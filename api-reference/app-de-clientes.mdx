@@ -1,0 +1,181 @@
+---
+title: "Armar una app para tus clientes"
+description: "Cómo construir una app propia donde tus clientes vean su saldo, canjeen premios, respondan encuestas y se inscriban en sorteos."
+---
+
+Con la API pública podés construir la app de tu programa de puntos: una app mobile o web con tu marca, donde cada cliente ve su saldo, su historial, el catálogo, las encuestas, los sorteos y sus referidos.
+
+Esta guía explica cómo armarla de forma segura y qué reglas del programa tenés que respetar en las pantallas.
+
+## Arquitectura: la app habla con tu backend, no con la API
+
+<Warning>
+  **La API key nunca puede ir dentro de la app.** Quien la tenga puede leer y modificar los datos de **todos** tus clientes, no solo los suyos. Una app mobile se puede desarmar y la key se extrae. Si la key se filtra, regenerala desde el panel.
+</Warning>
+
+La API key representa a tu comercio, no a un cliente. La API no sabe quién está usando tu app: si le pedís `GET /external/clients/123/movements`, te devuelve los movimientos del cliente 123, sea quien sea el que preguntó. Por eso necesitás un backend propio entre la app y Tienda de Puntos, que a veces se llama BFF (backend for frontend):
+
+1. La app se autentica contra **tu** backend, con el login que ya tengas (usuario y contraseña, Google, Apple, etc.).
+2. Tu backend guarda la API key en su configuración y llama a la API pública.
+3. En **cada** pedido, tu backend verifica que el `clientId` que va a consultar o modificar sea el del usuario logueado. Nunca lo tomes de lo que mande la app.
+
+<Warning>
+  Si tu backend acepta el `clientId` que viene de la app y lo reenvía tal cual, cualquier usuario puede ver y operar con los datos de otro cambiando un número. El `clientId` sale de tu base, asociado a la sesión, nunca del request.
+</Warning>
+
+Y mostrale a cada usuario solo los datos de su cliente. Algunos endpoints devuelven información de todo el comercio (por ejemplo `GET /external/purchase` sin `clientId`, o `GET /external/clients`): no los expongas a la app.
+
+## Vincular usuarios con clientes
+
+Cada usuario de tu app tiene que quedar asociado a un cliente de Tienda de Puntos. Hacelo una vez, al registrarse o al primer ingreso, y guardá el `id` del cliente en tu base.
+
+<Steps>
+  <Step title="Buscá al cliente">
+    [`GET /external/clients/search`](/api-reference/endpoints/clientes/buscar-un-cliente-por-email-o-documento) con el email o el documento del usuario (`query`). La búsqueda es exacta, no parcial.
+  </Step>
+  <Step title="Si no existe, crealo">
+    Ante un `404` (`Client not found`), [`POST /external/clients`](/api-reference/endpoints/clientes/crear-un-cliente). Si el usuario llegó invitado por un amigo, mandá su código en `referralCode` (opcional).
+  </Step>
+  <Step title="Guardá el id">
+    Guardá el `id` del cliente junto al usuario de tu app. De acá en más todas las llamadas usan ese `id`.
+  </Step>
+</Steps>
+
+```bash
+curl "https://api-qa.tiendadepuntos.com/external/clients/search?query=maria@ejemplo.com" \
+  -H "x-api-key: TU_API_KEY"
+```
+
+<Note>
+  `referralCode` solo se acepta **al dar de alta** al cliente. No se puede agregar ni cambiar después con `PUT /external/clients/{id}`.
+</Note>
+
+<Warning>
+  Antes de vincular por email o documento, verificá que el usuario sea realmente dueño de ese dato (por ejemplo, con un código por mail). Si no, alguien podría registrarse con el email de otro y quedar vinculado a su cuenta de puntos.
+</Warning>
+
+## Las pantallas típicas
+
+<CardGroup cols={2}>
+  <Card title="Inicio" icon="house">
+    [`GET /external/clients/{clientId}/summary`](/api-reference/endpoints/clientes/obtener-el-resumen-de-un-cliente) trae en una sola llamada nivel, bonificación, referidos, encuestas, sorteos y familiares. Para el saldo y los datos del perfil: [`GET /external/clients/{id}`](/api-reference/endpoints/clientes/obtener-un-cliente) (`score`).
+  </Card>
+  <Card title="Movimientos" icon="receipt">
+    [`GET /external/clients/{clientId}/movements`](/api-reference/endpoints/movimientos/listar-movimientos-de-un-cliente) para el historial y [`/movements/summary`](/api-reference/endpoints/movimientos/obtener-el-resumen-mensual-de-un-cliente) para el resumen de un mes (ganados, usados, vencidos).
+  </Card>
+  <Card title="Mis canjes" icon="gift">
+    [`GET /external/purchase?clientId=...`](/api-reference/endpoints/canjes/listar-canjes) lista los canjes de ese cliente.
+  </Card>
+  <Card title="Catálogo y canje" icon="shopping-bag">
+    [`GET /external/products`](/api-reference/endpoints/premios/listar-premios) y [`POST /external/exchange/product`](/api-reference/endpoints/canjes/canjear-un-premio).
+  </Card>
+  <Card title="Encuestas" icon="clipboard-list">
+    [Listar](/api-reference/endpoints/encuestas/listar-encuestas), [ver el detalle](/api-reference/endpoints/encuestas/obtener-una-encuesta) y [responder](/api-reference/endpoints/encuestas/responder-una-encuesta).
+  </Card>
+  <Card title="Sorteos" icon="ticket">
+    [Activos](/api-reference/endpoints/sorteos/listar-sorteos-activos), [detalle](/api-reference/endpoints/sorteos/obtener-un-sorteo), [inscribirse](/api-reference/endpoints/sorteos/inscribir-un-cliente-en-un-sorteo) y [mis inscripciones](/api-reference/endpoints/sorteos/listar-inscripciones-de-un-cliente).
+  </Card>
+  <Card title="Referidos" icon="user-plus">
+    El `referral_code` del cliente viene en [`GET /external/clients/{id}`](/api-reference/endpoints/clientes/obtener-un-cliente). El [listado](/api-reference/endpoints/referidos/listar-referidos-de-un-cliente) y el [resumen](/api-reference/endpoints/referidos/obtener-el-resumen-de-referidos-de-un-cliente) muestran a quiénes invitó.
+  </Card>
+  <Card title="Bonificaciones" icon="zap">
+    [Vigentes del comercio](/api-reference/endpoints/bonificaciones/listar-bonificaciones) y la [que aplica al cliente ahora](/api-reference/endpoints/bonificaciones/consultar-la-bonificacion-vigente-de-un-cliente) (o la próxima).
+  </Card>
+</CardGroup>
+
+### Encuestas
+
+<Steps>
+  <Step title="Listá las encuestas">
+    `GET /external/surveys?clientId=...`. Con `clientId`, cada encuesta trae `isCompleted`: ocultá o marcá como respondidas las que ya completó.
+  </Step>
+  <Step title="Mostrá el detalle">
+    `GET /external/surveys/{id}` trae las preguntas y sus opciones.
+  </Step>
+  <Step title="Mandá las respuestas">
+    `POST /external/surveys/{id}/responses` con el `clientId` y una respuesta por **cada** pregunta. Acredita los puntos de la encuesta.
+  </Step>
+</Steps>
+
+```json
+{
+  "clientId": 123,
+  "answers": [
+    { "questionId": 10, "answer": "5" },
+    { "questionId": 11, "options": ["Mañana", "Noche"] },
+    { "questionId": 12, "answer": "Todo bien, gracias." }
+  ]
+}
+```
+
+### Sorteos
+
+<Steps>
+  <Step title="Listá los sorteos activos">
+    `GET /external/raffles/active` devuelve los que aceptan inscripciones, con sus premios. No está paginado.
+  </Step>
+  <Step title="Mostrá el detalle">
+    `GET /external/raffles/{id}` y `GET /external/raffles/{id}/rewards`.
+  </Step>
+  <Step title="Inscribí al cliente">
+    `POST /external/raffles/{id}/inscriptions` con el `clientId` (y la cantidad de `chances`, si el sorteo las admite).
+  </Step>
+  <Step title="Mostrá sus inscripciones">
+    `GET /external/clients/{clientId}/raffle-inscriptions` con sus chances y si ganó.
+  </Step>
+</Steps>
+
+## Reglas que tu app tiene que respetar
+
+- **Una encuesta, una vez por cliente.** Si ya la respondió, la API devuelve `400` (`Ya has respondido esta encuesta anteriormente`). Usá `isCompleted` para no ofrecerla de nuevo.
+- **Un cliente suspendido no puede** responder encuestas, canjear premios ni inscribirse en sorteos. Mostrale un mensaje claro en lugar de dejarlo intentar.
+- **Inscribirse en un sorteo puede costar puntos.** Si el sorteo tiene `chancePointsCost`, se descuentan `chancePointsCost × chances` del saldo en la misma operación. Pedí confirmación al cliente antes de inscribirlo.
+- **En los sorteos gratis hay una sola inscripción por cliente**, con 1 chance. Los sorteos que admiten chances variables permiten volver a inscribirse para sumar más.
+- **Los sorteos pueden tener cupo máximo.** Si se llenó, la inscripción falla.
+- **`referralCode` solo se manda al crear el cliente.**
+- **El `code` de un canje o de un premio ganado es una credencial.** Quien lo tiene puede retirar el premio. Mostralo solo al cliente dueño, no lo loguees y no lo compartas por canales abiertos.
+- **Las imágenes de los premios llegan como URL.** Mostralas directamente desde esa URL; no las guardes ni asumas un dominio fijo.
+
+### Interpretar los movimientos
+
+El campo `points` de un movimiento viene **tal como quedó registrado** y su signo no es uniforme entre tipos. No lo uses solo para decidir si el movimiento suma o resta: mirá `transactionType` (`sum-of-points`, `sub-of-points`, `purchase`, `raffle`, `raffle-winner-reward`) y `operationType` (el origen: compra, encuesta, referido, vencimiento, etc.). Para mostrar el saldo, usá `balanceAfter` (puede venir `null` en movimientos antiguos).
+
+El filtro `status` es por igualdad exacta: `done` no incluye a `expired`.
+
+## Qué funcionalidades tiene cada comercio
+
+Encuestas, sorteos, referidos y bonificaciones dependen del plan del comercio. Si el plan no las incluye, o las incluye pero el comercio no tiene ninguna activa (por ejemplo, ninguna encuesta publicada), esos endpoints responden `403` con `data.code: BUSINESS_FEATURE_NOT_AVAILABLE`.
+
+<Note>
+  No lo trates como un error: es la señal para ocultar esa sección de la app. `GET /external/clients/{clientId}/summary` ya lo resuelve en una llamada, porque cada bloque (`referrals`, `surveys`, `raffles`, etc.) viene en `null` cuando no está disponible. Usalo para decidir qué secciones mostrar.
+</Note>
+
+## Paginación
+
+Los listados devuelven `{ data, meta, links }`. Para pasar a la página siguiente, seguí el valor de `links` que devuelve la API: conserva los filtros que mandaste (por ejemplo `clientId` o `status`). Si armás la URL a mano, acordate de repetirlos todos. Ver [Listados paginados](/api-reference/introduccion#listados-paginados).
+
+## Errores que tu app tiene que manejar
+
+| Caso | Qué hacer |
+| --- | --- |
+| `403` con `BUSINESS_FEATURE_NOT_AVAILABLE` | Ocultá la sección. |
+| `409` al inscribirse en un sorteo (`Ya te inscribiste en este sorteo`, `El sorteo ha llegado al maximo de participantes`) | No hubo inscripción nueva ni se descontaron puntos. Avisale al cliente. |
+| `409` al canjear (puntos insuficientes, cliente suspendido, sin stock, nivel insuficiente) | Mostrá el motivo según el `message`. |
+| `503` al responder una encuesta, inscribirse o canjear | Hay otra operación en curso para ese cliente. No se aplicó nada: reintentá en unos segundos. |
+| `400` en encuestas | Falta una respuesta, una opción no existe, la calificación no es un entero de 1 a 5, ya la respondió, o el cliente está suspendido. |
+
+El detalle de todos los códigos está en [Errores y límites](/api-reference/errores).
+
+## Antes de publicar la app
+
+<Steps>
+  <Step title="Probá contra QA">
+    Usá `https://api-qa.tiendadepuntos.com`. Inscribirse en un sorteo, responder una encuesta o canjear modifican saldos reales de ese entorno.
+  </Step>
+  <Step title="Revisá el control de acceso de tu backend">
+    Probá con dos usuarios distintos que ninguno pueda leer ni operar con el `clientId` del otro.
+  </Step>
+  <Step title="Rotá la key si dudás">
+    Si sospechás que la API key estuvo expuesta, regenerala desde el panel. Ver [Autenticación](/api-reference/autenticacion).
+  </Step>
+</Steps>
